@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "LightIn",
-    "slug": "lightin",
+    "name": "LigHue",
+    "slug": "lighue",
     "privacy": "public",
     "sdkVersion": "32.0.0",
     "platforms": [
