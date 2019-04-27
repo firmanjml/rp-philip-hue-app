@@ -60,3 +60,4 @@ typings/
 # next.js build output
 .next
 hue-app-design/.DS_Store
+lightin/.DS_Store
