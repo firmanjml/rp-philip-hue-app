@@ -34,7 +34,9 @@ export const fetchBridgeIp = (navigate, isManual = false, bridgeip) => (dispatch
                     { cancelable: false }
                 );
             }, 500);
-        })
+        }).then(() => {
+            dispatch(changeLoading(false));
+        });
     } else {
         axios({
             // url: 'https://discovery.meethue.com',
