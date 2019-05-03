@@ -43,7 +43,6 @@ class LinkButtonPage extends React.Component {
       clearInterval(interval);
       console.log("Link button pressed")
       this.props.navigation.navigate("createUserName")
-
     }
   }
 

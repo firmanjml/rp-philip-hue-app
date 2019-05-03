@@ -3,6 +3,6 @@
     "bridgeip": "",
     "username": "",
     "config": {},
-    "groups": {},
-    "lights": {}
+    "groups": [],
+    "lights": []
 }

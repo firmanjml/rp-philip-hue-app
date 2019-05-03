@@ -1,15 +1,14 @@
 import React from 'react';
-import { Text, StyleSheet, View, Button, TextInput, Dimensions } from 'react-native';
+import { Text, StyleSheet, View, Button, TextInput, Dimensions, Alert } from 'react-native';
 import { connect } from 'react-redux';
 import { fetchBridgeIp } from '../../redux/actions';
-import axios from 'axios';
-
-const DEVICE_WIDTH = Dimensions.get('window').width
+import validator from 'validator';
+import Layout from '../../constants/Layout'
 
 const mapDispatchToprops = (dispatch) => {
     return {
-        _setIP(ip) {
-            return () => dispatch(fetchBridgeIp(true, ip));
+        _setIP(navigation, ip) {
+            return dispatch(fetchBridgeIp(navigation, true, ip));
         }
     }
 }
@@ -43,27 +42,25 @@ class ManualIPage extends React.Component {
         console.log(this.state.manualIP)
     }
 
-    checkIP = () => {
-        axios({
-            url: 'http://' + this.state.manualIP + '/api/nouser/config',
-            method: 'GET'
-        }).then((res) => {
-            if (res.data.modelid === "BSB001") {
-                console.log("yey correct")
-                this.submitIP();
-            }
-        }).catch((error) => {
-            console.log(error)
-            alert("Wrong IP. Please re-enter Bridge IP")
-        });
-    }
+    // checkIP = () => {
+    //     axios({
+    //         url: 'http://' + this.state.manualIP + '/api/nouser/config',
+    //         method: 'GET'
+    //     }).then((res) => {
+    //         if (res.data.modelid === "BSB001") {
+    //             console.log("yey correct")
+    //             this.submitIP();
+    //         }
+    //     }).catch((error) => {
+    //         console.log(error)
+    //         alert("Wrong IP. Please re-enter Bridge IP")
+    //     });
+    // }
 
-    submitIP = () => {
-        this.props._setIP(this.state.manualIP)();
-        this.props.navigation.goBack();
-    }
-
-
+    // submitIP = () => {
+    //     this.props._setIP(this.state.manualIP)();
+    //     this.props.navigation.goBack();
+    // }
 
     render() {
         return (
@@ -71,7 +68,7 @@ class ManualIPage extends React.Component {
                 <Text>Set Manual IP</Text>
                 <View style={styles.manualIP}>
                     <TextInput
-                        style={{ height: 40, borderWidth: 1, borderColor: 'gray', width: DEVICE_WIDTH - 100, textAlign: 'center' }}
+                        style={{ height: 40, borderWidth: 1, borderColor: 'gray', width: Layout.window.width - 100, textAlign: 'center' }}
                         keyboardType='numeric'
                         onChangeText={this.changeText}
                         onEndEditing={this.ValidateIPaddress}
@@ -82,8 +79,19 @@ class ManualIPage extends React.Component {
                     <Button
                         title="Search"
                         // disabled={this.state.textDisabled}
-                        onPress={this.checkIP}
-                    />
+                        onPress={() => {
+                            if (validator.isIP(this.state.manualIP, [4])) {
+                                this.props._setIP(this.props.navigation, this.state.manualIP)
+                            } else {
+                                Alert.alert(
+                                    'Invalid IP Format',
+                                    '',
+                                    [{ text: "OK", onPress: () => console.log("OK Pressed") }],
+                                    { cancelable: false }
+                                )
+                            }
+                        }}
+                />
                 </View>
             </View>
         );

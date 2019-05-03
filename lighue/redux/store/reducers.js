@@ -45,7 +45,7 @@ export const config = (state = {}, action) => {
     }
 }
 
-export const groups = (state = {}, action) => {
+export const groups = (state = [], action) => {
     switch(action.type) {
         case C.FETCH_ALL_GROUPS:
             _state = JSON.parse(JSON.stringify(state))
@@ -56,7 +56,7 @@ export const groups = (state = {}, action) => {
     }
 }
 
-export const lights = (state = {}, action) => {
+export const lights = (state = [], action) => {
     switch(action.type) {
         case C.FETCH_ALL_LIGHTS:
             _state = JSON.parse(JSON.stringify(state))
