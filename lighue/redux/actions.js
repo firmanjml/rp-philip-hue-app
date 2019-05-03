@@ -8,27 +8,38 @@ export const changeLoading = (visibility) => ({
     payload: visibility
 })
 
-export const fetchBridgeIp = (bridgeip = '') =>  (dispatch) => {
+export const fetchBridgeIp = (isManual = false, bridgeip) => (dispatch) => {
     dispatch(changeLoading(true));
-    axios({
-        //url: 'https://discovery.meethue.com',
-        url: 'https://api.myjson.com/bins/1eqhrc',
-        method: 'GET'
-    }).then((res) => {
+    if (isManual) {
         dispatch({
             type: C.FETCH_BRIDGE_IP,
-            payload: res.data[0].internalipaddress
-        });
-    }).catch((error) => {
-        dispatch(changeLoading(false));
-        console.log(error)
-    }).then(dispatch(changeLoading(false)));
+            payload: bridgeip
+        })
+        dispatch(changeLoading(false))
+    }
+    else {
+        axios({
+            // url: 'https://discovery.meethue.com',
+            url: 'https://api.myjson.com/bins/1eqhrc',
+            method: 'GET'
+        }).then((res) => {
+            dispatch({
+                type: C.FETCH_BRIDGE_IP,
+                payload: res.data[0].internalipaddress
+            });
+        }).catch((error) => {
+            dispatch(changeLoading(false));
+            console.log(error)
+        }).then(dispatch(changeLoading(false)));
+    }
 }
+
+
 
 export const createUser = (username = '') => (dispatch, getState) => {
     dispatch(changeLoading(true));
     axios({
-        url: `http://${getState().bridgeip}/api/`,
+        url: `http://${getState().bridgeip}/api`,
         method: 'POST',
         data: {
             devicetype: `Lighue#${Constants.deviceName}`

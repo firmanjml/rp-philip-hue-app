@@ -1,10 +1,17 @@
-import React from 'react';
-import { createAppContainer, createSwitchNavigator } from 'react-navigation';
+import { createAppContainer, createStackNavigator } from 'react-navigation';
+import createUserNameScreen from '../screens/viewUserName'
 
-import MainTabNavigator from './MainTabNavigator';
 
-export default createAppContainer(createSwitchNavigator({
-  // You could add another route here for authentication.
-  // Read more at https://reactnavigation.org/docs/en/auth-flow.html
-  Main: MainTabNavigator,
-}));
+const SetupNavigatorApp = createStackNavigator(
+  {
+      createUserName : {screen : createUserNameScreen}
+  },
+  {
+    initialRouteName: "createUserName",
+    headerMode : 'none'
+  }
+);
+
+const SetupNavigator = createAppContainer(SetupNavigatorApp);
+
+export default SetupNavigator;

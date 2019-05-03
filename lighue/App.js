@@ -1,7 +1,7 @@
 import React from 'react';
 import { Platform, StatusBar, StyleSheet, View } from 'react-native';
 import { AppLoading, Asset, Font, Icon } from 'expo';
-import AppNavigator from './navigation/AppNavigator';
+import SwitchNavigator from './navigation/SwitchNavigator';
 import { Provider } from "react-redux";
 import { reduxStore, persistor } from "./redux/store";
 import { PersistGate } from "redux-persist/lib/integration/react";
@@ -13,8 +13,8 @@ export default class App extends React.Component {
   };
 
   render() {
-    // persistor.flush();
-    // persistor.purge();
+    persistor.flush();
+    persistor.purge();
     if (!this.state.isLoadingComplete && !this.props.skipLoadingScreen) {
       return (
         <AppLoading
@@ -29,7 +29,7 @@ export default class App extends React.Component {
           <PersistGate loading={null} persistor={persistor}>
             <View style={styles.container}>
               {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
-              <AppNavigator />
+              <SwitchNavigator />
             </View>
           </PersistGate>
         </Provider>
