@@ -4,7 +4,7 @@ import { persistor } from './store';
 import { Constants } from 'expo';
 import { Alert } from 'react-native';
 
-export const changeLoading = (visibility) => ({
+export const changeLoading = visibility => ({
     type: C.CHANGE_LOADING,
     payload: visibility
 })
@@ -91,10 +91,10 @@ export const fetchConfig = (config = {}) => async (dispatch, getState) => {
     }).then(dispatch(changeLoading(false)));
 }
 
-export const fetchAllGroups = (groups = []) => async (dispatch, getState) => {
+export const fetchAllGroups = (groups = []) => (dispatch, getState) => {
     dispatch(changeLoading(true));
-    await axios({
-        url: `http://${getState().bridgeip}/api/nouser/groups`,
+    axios({
+        url: `http://${getState().bridgeip}/api/${getState().username}/groups`,
         method: 'GET'
     }).then((res) => {
         dispatch({
@@ -107,7 +107,7 @@ export const fetchAllGroups = (groups = []) => async (dispatch, getState) => {
     }).then(dispatch(changeLoading(false)));
 }
 
-export const fetchAllLights = (lights = {}) => async (dispatch, getState) => {
+export const fetchAllLights = (lights = []) => async (dispatch, getState) => {
     dispatch(changeLoading(true));
     await axios({
         url: `http://${getState().bridgeip}/api/${getState().username}/lights`,

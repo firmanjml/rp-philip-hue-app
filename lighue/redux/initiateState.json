@@ -3,6 +3,24 @@
     "bridgeip": "",
     "username": "",
     "config": {},
-    "groups": [],
-    "lights": []
+    "groups": [
+        {
+            "name": "",
+            "action": {},
+            "lights": [],
+            "state": {},
+            "class": ""
+        }
+    ],
+    "lights": [
+        {
+            "state": {},
+            "type": "",
+            "name": "",
+            "modelid": "",
+            "manufacturername": "",
+            "uniqueid": "",
+            "swversion": ""
+        }
+    ]
 }
