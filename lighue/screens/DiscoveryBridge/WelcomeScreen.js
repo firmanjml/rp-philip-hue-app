@@ -129,7 +129,7 @@ WelcomeScreen.defaultProps = {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#34495E' 
+        backgroundColor: theme.colors.background
     },
     stepsContainer: {
         position: 'absolute',
