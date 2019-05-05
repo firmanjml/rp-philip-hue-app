@@ -7,7 +7,7 @@ import TestScreen from '../screens/TestScreen'
 
 const MainNavigator = createStackNavigator(
   {
-    StartPage: { screen: TestScreen },
+    StartPage: { screen: WelcomeScreen },
     LinkButton: { screen: LinkButtonPage},
     ManualIP : {screen : ManualIPScreen }
   },

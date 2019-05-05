@@ -13,54 +13,16 @@ const mapDispatchToprops = (dispatch) => {
     }
 }
 
-
 class ManualIPage extends React.Component {
     state = {
-        textDisabled: true,
         isChecking: false,
         manualIP: ""
     }
-
-    // ValidateIPaddress = () => {
-    //     var ipformat = '^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$';
-    //     var ipaddress = this.state.manualIP;
-    //     console.log(this.state.bridgeip)
-    //     if (ipaddress) {
-    //         if (ipaddress.match(ipformat)) {
-    //             this.setState({ textDisabled: false });
-    //             console.log(this.state.textDisabled)
-    //         }
-    //         else {
-    //             this.setState({ textDisabled: true })
-    //             console.log(this.state.textDisabled)
-    //         }
-    //     }
-    // }
 
     changeText = (value) => {
         this.setState({ manualIP: value })
         console.log(this.state.manualIP)
     }
-
-    // checkIP = () => {
-    //     axios({
-    //         url: 'http://' + this.state.manualIP + '/api/nouser/config',
-    //         method: 'GET'
-    //     }).then((res) => {
-    //         if (res.data.modelid === "BSB001") {
-    //             console.log("yey correct")
-    //             this.submitIP();
-    //         }
-    //     }).catch((error) => {
-    //         console.log(error)
-    //         alert("Wrong IP. Please re-enter Bridge IP")
-    //     });
-    // }
-
-    // submitIP = () => {
-    //     this.props._setIP(this.state.manualIP)();
-    //     this.props.navigation.goBack();
-    // }
 
     render() {
         return (
@@ -78,7 +40,6 @@ class ManualIPage extends React.Component {
                 <View style={styles.searchButton}>
                     <Button
                         title="Search"
-                        // disabled={this.state.textDisabled}
                         onPress={() => {
                             if (validator.isIP(this.state.manualIP, [4])) {
                                 this.props._setIP(this.props.navigation, this.state.manualIP)

@@ -4,6 +4,9 @@
     "slug": "lighue",
     "privacy": "public",
     "sdkVersion": "32.0.0",
+    "androidStatusBar": {
+      "backgroundColor" : "#34495E"
+    },
     "platforms": [
       "ios",
       "android"

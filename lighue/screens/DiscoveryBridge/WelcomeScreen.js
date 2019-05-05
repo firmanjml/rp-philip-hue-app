@@ -21,7 +21,7 @@ export default class WelcomeScreen extends Component {
         // TEST
         setTimeout(() => {
             this.setState({pairBtn: 'Pair'});
-            SnackBar.show('1 new Hue Bridge found', { duration: 8000 });
+            SnackBar.show('1 new Hue Bridge found', { duration: 4000 });
         }, 3000)
     }
 
@@ -87,9 +87,9 @@ export default class WelcomeScreen extends Component {
 
     render() {
         return (
-            <Block>
+            <Block style={styles.container}>
                 <Block center bottom flex={0.4}>
-                    <Text h1 center bold>
+                    <Text h1 center bold style={{color : 'white'}}>
                         Your Smarter Home.
                     </Text>
                     <Text h3 gray2 style={{ marginTop: theme.sizes.padding / 2 }}>
@@ -104,7 +104,7 @@ export default class WelcomeScreen extends Component {
                     <Button gradient>
                         <Text center semibold white>{this.state.pairBtn}</Text>
                     </Button>
-                    <Button shadow>
+                    <Button shadow >
                         <Text center semibold>Manual Search</Text>
                     </Button>
                 </Block>
@@ -128,6 +128,9 @@ WelcomeScreen.defaultProps = {
 }
 
 const styles = StyleSheet.create({
+    container: {
+        backgroundColor: '#34495E' 
+    },
     stepsContainer: {
         position: 'absolute',
         bottom: theme.sizes.base * 3,
