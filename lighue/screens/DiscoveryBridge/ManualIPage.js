@@ -40,6 +40,7 @@ class ManualIPage extends React.Component {
                 <View style={styles.searchButton}>
                     <Button
                         title="Search"
+                        // disabled={this.state.textDisabled}
                         onPress={() => {
                             if (validator.isIP(this.state.manualIP, [4])) {
                                 this.props._setIP(this.props.navigation, this.state.manualIP)

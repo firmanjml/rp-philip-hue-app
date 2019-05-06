@@ -13,7 +13,7 @@ export const fetchBridgeIp = (navigate, isManual = false, bridgeip) => (dispatch
     dispatch(changeLoading(true));
     if (isManual) {
         axios({
-            url: `http://${bridgeip}/api/nouser/config`,
+            url: `http://${bridgeip}/api/newdeveloper/config`,
             method: 'GET'
         }).then((res) => {
             if (res.data.modelid === "BSB001") {
@@ -28,8 +28,8 @@ export const fetchBridgeIp = (navigate, isManual = false, bridgeip) => (dispatch
         }).catch((error) => {
             setTimeout(() => {
                 Alert.alert(
-                    'The IP you specify couldn\'t be reached.',
-                    "",
+                    'IP address you entered cannot be reached',
+                    "Please try again",
                     [{ text: "OK", onPress: () => console.log("OK Pressed") }],
                     { cancelable: false }
                 );

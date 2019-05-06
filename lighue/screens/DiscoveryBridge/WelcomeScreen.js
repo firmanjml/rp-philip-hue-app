@@ -23,6 +23,8 @@ export default class WelcomeScreen extends Component {
             this.setState({pairBtn: 'Pair'});
             SnackBar.show('1 new Hue Bridge found', { duration: 4000 });
         }, 3000)
+        console.log(Layout.window.height)
+        console.log(Layout.window.width)
     }
 
 
@@ -86,6 +88,8 @@ export default class WelcomeScreen extends Component {
     }
 
     render() {
+        const { navigation } = this.props;
+
         return (
             <Block style={styles.container}>
                 <Block center bottom flex={0.4}>
@@ -104,7 +108,7 @@ export default class WelcomeScreen extends Component {
                     <Button gradient>
                         <Text center semibold white>{this.state.pairBtn}</Text>
                     </Button>
-                    <Button shadow >
+                    <Button shadow onPress={() => navigation.navigate('ManualIP')}>
                         <Text center semibold>Manual Search</Text>
                     </Button>
                 </Block>

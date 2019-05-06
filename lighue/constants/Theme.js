@@ -45,6 +45,9 @@ const fonts = {
     },
     caption: {
         fontSize: sizes.caption
+    },
+    paragraph: {
+        fontSize : sizes.font
     }
 }
 
