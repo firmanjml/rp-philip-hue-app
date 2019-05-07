@@ -9,6 +9,15 @@ export const loading = (state = false, action) => {
     }
 }
 
+export const nightmode = (state = false, action) => {
+    if (action.type === C.CHANGE_THEME) {
+        return action.payload;
+    } else {
+        return state
+    }
+}
+
+
 export const bridgeip = (state = '', action) => {
     switch (action.type) {
         case C.FETCH_BRIDGE_IP: 
@@ -73,5 +82,6 @@ export default combineReducers({
     groups,
     lights,
     loading,
-    username
+    username,
+    nightmode
 })

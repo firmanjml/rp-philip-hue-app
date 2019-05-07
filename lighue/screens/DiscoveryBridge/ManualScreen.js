@@ -67,6 +67,9 @@ class ManualScreen extends React.Component {
                             keyboardType="numeric"
                             value={this.state.manualIP}
                             onChangeText={this.changeText}
+                            placeholder={'192.168.1.1'}
+                            placeholderTextColor={theme.colors.gray2}
+                            returnKeyType={'done'}
                         />
                         <Text paragraph gray2 marginTop={10}>
                             Advanced. You can also enter IP address above before starting the search.

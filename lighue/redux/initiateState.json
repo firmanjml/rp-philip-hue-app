@@ -1,5 +1,6 @@
 {
     "loading": false,
+    "nightmode": true,
     "bridgeip": "",
     "username": "",
     "config": {},

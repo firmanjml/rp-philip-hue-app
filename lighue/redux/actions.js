@@ -9,11 +9,11 @@ export const changeLoading = visibility => ({
     payload: visibility
 })
 
-export const fetchBridgeIp = (navigate, isManual = false, bridgeip) => (dispatch) => {
+export const fetchBridgeIp = (navigation, isManual = false, bridgeip) => async (dispatch) => {
     dispatch(changeLoading(true));
     if (isManual) {
-        axios({
-            url: `http://${bridgeip}/api/newdeveloper/config`,
+        await axios({
+            url: `http://${bridgeip}/api/nouser/config`,
             method: 'GET'
         }).then((res) => {
             if (res.data.modelid === "BSB001") {
@@ -21,7 +21,7 @@ export const fetchBridgeIp = (navigate, isManual = false, bridgeip) => (dispatch
                     type: C.FETCH_BRIDGE_IP,
                     payload: bridgeip
                 })
-                navigate.goBack();
+                navigation.navigate('LinkButton');
             } else {
                 throw Error('Invalid IP');
             }
@@ -38,7 +38,7 @@ export const fetchBridgeIp = (navigate, isManual = false, bridgeip) => (dispatch
             dispatch(changeLoading(false));
         });
     } else {
-        axios({
+        await axios({
             // url: 'https://discovery.meethue.com',
             url: 'https://api.myjson.com/bins/1eqhrc',
             method: 'GET'
@@ -65,10 +65,12 @@ export const createUser = (username = '') => (dispatch, getState) => {
             devicetype: `Lighue#${Constants.deviceName}`
         }
     }).then((res) => {
-        dispatch({
-            type: C.FETCH_USERNAME,
-            payload: res.data[0].success.username
-        });
+        if (res.data[0].success) {
+            dispatch({
+                type: C.FETCH_USERNAME,
+                payload: res.data[0].success.username
+            });
+        }
     }).catch((error) => {
         dispatch(changeLoading(false));
         console.log(error);
