@@ -81,7 +81,7 @@ class LinkButtonScreen extends Component {
                     </Block>
                     <Block marginTop={20}>
                         {<Countdown
-                            date={Date.now() + 3000}
+                            date={Date.now() + 30000}
                             intervalDelay={0}
                             precision={3}
                             renderer={this.timer}
