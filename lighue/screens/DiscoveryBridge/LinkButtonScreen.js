@@ -2,7 +2,8 @@ import React, { Component } from 'react'
 import {
     StyleSheet,
     TouchableOpacity,
-    Image
+    Image,
+    Alert
 } from 'react-native';
 import { connect } from 'react-redux';
 import { fetchBridgeIp, createUser } from '../../redux/actions';
@@ -57,7 +58,7 @@ class LinkButtonScreen extends Component {
         if (!completed) {
             return <Text center h1 style={[this.props.style, { color: theme.colors.white, fontFamily: 'space-mono' }]}>{seconds} seconds</Text>;
         } else {
-            return <Text>Easter egg :D</Text>;
+            return <Text center h1 style={[this.props.style, { color: theme.colors.white, fontFamily: 'space-mono' }]}>No device link.</Text>;
         }
     };
 
@@ -80,11 +81,20 @@ class LinkButtonScreen extends Component {
                     </Block>
                     <Block marginTop={20}>
                         {<Countdown
-                            date={Date.now() + 30000}
+                            date={Date.now() + 3000}
                             intervalDelay={0}
                             precision={3}
                             renderer={this.timer}
-                            onComplete={() => this.props.navigation.goBack()}
+                            onComplete={() => {
+                                Alert.alert(
+                                    'No Bridge was found.',
+                                    '',
+                                    [{ text: "OK", onPress: () => {
+                                        this.props.navigation.goBack();
+                                    } }],
+                                    { cancelable: false }
+                                )
+                            }}
                             onTick={() => {
                                 this.createUsername();
                             }}
@@ -119,4 +129,4 @@ const styles = StyleSheet.create({
 export default connect(
     mapStateToProps,
     mapDispatchToprops
-  )(LinkButtonScreen);
+)(LinkButtonScreen);
