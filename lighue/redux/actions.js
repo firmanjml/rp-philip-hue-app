@@ -7,7 +7,7 @@ import { Alert } from 'react-native';
 export const changeLoading = visibility => ({
     type: C.CHANGE_LOADING,
     payload: visibility
-})
+});
 
 export const fetchBridgeIp = (navigation, isManual = false, bridgeip) => async (dispatch) => {
     dispatch(changeLoading(true));
@@ -54,9 +54,9 @@ export const fetchBridgeIp = (navigation, isManual = false, bridgeip) => async (
             dispatch(changeLoading(false));
         });
     }
-}
+};
 
-export const createUser = (username = '') => (dispatch, getState) => {
+export const createUser = (dispatch, getState) => {
     dispatch(changeLoading(true));
     axios({
         url: `http://${getState().bridgeip}/api`,
@@ -75,9 +75,9 @@ export const createUser = (username = '') => (dispatch, getState) => {
         dispatch(changeLoading(false));
         console.log(error);
     }).then(dispatch(changeLoading(false)));
-}
+};
 
-export const fetchConfig = (config = {}) => async (dispatch, getState) => {
+export const fetchConfig = async (dispatch, getState) => {
     dispatch(changeLoading(true));
     await axios({
         url: `http://${getState().bridgeip}/api/${getState().username}/config`,
@@ -91,9 +91,35 @@ export const fetchConfig = (config = {}) => async (dispatch, getState) => {
         dispatch(changeLoading(false));
         console.log(error);
     }).then(dispatch(changeLoading(false)));
-}
+};
 
-export const fetchAllGroups = (groups = []) => (dispatch, getState) => {
+export const addGroup = (groupData) => (dispatch, getState) => {
+    dispatch(changeLoading(true));
+    axios({
+        url: `http://${getState().bridgeip}/api/${getState().username}/groups`,
+        method: 'POST',
+        data: groupData
+    }).then(res => {
+        if (res.data[0].success) {
+            dispatch({
+                type: C.CREATE_GROUP,
+                payload: {
+                    "name": groupData.name,
+                    "lights": groupData.lights,
+                    "type": groupData.type,
+                    "action": null
+                }
+            })
+        } else {
+            throw Error('Can\'t create a room.');
+        }
+    }).catch((error) => {
+        dispatch(changeLoading(false));
+        console.log(error);
+    }).then(dispatch(changeLoading(false)));
+};
+
+export const fetchAllGroups = (dispatch, getState) => {
     dispatch(changeLoading(true));
     axios({
         url: `http://${getState().bridgeip}/api/${getState().username}/groups`,
@@ -107,7 +133,55 @@ export const fetchAllGroups = (groups = []) => (dispatch, getState) => {
         dispatch(changeLoading(false));
         console.log(error);
     }).then(dispatch(changeLoading(false)));
-}
+};
+
+export const changeGroupStateByID = (groupID, groupData) => (dispatch, getState) => {
+    dispatch(changeLoading(true));
+    axios({
+        url: `http://${getState().bridgeip}/api/${getState().username}/groups/${groupID}/action`,
+        method: 'PUT',
+        data: groupData
+    }).then(res => {
+        var payload = {};
+        res.data.map((data) => {
+            let key = Object.keys(data.success)[0].substring(Object.keys(data.success)[0].lastIndexOf('/') + 1);
+            let value = Object.values(data.success)[0];
+            payload[key] = value;
+        })
+        if (payload) {
+            dispatch({
+                type: C.CHANGE_GROUP,
+                id: groupID,
+                payload: payload
+            })
+        } else {
+            throw Error('An error has occur');
+        }
+    }).catch((error) => {
+        dispatch(changeLoading(false));
+        console.log(error);
+    }).then(dispatch(changeLoading(false)));
+};
+
+export const deleteGroupByID = (groupID) => (dispatch, getState) => {
+    dispatch(changeLoading(true));
+    axios({
+        url: `http://${getState().bridgeip}/api/${getState().username}/groups/${groupID}`,
+        method: 'DELETE'
+    }).then((res) => {
+        if (res.data[0].success) {
+            dispatch({
+                type: C.DELETE_GROUP,
+                payload: groupID
+            })
+        } else {
+            throw Error('An error has occur')
+        }
+    }).catch((error) => {
+        dispatch(changeLoading(false));
+        console.log(error);
+    }).then(dispatch(changeLoading(false)));
+};
 
 export const fetchAllLights = (lights = []) => async (dispatch, getState) => {
     dispatch(changeLoading(true));
@@ -123,4 +197,4 @@ export const fetchAllLights = (lights = []) => async (dispatch, getState) => {
         dispatch(changeLoading(false));
         console.log(error);
     }).then(dispatch(changeLoading(false)));
-}
+};
