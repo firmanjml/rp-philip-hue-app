@@ -82,8 +82,8 @@ class LinkButtonScreen extends Component {
                     <Block marginTop={20}>
                         {<Countdown
                             date={Date.now() + 30000}
-                            intervalDelay={0}
-                            precision={3}
+                            intervalDelay={1000}
+                            precision={0}
                             renderer={this.timer}
                             onComplete={() => {
                                 Alert.alert(
