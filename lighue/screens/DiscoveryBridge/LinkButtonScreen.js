@@ -50,7 +50,7 @@ class LinkButtonScreen extends Component {
             console.log("Link button not pressed!")
         } else {
             console.log("Link button pressed")
-            this.props.navigation.navigate("createUserName")
+            this.props.navigation.navigate("SplashPage")
         }
     }
 

@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   light: {
-    fontWeight: "200",
+    fontWeight: "100",
   },
   // position
   center: { textAlign: "center" },
