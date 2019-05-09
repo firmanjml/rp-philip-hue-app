@@ -54,9 +54,9 @@ export const fetchBridgeIp = (navigation, isManual = false, bridgeip) => async (
             dispatch(changeLoading(false));
         });
     }
-};
+}
 
-export const createUser = (dispatch, getState) => {
+export const createUser = () => (dispatch, getState) => {
     dispatch(changeLoading(true));
     axios({
         url: `http://${getState().bridgeip}/api`,

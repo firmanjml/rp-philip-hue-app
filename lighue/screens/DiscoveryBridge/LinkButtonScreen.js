@@ -83,7 +83,6 @@ class LinkButtonScreen extends Component {
                         {<Countdown
                             date={Date.now() + 30000}
                             intervalDelay={1000}
-                            precision={0}
                             renderer={this.timer}
                             onComplete={() => {
                                 Alert.alert(
