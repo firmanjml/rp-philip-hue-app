@@ -46,7 +46,7 @@ class LinkButtonScreen extends Component {
 
     createUsername = () => {
         if (!this.props.username) {
-            this.props._createUser()()
+            this.props._createUser()
             console.log("Link button not pressed!")
         } else {
             console.log("Link button pressed")
