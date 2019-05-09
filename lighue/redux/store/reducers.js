@@ -70,7 +70,7 @@ export const groups = (state = [], action) => {
             return _state;
         case C.DELETE_GROUP:
             _state = JSON.parse(JSON.stringify(state));
-            _state.slice(action.payload);
+            _state.slice(action.payload, 1);
             return _state;
         default:
             return state;
