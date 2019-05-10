@@ -111,13 +111,13 @@ class WelcomeScreen extends Component {
     renderPairBtn() {
         if (this.props.bridgeip) {
             return (
-                <Button gradient onPress={() => this.props.navigation.navigate('LinkButton')}>
+                <Button gradient disabled={false} onPress={() => this.props.navigation.navigate('LinkButton')}>
                     <Text center semibold white>{this.state.pairBtn}</Text>
                 </Button>
             )
         } else {
             return (
-                <Button shadow>
+                <Button shadow disabled={true}>
                     <Text center semibold>Searching....</Text>
                 </Button>
             )
