@@ -39,8 +39,8 @@ export const fetchBridgeIp = (navigation, isManual = false, bridgeip) => async (
         });
     } else {
         await axios({
-            url: 'https://discovery.meethue.com',
-            // url: 'https://api.myjson.com/bins/1eqhrc',
+            // url: 'https://discovery.meethue.com',
+            url: 'https://api.myjson.com/bins/1eqhrc',
             method: 'GET'
         }).then((res) => {
             dispatch({
@@ -65,7 +65,6 @@ export const createUser = () => (dispatch, getState) => {
             devicetype: `Lighue#${Constants.deviceName}`
         }
     }).then((res) => {
-        console.log(res.data)
         if (res.data[0].success) {
             dispatch({
                 type: C.FETCH_USERNAME,
@@ -104,11 +103,12 @@ export const addGroup = (groupData) => (dispatch, getState) => {
         if (res.data[0].success) {
             dispatch({
                 type: C.CREATE_GROUP,
+                id: res.data[0].success.id,
                 payload: {
                     "name": groupData.name,
                     "lights": groupData.lights,
                     "type": groupData.type,
-                    "action": null
+                    "action": {}
                 }
             })
         } else {
@@ -128,8 +128,29 @@ export const fetchAllGroups = (dispatch, getState) => {
     }).then((res) => {
         dispatch({
             type: C.FETCH_ALL_GROUPS,
-            payload: Object.values(res.data)
+            payload: res.data
         })
+    }).catch((error) => {
+        dispatch(changeLoading(false));
+        console.log(error);
+    }).then(dispatch(changeLoading(false)));
+};
+
+export const getGroupStateByID = (groupID) => (dispatch, getState) => {
+    dispatch(changeLoading(true));
+    axios({
+        url: `http://${getState().bridgeip}/api/${getState().username}/groups/${groupID}`,
+        method: 'GET',
+    }).then(res => {
+        if (res.data) {
+            dispatch({
+                type: C.FETCH_GROUP,
+                id: groupID,
+                payload: payload
+            })
+        } else {
+            throw Error('An error has occur');
+        }
     }).catch((error) => {
         dispatch(changeLoading(false));
         console.log(error);
@@ -200,7 +221,7 @@ export const fetchAllLights = (lights = []) => async (dispatch, getState) => {
     }).then(dispatch(changeLoading(false)));
 };
 
-export const fetchLights = (lampID) => async (dispatch, getState) => {
+export const fetchLight = (lampID) => async (dispatch, getState) => {
     dispatch(changeLoading(true));
     await axios({
         url: `http://${getState().bridgeip}/api/${getState().username}/lights/${lampID}`,

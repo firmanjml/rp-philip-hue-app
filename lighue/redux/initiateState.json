@@ -1,27 +1,27 @@
 {
-    "loading": false,
-    "nightmode": true,
-    "bridgeip": "",
-    "username": "",
-    "config": {},
-    "groups": [
-        {
-            "name": "",
-            "action": {},
-            "lights": [],
-            "state": {},
-            "class": ""
-        }
-    ],
-    "lights": [
-        {
-            "state": {},
-            "type": "",
-            "name": "",
-            "modelid": "",
-            "manufacturername": "",
-            "uniqueid": "",
-            "swversion": ""
-        }
-    ]
+  "loading": false,
+  "nightmode": true,
+  "bridgeip": "",
+  "username": "",
+  "config": {},
+  "groups": {
+    "1": {
+      "name": "",
+      "action": {},
+      "lights": [],
+      "state": {},
+      "class": ""
+    }
+  },
+  "lights": {
+    "1": {
+      "state": {},
+      "type": "",
+      "name": "",
+      "modelid": "",
+      "manufacturername": "",
+      "uniqueid": "",
+      "swversion": ""
+    }
+  }
 }
