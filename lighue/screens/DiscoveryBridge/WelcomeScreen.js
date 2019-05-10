@@ -133,7 +133,7 @@ class WelcomeScreen extends Component {
                         Your Smarter Home.
                     </Text>
                     <Text h3 gray2 style={{ marginTop: theme.sizes.padding / 2 }}>
-                        Enjoy the experience.
+                        {this.props.bridgeip}
                     </Text>
                 </Block>
                 <Block center middle>
