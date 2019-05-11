@@ -6,6 +6,8 @@ import { Provider } from "react-redux";
 import { reduxStore, persistor } from "./redux/store";
 import { PersistGate } from "redux-persist/lib/integration/react";
 
+import Test from './screens/TestScreen';
+
 
 export default class App extends React.Component {
   state = {
@@ -29,7 +31,8 @@ export default class App extends React.Component {
           <PersistGate loading={null} persistor={persistor}>
             <View style={styles.container}>
               {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
-              <SwitchNavigator />
+              {/* <SwitchNavigator /> */}
+              <Test />
             </View>
           </PersistGate>
         </Provider>

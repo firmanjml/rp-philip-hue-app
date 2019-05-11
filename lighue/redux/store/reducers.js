@@ -81,19 +81,19 @@ export const groups = (state = {}, action) => {
     }
 }
 
-export const lights = (state = [], action) => {
+export const lights = (state = {}, action) => {
     switch (action.type) {
         case C.FETCH_ALL_LIGHTS:
             _state = JSON.parse(JSON.stringify(state));
             _state = action.payload;
             return _state;
-        case C.FETCH_LIGHT:
-            _state = JSON.parse(JSON.stringify(state));
-            _state[action.id] = action.payload;
-            return _state;
         case C.CHANGE_LIGHT_STATE:
             _state = JSON.parse(JSON.stringify(state));
-            _state[action.id] = action.payload;
+            _state[action.id].state = action.payload;
+            return _state;
+        case C.DELETE_LIGHT:
+            _state = JSON.parse(JSON.stringify(state));
+            delete _state[payload]
             return _state;
         default:
             return state;

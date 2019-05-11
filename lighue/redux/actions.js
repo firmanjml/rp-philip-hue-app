@@ -205,9 +205,9 @@ export const deleteGroupByID = (groupID) => (dispatch, getState) => {
     }).then(dispatch(changeLoading(false)));
 };
 
-export const fetchAllLights = (lights = []) => async (dispatch, getState) => {
+export const fetchAllLights = (dispatch, getState) => {
     dispatch(changeLoading(true));
-    await axios({
+    axios({
         url: `http://${getState().bridgeip}/api/${getState().username}/lights`,
         method: 'GET'
     }).then((res) => {
@@ -221,21 +221,6 @@ export const fetchAllLights = (lights = []) => async (dispatch, getState) => {
     }).then(dispatch(changeLoading(false)));
 };
 
-export const fetchLight = (lampID) => async (dispatch, getState) => {
-    dispatch(changeLoading(true));
-    await axios({
-        url: `http://${getState().bridgeip}/api/${getState().username}/lights/${lampID}`,
-        method: 'GET'
-    }).then((res) => {
-        dispatch({
-            type: C.FETCH_LIGHTS,
-            payload: res.data
-        })
-    }).catch((error) => {
-        dispatch(changeLoading(false));
-        console.log(error);
-    }).then(dispatch(changeLoading(false)));
-};
 
 export const changeLampStateByID = (lampID, lampData) => (dispatch, getState) => {
     dispatch(changeLoading(true));
@@ -244,9 +229,36 @@ export const changeLampStateByID = (lampID, lampData) => (dispatch, getState) =>
         method: 'PUT',
         data: lampData
     }).then(res => {
-        if (res.data[0].success) {
+        var payload = {};
+        res.data.map((data) => {
+            let key = Object.keys(data.success)[0].substring(Object.keys(data.success)[0].lastIndexOf('/') + 1);
+            let value = Object.values(data.success)[0];
+            payload[key] = value;
+        })
+        if (payload) {
             dispatch({
                 type: C.CHANGE_LIGHT_STATE,
+                id: lampID,
+                payload: payload
+            })
+        } else {
+            throw Error('An error has occur');
+        }
+    }).catch((error) => {
+        dispatch(changeLoading(false));
+        console.log(error);
+    }).then(dispatch(changeLoading(false)));
+};
+
+export const deleteLampByID = (lampID) => (dispatch, getState) => {
+    dispatch(changeLoading(true));
+    axios({
+        url: `http://${getState().bridgeip}/api/${getState().username}/lights/${lampID}`,
+        method: 'DELETE'
+    }).then((res) => {
+        if (res.data[0].success) {
+            dispatch({
+                type: C.DELETE_LIGHT,
                 payload: lampID
             })
         } else {
