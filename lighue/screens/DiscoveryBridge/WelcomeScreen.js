@@ -7,21 +7,6 @@ import SnackBar from 'rn-snackbar';
 import { connect } from 'react-redux';
 import { GetBridgeIP } from '../../redux/actions';
 
-const mapStateToProps = state => {
-    return {
-        loading: state.loading,
-        bridgeip: state.bridgeip
-    }
-}
-
-const mapDispatchToprops = (dispatch) => {
-    return {
-        _GetBridgeIP() {
-            return () => dispatch(GetBridgeIP());
-        }
-    }
-}
-
 class WelcomeScreen extends Component {
     static navigationOptions = {
         header: null
@@ -41,7 +26,7 @@ class WelcomeScreen extends Component {
         // }, 3000)
         // console.log(Layout.window.height)
         // console.log(Layout.window.width)
-        await this.props._GetBridgeIP()();
+        await this.props._GetBridgeIP();
         if (this.props.bridgeip) {
             SnackBar.show('New Hue Bridge Found!', { duration: 4000 });
             this.setState({ pairBtn: 'Pair now' });
@@ -132,7 +117,7 @@ class WelcomeScreen extends Component {
                         Your Smarter Home.
                     </Text>
                     <Text h3 gray2 style={{ marginTop: theme.sizes.padding / 2 }}>
-                        {this.props.bridgeip}
+                        Enjoy the experience
                     </Text>
                 </Block>
                 <Block center middle>
@@ -164,6 +149,21 @@ WelcomeScreen.defaultProps = {
     ]
 }
 
+const mapStateToProps = (state) => {
+    return {
+        loading: state.loading,
+        bridgeip: state.bridgeip
+    }
+}
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        _GetBridgeIP() {
+            return dispatch(GetBridgeIP());
+        }
+    }
+}
+
 const styles = StyleSheet.create({
     container: {
         backgroundColor: theme.colors.background
@@ -182,4 +182,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default connect(mapStateToProps, mapDispatchToprops)(WelcomeScreen);
+export default connect(mapStateToProps, mapDispatchToProps)(WelcomeScreen);

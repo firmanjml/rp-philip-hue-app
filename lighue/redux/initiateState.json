@@ -7,7 +7,9 @@
   "groups": {
     "1": {
       "name": "",
-      "action": {},
+      "action": {
+        "on": false
+      },
       "lights": [],
       "state": {},
       "class": ""
@@ -15,7 +17,9 @@
   },
   "lights": {
     "1": {
-      "state": {},
+      "state": {
+        "on": false
+      },
       "type": "",
       "name": "",
       "modelid": "",

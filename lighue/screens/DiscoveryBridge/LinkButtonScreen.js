@@ -6,25 +6,10 @@ import {
     Alert
 } from 'react-native';
 import { connect } from 'react-redux';
-import { GetBridgeIP, CreateUser } from '../../redux/actions';
+import { CreateUser } from '../../redux/actions';
 import { theme } from '../../constants';
 import { Block, Text } from '../../components';
 import Countdown from 'react-countdown-now';
-
-const mapStateToProps = state => {
-    return {
-        bridgeip: state.bridgeip,
-        username: state.username
-    }
-}
-
-const mapDispatchToprops = (dispatch, ownProps) => {
-    return {
-        _CreateUser() {
-            return () => dispatch(CreateUser());
-        }
-    }
-}
 
 class LinkButtonScreen extends Component {
     static navigationOptions = ({ navigation }) => {
@@ -42,10 +27,10 @@ class LinkButtonScreen extends Component {
 
     createUsername = () => {
         if (!this.props.username) {
-            this.props._CreateUser()()
-            console.log("Link button not pressed!")
+            this.props._CreateUser();
+            console.log("Link button not pressed!");
         } else {
-            console.log("Link button pressed")
+            console.log("Link button pressed");
             this.props.navigation.navigate("SplashPage")
         }
     }
@@ -108,6 +93,21 @@ class LinkButtonScreen extends Component {
     }
 }
 
+const mapStateToProps = (state) => {
+    return {
+        bridgeip: state.bridgeip,
+        username: state.username
+    }
+}
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        _CreateUser() {
+            return dispatch(CreateUser());
+        }
+    }
+}
+
 const styles = StyleSheet.create({
     container: {
         backgroundColor: theme.colors.background,
@@ -123,7 +123,8 @@ const styles = StyleSheet.create({
         paddingBottom: 10
     }
 });
+
 export default connect(
     mapStateToProps,
-    mapDispatchToprops
+    mapDispatchToProps
 )(LinkButtonScreen);

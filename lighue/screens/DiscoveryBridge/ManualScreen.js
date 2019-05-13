@@ -7,14 +7,6 @@ import Layout from '../../constants/Layout';
 import { Button, Block, Text, Input } from '../../components';
 import { theme } from '../../constants';
 
-const mapDispatchToprops = (dispatch) => {
-    return {
-        _setIP(navigation, ip) {
-            return dispatch(GetBridgeIP(navigation, true, ip));
-        }
-    }
-}
-
 class ManualScreen extends React.Component {
     static navigationOptions = ({ navigation }) => {
         return {
@@ -97,6 +89,14 @@ class ManualScreen extends React.Component {
     }
 }
 
+const mapDispatchToProps = (dispatch) => {
+    return {
+        _setIP(navigation, ip) {
+            return dispatch(GetBridgeIP(navigation, true, ip));
+        }
+    }
+}
+
 const styles = StyleSheet.create({
     container: {
         backgroundColor: theme.colors.background,
@@ -113,4 +113,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default connect(null, mapDispatchToprops)(ManualScreen);
+export default connect(mapDispatchToProps)(ManualScreen);

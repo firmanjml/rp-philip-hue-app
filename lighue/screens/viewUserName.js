@@ -3,12 +3,6 @@ import { Text, StyleSheet, View, Button } from 'react-native';
 import { connect } from 'react-redux';
 import { Constants } from 'expo';
 
-const mapStateToProps = state => {
-    return {
-        username: state.username
-    }
-}
-
 class viewUserName extends React.Component {
     render() {
         const { navigate } = this.props.navigation;
@@ -16,8 +10,14 @@ class viewUserName extends React.Component {
             <View style={styles.container}>
                 <Text>{this.props.username}</Text>
                 <Text>{Constants.deviceName}</Text>
-            </View >
+            </View>
         );
+    }
+}
+
+const mapStateToProps = state => {
+    return {
+        username: state.username
     }
 }
 
@@ -35,4 +35,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default connect(mapStateToProps, null)(viewUserName);
+export default connect(mapStateToProps)(viewUserName);
