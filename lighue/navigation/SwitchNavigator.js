@@ -3,17 +3,22 @@ import DiscoveryNavigatorScreen from '../navigation/DiscoveryNavigator';
 import AppNavigator from './AppNavigator';
 import SplashNavigator from './SplashNavigator';
 
-
 const SwitchNavigator = createSwitchNavigator(
   {
-    DiscoveryNavigator: {screen: DiscoveryNavigatorScreen},
-    AppNavigator: {screen : AppNavigator},
-    SplashNavigator: {screen : SplashNavigator}
-    
+    DiscoveryNavigator: {
+      screen: DiscoveryNavigatorScreen
+    },
+    AppNavigator: {
+      screen: AppNavigator
+    },
+    SplashNavigator: {
+      screen: SplashNavigator
+    }
+
   },
   {
     initialRouteName: "DiscoveryNavigator",
-    headerMode : 'none'
+    headerMode: 'none'
   }
 );
 

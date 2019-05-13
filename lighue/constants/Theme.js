@@ -1,6 +1,6 @@
 const colors = {
     accent: '#F3534A',
-    background : '#34495E', 
+    background: '#34495E',
     primary: '#0AC4BA',
     secondary: '#2BDA8E',
     tertiary: '#FFE358',
@@ -47,7 +47,7 @@ const fonts = {
         fontSize: sizes.caption
     },
     paragraph: {
-        fontSize : sizes.font
+        fontSize: sizes.font
     }
 }
 

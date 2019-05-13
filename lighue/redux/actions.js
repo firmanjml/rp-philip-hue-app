@@ -1,15 +1,27 @@
 import C from './constants';
 import axios from 'axios';
-import { persistor } from './store';
 import { Constants } from 'expo';
 import { Alert } from 'react-native';
 
+/** 
+ * changeLoading
+ * * Change loading state before rendering the information to screen.
+ * @param {boolean} visibility This paramter takes in boolean data
+*/
 export const changeLoading = visibility => ({
     type: C.CHANGE_LOADING,
     payload: visibility
 });
 
-export const fetchBridgeIp = (navigation, isManual = false, bridgeip) => async (dispatch) => {
+/** 
+ * GetBridgeIP
+ * * Discover Bridge IP through NUPNP or set manual IP
+ * * https://developers.meethue.com/develop/get-started-2/
+ * @param {object} navigation This paramter takes in navigation props
+ * @param {boolean} isManual This paramter takes in boolean data
+ * @param {string} bridgeip This paramter takes in the bridge ip address if 'isManual' is true.
+*/
+export const GetBridgeIP = (navigation, isManual = false, bridgeip = '') => async (dispatch) => {
     dispatch(changeLoading(true));
     if (isManual) {
         await axios({
@@ -56,156 +68,12 @@ export const fetchBridgeIp = (navigation, isManual = false, bridgeip) => async (
     }
 }
 
-export const createUser = () => (dispatch, getState) => {
-    dispatch(changeLoading(true));
-    axios({
-        url: `http://${getState().bridgeip}/api`,
-        method: 'POST',
-        data: {
-            devicetype: `Lighue#${Constants.deviceName}`
-        }
-    }).then((res) => {
-        if (res.data[0].success) {
-            dispatch({
-                type: C.FETCH_USERNAME,
-                payload: res.data[0].success.username
-            });
-        }
-    }).catch((error) => {
-        dispatch(changeLoading(false));
-        console.log(error);
-    }).then(dispatch(changeLoading(false)));
-};
-
-export const fetchConfig = async (dispatch, getState) => {
-    dispatch(changeLoading(true));
-    await axios({
-        url: `http://${getState().bridgeip}/api/${getState().username}/config`,
-        method: 'GET'
-    }).then((res) => {
-        dispatch({
-            type: C.FETCH_CONFIG,
-            payload: res.data
-        })
-    }).catch((error) => {
-        dispatch(changeLoading(false));
-        console.log(error);
-    }).then(dispatch(changeLoading(false)));
-};
-
-export const addGroup = (groupData) => (dispatch, getState) => {
-    dispatch(changeLoading(true));
-    axios({
-        url: `http://${getState().bridgeip}/api/${getState().username}/groups`,
-        method: 'POST',
-        data: groupData
-    }).then(res => {
-        if (res.data[0].success) {
-            dispatch({
-                type: C.CREATE_GROUP,
-                id: res.data[0].success.id,
-                payload: {
-                    "name": groupData.name,
-                    "lights": groupData.lights,
-                    "type": groupData.type,
-                    "action": {}
-                }
-            })
-        } else {
-            throw Error('Can\'t create a room.');
-        }
-    }).catch((error) => {
-        dispatch(changeLoading(false));
-        console.log(error);
-    }).then(dispatch(changeLoading(false)));
-};
-
-export const fetchAllGroups = (dispatch, getState) => {
-    dispatch(changeLoading(true));
-    axios({
-        url: `http://${getState().bridgeip}/api/${getState().username}/groups`,
-        method: 'GET'
-    }).then((res) => {
-        dispatch({
-            type: C.FETCH_ALL_GROUPS,
-            payload: res.data
-        })
-    }).catch((error) => {
-        dispatch(changeLoading(false));
-        console.log(error);
-    }).then(dispatch(changeLoading(false)));
-};
-
-export const getGroupStateByID = (groupID) => (dispatch, getState) => {
-    dispatch(changeLoading(true));
-    axios({
-        url: `http://${getState().bridgeip}/api/${getState().username}/groups/${groupID}`,
-        method: 'GET',
-    }).then(res => {
-        if (res.data) {
-            dispatch({
-                type: C.FETCH_GROUP,
-                id: groupID,
-                payload: payload
-            })
-        } else {
-            throw Error('An error has occur');
-        }
-    }).catch((error) => {
-        dispatch(changeLoading(false));
-        console.log(error);
-    }).then(dispatch(changeLoading(false)));
-};
-
-export const changeGroupStateByID = (groupID, groupData) => (dispatch, getState) => {
-    dispatch(changeLoading(true));
-    axios({
-        url: `http://${getState().bridgeip}/api/${getState().username}/groups/${groupID}/action`,
-        method: 'PUT',
-        data: groupData
-    }).then(res => {
-        var payload = {};
-        res.data.map((data) => {
-            let key = Object.keys(data.success)[0].substring(Object.keys(data.success)[0].lastIndexOf('/') + 1);
-            let value = Object.values(data.success)[0];
-            payload[key] = value;
-        })
-        if (payload) {
-            dispatch({
-                type: C.CHANGE_GROUP_STATE,
-                id: groupID,
-                payload: payload
-            })
-        } else {
-            throw Error('An error has occur');
-        }
-    }).catch((error) => {
-        dispatch(changeLoading(false));
-        console.log(error);
-    }).then(dispatch(changeLoading(false)));
-};
-
-export const deleteGroupByID = (groupID) => (dispatch, getState) => {
-    dispatch(changeLoading(true));
-    axios({
-        url: `http://${getState().bridgeip}/api/${getState().username}/groups/${groupID}`,
-        method: 'DELETE'
-    }).then((res) => {
-        if (res.data[0].success) {
-            dispatch({
-                type: C.DELETE_GROUP,
-                payload: groupID
-            })
-        } else {
-            throw Error('An error has occur')
-        }
-    }).catch((error) => {
-        dispatch(changeLoading(false));
-        console.log(error);
-    }).then(dispatch(changeLoading(false)));
-};
-
-export const fetchAllLights = (dispatch, getState) => {
+/** 
+ * GetAllLights
+ * * Document 1.1 Get All Light
+ * * https://developers.meethue.com/develop/hue-api/lights-api/#get-all-lights
+*/
+export const GetAllLights = (dispatch, getState) => {
     dispatch(changeLoading(true));
     axios({
         url: `http://${getState().bridgeip}/api/${getState().username}/lights`,
@@ -221,8 +89,14 @@ export const fetchAllLights = (dispatch, getState) => {
     }).then(dispatch(changeLoading(false)));
 };
 
-
-export const changeLampStateByID = (lampID, lampData) => (dispatch, getState) => {
+/** 
+ * SetLampState
+ * * Document 1.6 Set Light State
+ * * https://developers.meethue.com/develop/hue-api/lights-api/#set-light-state
+ * @param {number} lampID This paramter takes in the light ID.
+ * @param {object} lampData This paramter takes in the body argument of the request.
+*/
+export const SetLampState = (lampID, lampData) => (dispatch, getState) => {
     dispatch(changeLoading(true));
     axios({
         url: `http://${getState().bridgeip}/api/${getState().username}/lights/${lampID}/state`,
@@ -250,7 +124,13 @@ export const changeLampStateByID = (lampID, lampData) => (dispatch, getState) =>
     }).then(dispatch(changeLoading(false)));
 };
 
-export const deleteLampByID = (lampID) => (dispatch, getState) => {
+/** 
+ * DeleteLight
+ * * Document 1.7. Delete lights
+ * * https://developers.meethue.com/develop/hue-api/lights-api/#del-lights
+ * @param {number} lampID This paramter takes in the light ID.
+*/
+export const DeleteLight = (lampID) => (dispatch, getState) => {
     dispatch(changeLoading(true));
     axios({
         url: `http://${getState().bridgeip}/api/${getState().username}/lights/${lampID}`,
@@ -264,6 +144,195 @@ export const deleteLampByID = (lampID) => (dispatch, getState) => {
         } else {
             throw Error('An error has occur')
         }
+    }).catch((error) => {
+        dispatch(changeLoading(false));
+        console.log(error);
+    }).then(dispatch(changeLoading(false)));
+};
+
+/** 
+ * GetAllGroups
+ * * Document 2.1. Get all groups
+ * * https://developers.meethue.com/develop/hue-api/groupds-api/#get-all-groups
+*/
+export const GetAllGroups = (dispatch, getState) => {
+    dispatch(changeLoading(true));
+    axios({
+        url: `http://${getState().bridgeip}/api/${getState().username}/groups`,
+        method: 'GET'
+    }).then((res) => {
+        dispatch({
+            type: C.FETCH_ALL_GROUPS,
+            payload: res.data
+        })
+    }).catch((error) => {
+        dispatch(changeLoading(false));
+        console.log(error);
+    }).then(dispatch(changeLoading(false)));
+};
+
+/** 
+ * CreateGroup
+ * * Document 2.2. Create group
+ * * https://developers.meethue.com/develop/hue-api/groupds-api/#create-group
+ * @param {object} groupData This paramter takes in the body argument of the request.
+*/
+export const CreateGroup = (groupData) => (dispatch, getState) => {
+    dispatch(changeLoading(true));
+    axios({
+        url: `http://${getState().bridgeip}/api/${getState().username}/groups`,
+        method: 'POST',
+        data: groupData
+    }).then(res => {
+        if (res.data[0].success) {
+            dispatch({
+                type: C.CREATE_GROUP,
+                id: res.data[0].success.id,
+                payload: {
+                    "name": groupData.name,
+                    "lights": groupData.lights,
+                    "type": groupData.type,
+                    "action": {}
+                }
+            })
+        } else {
+            throw Error('Can\'t create a room.');
+        }
+    }).catch((error) => {
+        dispatch(changeLoading(false));
+        console.log(error);
+    }).then(dispatch(changeLoading(false)));
+};
+
+/** 
+ * GetGroupAtrributes
+ * * Document 2.3. Get group attributes
+ * * https://developers.meethue.com/develop/hue-api/groupds-api/#get-group-attr
+ * @param {number} groupID This paramter takes in the group ID.
+*/
+export const GetGroupAtrributes = (groupID) => (dispatch, getState) => {
+    dispatch(changeLoading(true));
+    axios({
+        url: `http://${getState().bridgeip}/api/${getState().username}/groups/${groupID}`,
+        method: 'GET',
+    }).then(res => {
+        if (res.data) {
+            dispatch({
+                type: C.FETCH_GROUP,
+                id: groupID,
+                payload: payload
+            })
+        } else {
+            throw Error('An error has occur');
+        }
+    }).catch((error) => {
+        dispatch(changeLoading(false));
+        console.log(error);
+    }).then(dispatch(changeLoading(false)));
+};
+
+/** 
+ * SetGroupState
+ * * Document 2.5. Set group state
+ * * https://developers.meethue.com/develop/hue-api/groupds-api/#set-gr-state
+ * @param {number} groupID This paramter takes in the group ID.
+ * @param {object} groupData This paramter takes in the body argument of the request.
+*/
+export const SetGroupState = (groupID, groupData) => (dispatch, getState) => {
+    dispatch(changeLoading(true));
+    axios({
+        url: `http://${getState().bridgeip}/api/${getState().username}/groups/${groupID}/action`,
+        method: 'PUT',
+        data: groupData
+    }).then(res => {
+        var payload = {};
+        res.data.map((data) => {
+            let key = Object.keys(data.success)[0].substring(Object.keys(data.success)[0].lastIndexOf('/') + 1);
+            let value = Object.values(data.success)[0];
+            payload[key] = value;
+        })
+        if (payload) {
+            dispatch({
+                type: C.CHANGE_GROUP_STATE,
+                id: groupID,
+                payload: payload
+            })
+        } else {
+            throw Error('An error has occur');
+        }
+    }).catch((error) => {
+        dispatch(changeLoading(false));
+        console.log(error);
+    }).then(dispatch(changeLoading(false)));
+};
+
+/** 
+ * DeleteGroup
+ * * Document 2.6. Delete Group
+ * * https://developers.meethue.com/develop/hue-api/groupds-api/#del-group
+ * @param {number} groupID This paramter takes in the group ID.
+*/
+export const DeleteGroup = (groupID) => (dispatch, getState) => {
+    dispatch(changeLoading(true));
+    axios({
+        url: `http://${getState().bridgeip}/api/${getState().username}/groups/${groupID}`,
+        method: 'DELETE'
+    }).then((res) => {
+        if (res.data[0].success) {
+            dispatch({
+                type: C.DELETE_GROUP,
+                payload: groupID
+            })
+        } else {
+            throw Error('An error has occur')
+        }
+    }).catch((error) => {
+        dispatch(changeLoading(false));
+        console.log(error);
+    }).then(dispatch(changeLoading(false)));
+};
+
+/** 
+ * CreateUser
+ * * Document 7.1. Create user
+ * * https://developers.meethue.com/develop/hue-api/7-configuration-api/#create-user
+*/
+export const CreateUser = () => (dispatch, getState) => {
+    dispatch(changeLoading(true));
+    axios({
+        url: `http://${getState().bridgeip}/api`,
+        method: 'POST',
+        data: {
+            devicetype: `Lighue#${Constants.deviceName}`
+        }
+    }).then((res) => {
+        if (res.data[0].success) {
+            dispatch({
+                type: C.CHANGE_USERNAME,
+                payload: res.data[0].success.username
+            });
+        }
+    }).catch((error) => {
+        dispatch(changeLoading(false));
+        console.log(error);
+    }).then(dispatch(changeLoading(false)));
+};
+
+/** 
+ * GetConfig
+ * * Document 7.2. Get configuration
+ * * https://developers.meethue.com/develop/hue-api/7-configuration-api/#get-configuration 
+*/
+export const GetConfig = async (dispatch, getState) => {
+    dispatch(changeLoading(true));
+    await axios({
+        url: `http://${getState().bridgeip}/api/${getState().username}/config`,
+        method: 'GET'
+    }).then((res) => {
+        dispatch({
+            type: C.FETCH_CONFIG,
+            payload: res.data
+        })
     }).catch((error) => {
         dispatch(changeLoading(false));
         console.log(error);

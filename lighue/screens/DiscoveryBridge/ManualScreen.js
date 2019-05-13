@@ -1,19 +1,16 @@
 import React from 'react';
 import { StyleSheet, Image, Alert, TouchableOpacity } from 'react-native';
 import { connect } from 'react-redux';
-
-import { fetchBridgeIp } from '../../redux/actions';
+import { GetBridgeIP } from '../../redux/actions';
 import validator from 'validator';
-
-import Layout from '../../constants/Layout'
+import Layout from '../../constants/Layout';
 import { Button, Block, Text, Input } from '../../components';
 import { theme } from '../../constants';
-
 
 const mapDispatchToprops = (dispatch) => {
     return {
         _setIP(navigation, ip) {
-            return dispatch(fetchBridgeIp(navigation, true, ip));
+            return dispatch(GetBridgeIP(navigation, true, ip));
         }
     }
 }
@@ -73,7 +70,7 @@ class ManualScreen extends React.Component {
                         />
                         <Text paragraph gray2 marginTop={10}>
                             Advanced. You can also enter IP address above before starting the search.
-                    </Text>
+                        </Text>
                     </Block>
                     <Block middle flex={0.8}>
                         <Button gradient
@@ -105,13 +102,13 @@ const styles = StyleSheet.create({
         backgroundColor: theme.colors.background,
     },
     textInput: {
-        height: 25, 
-        borderBottomWidth: .5, 
-        borderRadius: 0, 
-        borderWidth: 0, 
-        color: 'white', 
-        borderColor: 'white', 
-        textAlign: 'left', 
+        height: 25,
+        borderBottomWidth: .5,
+        borderRadius: 0,
+        borderWidth: 0,
+        color: 'white',
+        borderColor: 'white',
+        textAlign: 'left',
         paddingBottom: 10
     }
 });

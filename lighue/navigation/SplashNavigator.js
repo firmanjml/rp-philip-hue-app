@@ -1,17 +1,14 @@
-import React from 'react';
-import { Image, Platform, TouchableOpacity } from 'react-native';
-import { createAppContainer, createStackNavigator, NavigationEvents } from 'react-navigation';
-
+import { Platform } from 'react-native';
+import { createAppContainer, createStackNavigator } from 'react-navigation';
 import Splash from '../screens/SplashScreen/Splash';
-
 import { fromRight } from 'react-navigation-transitions';
 import { theme } from '../constants';
 
-
-
 const MainNavigator = createStackNavigator(
   {
-    SplashPage: { screen: Splash }
+    SplashPage: {
+      screen: Splash
+    }
   },
   {
     initialRouteName: "SplashPage",
@@ -28,7 +25,7 @@ const MainNavigator = createStackNavigator(
         alignItems: 'center',
         marginLeft: theme.sizes.base * 2,
       },
-      gesturesEnabled : true,
+      gesturesEnabled: true,
     },
   }
 );

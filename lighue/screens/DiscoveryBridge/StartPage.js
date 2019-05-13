@@ -1,9 +1,7 @@
 import React from 'react';
 import { Text, StyleSheet, View, Button } from 'react-native';
-import Spinner from "react-native-loading-spinner-overlay";
-import { fetchBridgeIp } from '../../redux/actions';
+import { GetBridgeIP } from '../../redux/actions';
 import { connect } from 'react-redux';
-
 
 const mapStateToProps = state => {
     return {
@@ -15,17 +13,22 @@ const mapStateToProps = state => {
 
 const mapDispatchToprops = (dispatch) => {
     return {
-        _fetchBridgeIp() {
-            return () => dispatch(fetchBridgeIp());
+        _GetBridgeIP() {
+            return () => dispatch(GetBridgeIP());
         }
     }
 }
 
+
+/**
+ * StartPage
+ * ! This class is deprecated, please do not use.
+ */
 class StartPage extends React.Component {
 
     componentWillMount() {
         if (!this.props.bridgeip) {
-            this.props._fetchBridgeIp()();
+            this.props._GetBridgeIP()();
         }
         if (this.props.username) {
             this.props.navigation.navigate("viewUserName")
@@ -34,9 +37,9 @@ class StartPage extends React.Component {
 
     pairButton = () => {
         if (!this.props.bridgeip) {
-            this.props._fetchBridgeIp()();
+            this.props._GetBridgeIP()();
         }
-        else{
+        else {
             this.props.navigation.navigate("LinkButton")
         }
     }

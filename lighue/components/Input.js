@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { StyleSheet, TextInput } from 'react-native'
 import { Icon } from 'expo';
-
 import Text from './Text';
 import Block from './Block';
 import Button from './Button';
@@ -39,7 +38,7 @@ export default class Input extends Component {
               color={theme.colors.gray}
               size={theme.sizes.font * 1.35}
               name={!toggleSecure ? "md-eye" : "md-eye-off"}
-          />
+            />
         }
       </Button>
     );
@@ -82,8 +81,8 @@ export default class Input extends Component {
 
     const inputType = email
       ? 'email-address' : number
-      ? 'numeric' : phone
-      ? 'phone-pad' : 'default';
+        ? 'numeric' : phone
+          ? 'phone-pad' : 'default';
 
     return (
       <Block flex={false} margin={[theme.sizes.base, 0]}>

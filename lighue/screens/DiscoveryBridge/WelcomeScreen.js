@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
-import { Animated, Image, FlatList, Modeal, StyleSheet, ScrollView } from 'react-native';
+import { Animated, Image, FlatList, StyleSheet } from 'react-native';
 import { Button, Block, Text } from '../../components';
 import { theme } from '../../constants';
 import Layout from '../../constants/Layout';
 import SnackBar from 'rn-snackbar';
 import { connect } from 'react-redux';
-import { fetchBridgeIp } from '../../redux/actions';
+import { GetBridgeIP } from '../../redux/actions';
 
 const mapStateToProps = state => {
     return {
@@ -16,8 +16,8 @@ const mapStateToProps = state => {
 
 const mapDispatchToprops = (dispatch) => {
     return {
-        _fetchBridgeIp() {
-            return () => dispatch(fetchBridgeIp());
+        _GetBridgeIP() {
+            return () => dispatch(GetBridgeIP());
         }
     }
 }
@@ -41,13 +41,12 @@ class WelcomeScreen extends Component {
         // }, 3000)
         // console.log(Layout.window.height)
         // console.log(Layout.window.width)
-        await this.props._fetchBridgeIp()();
+        await this.props._GetBridgeIP()();
         if (this.props.bridgeip) {
             SnackBar.show('New Hue Bridge Found!', { duration: 4000 });
             this.setState({ pairBtn: 'Pair now' });
         }
     }
-
 
     renderIllustrations() {
         const { illustrations } = this.props;

@@ -6,7 +6,6 @@ import { theme } from '../constants';
 export default class Badge extends Component {
   render() {
     const { children, style, size, color, ...props } = this.props;
-
     const badgeStyles = StyleSheet.flatten([
       styles.badge,
       size && {

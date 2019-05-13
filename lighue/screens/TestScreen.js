@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Text, StyleSheet, View, Button } from 'react-native'
 import { connect } from 'react-redux'
-import { fetchAllGroups, changeGroupStateByID, addGroup, deleteGroupByID, fetchAllLights, changeLampStateByID, deleteLampByID } from '../redux/actions'
+import { GetAllGroups, SetGroupState, CreateGroup, DeleteGroup, GetAllLights, SetLampState, DeleteLight } from '../redux/actions'
 import Spinner from "react-native-loading-spinner-overlay";
 
 const mapStateToProps = state => {
@@ -15,42 +15,42 @@ const mapStateToProps = state => {
 const mapDispatchToprops = (dispatch, ownProps) => {
     return {
         _fetchAllGroups() {
-            return dispatch(fetchAllGroups); 
+            return dispatch(GetAllGroups);
         },
         _changeGroupStateByID(id, data) {
-            return () => dispatch(changeGroupStateByID(id, data));
+            return () => dispatch(SetGroupState(id, data));
         },
         _addGroup(data) {
-            return dispatch(addGroup(data));
+            return dispatch(CreateGroup(data));
         },
         _deleteGroup(id) {
-            return dispatch(deleteGroupByID(id));
+            return dispatch(DeleteGroup(id));
         },
         _fetchAllLights() {
-            return dispatch(fetchAllLights)
+            return dispatch(GetAllLights)
         },
         _changeLampStateByID(id, data) {
-            return () => dispatch(changeLampStateByID(id,data));
+            return () => dispatch(SetLampState(id,data));
         },
         _deleteLampByID(id) {
-            return dispatch(deleteLampByID(id));
+            return dispatch(DeleteLight(id));
         }
     }
 }
-
+/**
+ * TestScreen
+ * ! This class is used for testing purposes.
+ */
 class TestScreen extends Component {
 
     componentWillMount() {
         // // before calling get group api
         // console.log(this.props.groups);
-
         // this.props._fetchAllGroups()();
         // // after calling get group api
         // console.log(this.props.groups[0].name);
         this.props._fetchAllGroups();
         // this.props._fetchAllLights();
-        
-        
     }
 
     test() {
@@ -64,7 +64,7 @@ class TestScreen extends Component {
         // })
         // this.props._deleteGroup(13)
         this.props._changeGroupStateByID(1, {
-            hue: 10000
+            on: false
         })();
         // const { groups } = this.props
         // console.log(groups[1])
@@ -84,23 +84,23 @@ class TestScreen extends Component {
 
     render() {
         // Example 
-        return(
+        return (
             <View style={styles.container}>
-            <Spinner visible={this.props.loading} />
-            <View>
-                <Text style={{ fontSize: 20 }}>1</Text>
-                <View style={styles.manualButton}>
-                    <Button
-                        title="Test"
-                        onPress={() => this.test()}
-                    />
-                    <Button
-                        title="Console.log"
-                        onPress={() => this.log()}
-                    />
+                <Spinner visible={this.props.loading} />
+                <View>
+                    <Text style={{ fontSize: 20 }}>1</Text>
+                    <View style={styles.manualButton}>
+                        <Button
+                            title="Test"
+                            onPress={() => this.test()}
+                        />
+                        <Button
+                            title="Console.log"
+                            onPress={() => this.log()}
+                        />
+                    </View>
                 </View>
             </View>
-        </View>
         )
     }
 }

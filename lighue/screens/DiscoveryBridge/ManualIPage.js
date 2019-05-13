@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, StyleSheet, View, Button, TextInput, Dimensions, Alert } from 'react-native';
+import { Text, StyleSheet, View, Button, TextInput, Alert } from 'react-native';
 import { connect } from 'react-redux';
 import { fetchBridgeIp } from '../../redux/actions';
 import validator from 'validator';
@@ -13,6 +13,10 @@ const mapDispatchToprops = (dispatch) => {
     }
 }
 
+/**
+ * ManualIPage
+ * ! This class is deprecated, please do not use.
+ */
 class ManualIPage extends React.Component {
     state = {
         isChecking: false,
@@ -53,7 +57,7 @@ class ManualIPage extends React.Component {
                                 )
                             }
                         }}
-                />
+                    />
                 </View>
             </View>
         );

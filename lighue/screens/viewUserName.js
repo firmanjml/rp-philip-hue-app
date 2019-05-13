@@ -5,15 +5,13 @@ import { Constants } from 'expo';
 
 const mapStateToProps = state => {
     return {
-        username : state.username
+        username: state.username
     }
 }
-
 
 class viewUserName extends React.Component {
     render() {
         const { navigate } = this.props.navigation;
-
         return (
             <View style={styles.container}>
                 <Text>{this.props.username}</Text>

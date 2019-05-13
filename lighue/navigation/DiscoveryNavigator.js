@@ -1,16 +1,12 @@
 import React from 'react';
-import { Image, Platform, TouchableOpacity } from 'react-native';
-import { createAppContainer, createStackNavigator, NavigationEvents } from 'react-navigation';
-
-import ManualIPScreen from '../screens/DiscoveryBridge/ManualScreen'
-import LinkButtonPage from '../screens/DiscoveryBridge/LinkButtonScreen'
-import WelcomeScreen from '../screens/DiscoveryBridge/WelcomeScreen'
-
+import { Platform } from 'react-native';
+import { createAppContainer, createStackNavigator } from 'react-navigation';
+import ManualIPScreen from '../screens/DiscoveryBridge/ManualScreen';
+import LinkButtonPage from '../screens/DiscoveryBridge/LinkButtonScreen';
+import WelcomeScreen from '../screens/DiscoveryBridge/WelcomeScreen';
+import TestScreen from '../screens/TestScreen';
 import { fromRight } from 'react-navigation-transitions';
 import { theme } from '../constants';
-
-import Layout from '../constants/Layout'
-
 
 const MainNavigator = createStackNavigator(
   {
@@ -33,7 +29,7 @@ const MainNavigator = createStackNavigator(
         alignItems: 'center',
         marginLeft: theme.sizes.base * 2,
       },
-      gesturesEnabled : true,
+      gesturesEnabled: true,
     },
   }
 );

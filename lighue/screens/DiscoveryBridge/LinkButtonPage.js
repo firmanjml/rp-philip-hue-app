@@ -1,16 +1,12 @@
 import React from 'react';
 import {
   StyleSheet,
-  View,
-  Text
+  View
 } from 'react-native';
-
 import { MonoText } from '../../components/StyledText';
 import { connect } from 'react-redux';
 import { fetchBridgeIp, createUser } from '../../redux/actions';
-
 import CountdownCircle from 'react-native-countdown-circle'
-
 
 const mapStateToProps = state => {
   return {
@@ -32,6 +28,10 @@ const mapDispatchToprops = (dispatch, ownProps) => {
 
 let interval;
 
+/**
+ * LinkButtonPage
+ * ! This class is deprecated, please do not use.
+ */
 class LinkButtonPage extends React.Component {
 
   createUsername = () => {
@@ -64,16 +64,16 @@ class LinkButtonPage extends React.Component {
   render() {
     return (
       <View style={styles.container}>
-         <CountdownCircle
-            seconds={30}
-            radius={80}
-            borderWidth={20}
-            color="#ff003f"
-            bgColor="#fff"
-            textStyle={{ fontSize: 50 }}
-            onTimeElapsed={() => this.expired(this.props.navigation)}
+        <CountdownCircle
+          seconds={30}
+          radius={80}
+          borderWidth={20}
+          color="#ff003f"
+          bgColor="#fff"
+          textStyle={{ fontSize: 50 }}
+          onTimeElapsed={() => this.expired(this.props.navigation)}
         />
-        <View style={[styles.codeHighlightContainer, styles.homeScreenFilename, {marginTop : 20}]}>
+        <View style={[styles.codeHighlightContainer, styles.homeScreenFilename, { marginTop: 20 }]}>
           <MonoText style={styles.codeHighlightText} onPress={() => this._handleHelpPress()}>You have 30 seconds to press the link button</MonoText>
         </View>
       </View>

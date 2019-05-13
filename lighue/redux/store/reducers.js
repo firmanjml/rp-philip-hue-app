@@ -1,6 +1,11 @@
 import C from '../constants';
 import { combineReducers } from 'redux';
+import _ from 'lodash';
 
+/** 
+ * loading
+ * * Redux reducer stores loading data to Redux state.
+*/
 export const loading = (state = false, action) => {
     if (action.type === C.CHANGE_LOADING) {
         return action.payload;
@@ -9,6 +14,10 @@ export const loading = (state = false, action) => {
     }
 }
 
+/** 
+ * nightmode
+ * * Redux reducer stores nightmode data to Redux state.
+*/
 export const nightmode = (state = false, action) => {
     if (action.type === C.CHANGE_THEME) {
         return action.payload;
@@ -17,7 +26,10 @@ export const nightmode = (state = false, action) => {
     }
 }
 
-
+/** 
+ * bridgeip
+ * * Redux reducer stores bridge ip address data to Redux state.
+*/
 export const bridgeip = (state = '', action) => {
     switch (action.type) {
         case C.FETCH_BRIDGE_IP:
@@ -30,6 +42,10 @@ export const bridgeip = (state = '', action) => {
     }
 }
 
+/** 
+ * username
+ * * Redux reducer stores username data it recevied from the API to Redux state.
+*/
 export const username = (state = '', action) => {
     switch (action.type) {
         case C.FETCH_USERNAME:
@@ -43,6 +59,10 @@ export const username = (state = '', action) => {
     }
 }
 
+/** 
+ * config
+ * * Redux reducer stores config data it recevied from the API to Redux state.
+*/
 export const config = (state = {}, action) => {
     switch (action.type) {
         case C.FETCH_CONFIG:
@@ -54,6 +74,10 @@ export const config = (state = {}, action) => {
     }
 }
 
+/** 
+ * groups
+ * * Redux reducer stores group data it recevied from the API to Redux state
+*/
 export const groups = (state = {}, action) => {
     switch (action.type) {
         case C.FETCH_ALL_GROUPS:
@@ -66,7 +90,7 @@ export const groups = (state = {}, action) => {
             return _state;
         case C.CHANGE_GROUP_STATE:
             _state = JSON.parse(JSON.stringify(state));
-            _state[action.id].action = action.payload;
+            _.merge(_state[action.id].action, action.payload);
             return _state;
         case C.CREATE_GROUP:
             _state = JSON.parse(JSON.stringify(state));
@@ -81,6 +105,10 @@ export const groups = (state = {}, action) => {
     }
 }
 
+/** 
+ * lights
+ * * Redux reducer stores light data it recevied from the API to Redux state
+*/
 export const lights = (state = {}, action) => {
     switch (action.type) {
         case C.FETCH_ALL_LIGHTS:

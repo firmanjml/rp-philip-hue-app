@@ -6,10 +6,9 @@ import {
     Alert
 } from 'react-native';
 import { connect } from 'react-redux';
-import { fetchBridgeIp, createUser } from '../../redux/actions';
+import { GetBridgeIP, CreateUser } from '../../redux/actions';
 import { theme } from '../../constants';
-import { Button, Block, Text, Input } from '../../components';
-import Layout from '../../constants/Layout';
+import { Block, Text } from '../../components';
 import Countdown from 'react-countdown-now';
 
 const mapStateToProps = state => {
@@ -21,11 +20,8 @@ const mapStateToProps = state => {
 
 const mapDispatchToprops = (dispatch, ownProps) => {
     return {
-        _fetchBridgeIp() {
-            return () => dispatch(fetchBridgeIp());
-        },
-        _createUser() {
-            return () => dispatch(createUser());
+        _CreateUser() {
+            return () => dispatch(CreateUser());
         }
     }
 }
@@ -46,7 +42,7 @@ class LinkButtonScreen extends Component {
 
     createUsername = () => {
         if (!this.props.username) {
-            this.props._createUser()()
+            this.props._CreateUser()()
             console.log("Link button not pressed!")
         } else {
             console.log("Link button pressed")
@@ -88,9 +84,11 @@ class LinkButtonScreen extends Component {
                                 Alert.alert(
                                     'No Bridge was found.',
                                     '',
-                                    [{ text: "OK", onPress: () => {
-                                        this.props.navigation.goBack();
-                                    } }],
+                                    [{
+                                        text: "OK", onPress: () => {
+                                            this.props.navigation.goBack();
+                                        }
+                                    }],
                                     { cancelable: false }
                                 )
                             }}
