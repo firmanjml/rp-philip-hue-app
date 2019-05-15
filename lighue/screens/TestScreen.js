@@ -83,7 +83,7 @@ class TestScreen extends Component {
                 });
             } else {
                 Alert.alert(
-                    'Could not connect to bridge.',
+                    'Could not connect to bridge',
                     'Please edit initialState.json',
                     [{
                         text: "OK", onPress: () => {

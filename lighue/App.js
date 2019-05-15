@@ -28,7 +28,7 @@ export default class App extends React.Component {
           <PersistGate loading={null} persistor={persistor}>
             <View style={styles.container}>
               {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
-              <SwitchNavigator />
+              <SwitchNavigator/>
             </View>
           </PersistGate>
         </Provider>
