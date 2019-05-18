@@ -14,7 +14,8 @@ class TestScreen extends Component {
 
     state = {
         group_on: false,
-        light_on: false
+        light_on: false,
+        name : ''
     }
     componentWillMount() {
         // // before calling get group api

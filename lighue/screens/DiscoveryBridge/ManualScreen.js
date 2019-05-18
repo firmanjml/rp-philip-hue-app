@@ -3,9 +3,11 @@ import { StyleSheet, Image, Alert, TouchableOpacity } from 'react-native';
 import { connect } from 'react-redux';
 import { GetBridgeIP } from '../../redux/actions';
 import validator from 'validator';
+
 import Layout from '../../constants/Layout';
 import { Button, Block, Text, Input } from '../../components';
 import { theme } from '../../constants';
+
 
 class ManualScreen extends React.Component {
     static navigationOptions = ({ navigation }) => {
@@ -20,7 +22,6 @@ class ManualScreen extends React.Component {
                 </TouchableOpacity>
         }
     }
-
     state = {
         isChecking: false,
         manualIP: ""
@@ -28,6 +29,10 @@ class ManualScreen extends React.Component {
 
     changeText = (value) => {
         this.setState({ manualIP: value })
+    }
+
+    onPress = () => {
+        this.props.navigation.navigate("StepByStep");
     }
 
     render() {
@@ -64,7 +69,7 @@ class ManualScreen extends React.Component {
                             Advanced. You can also enter IP address above before starting the search.
                         </Text>
                     </Block>
-                    <Block middle flex={0.8}>
+                    <Block middle flex={1}>
                         <Button gradient
                             startColor='#0A7CC4'
                             endColor='#2BDACD'
@@ -82,6 +87,9 @@ class ManualScreen extends React.Component {
                             }}>
                             <Text center semibold white>Search</Text>
                         </Button>
+                        <TouchableOpacity style={{ marginTop: 5 }} onPress={this.onPress}>
+                            <Text style={{ textAlign: 'center', color: 'white' }}>Having trouble finding out Bridge IP?</Text>
+                        </TouchableOpacity>
                     </Block>
                 </Block>
             </Block>

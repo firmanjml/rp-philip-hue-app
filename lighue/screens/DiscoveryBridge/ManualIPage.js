@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, StyleSheet, View, Button, TextInput, Alert } from 'react-native';
+import { TouchableOpacity, Text, StyleSheet, View, Button, TextInput, Alert } from 'react-native';
 import { connect } from 'react-redux';
 import { fetchBridgeIp } from '../../redux/actions';
 import validator from 'validator';
@@ -41,6 +41,11 @@ class ManualIPage extends React.Component {
                         value={this.state.manualIP}
                     />
                 </View>
+                <View style={styles.linkButton}>
+                   <TouchableOpacity onPress={this.props.navigation.navigate("StepByStep")}>
+                         Having trouble finding out Bridge IP?
+                   </TouchableOpacity>
+                </View>
                 <View style={styles.searchButton}>
                     <Button
                         title="Search"
@@ -72,6 +77,9 @@ const styles = StyleSheet.create({
     },
     manualIP: {
         marginTop: 20
+    },
+    linkButton: {
+        marginTop : 10
     },
     searchButton: {
         marginTop: 20

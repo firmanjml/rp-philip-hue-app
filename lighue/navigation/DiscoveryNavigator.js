@@ -1,18 +1,22 @@
 import React from 'react';
 import { Platform } from 'react-native';
 import { createAppContainer, createStackNavigator } from 'react-navigation';
+
+import StepScreen from '../screens/StepbyStep';
 import ManualIPScreen from '../screens/DiscoveryBridge/ManualScreen';
 import LinkButtonPage from '../screens/DiscoveryBridge/LinkButtonScreen';
 import WelcomeScreen from '../screens/DiscoveryBridge/WelcomeScreen';
 import TestScreen from '../screens/TestScreen';
-import { fromRight } from 'react-navigation-transitions';
+
+import {fromRight} from 'react-navigation-transitions';
 import { theme } from '../constants';
 
 const MainNavigator = createStackNavigator(
   {
     StartPage: { screen: WelcomeScreen },
     LinkButton: { screen: LinkButtonPage },
-    ManualIP: { screen: ManualIPScreen }
+    ManualIP: { screen: ManualIPScreen },
+    StepByStep: {screen : StepScreen}
   },
   {
     initialRouteName: "StartPage",
