@@ -2,11 +2,24 @@ import React, { Component } from 'react';
 import { View, Image, StyleSheet } from 'react-native';
 import { Block, Text } from '../../components';
 import { theme, constant } from '../../constants';
+
+import { connect } from 'react-redux'
 import Layout from '../../constants/Layout';
 import AppIntroSlider from 'react-native-app-intro-slider';
 
+import { GetAllLights} from '../../redux/actions'
 
-export default class Splash extends Component {
+
+class Splash extends Component {
+
+    async componentWillMount() {
+        await this.props._fetchAllLights();
+    }
+
+    async componentDidMount() {
+        await this.props._fetchAllLights();
+    }
+
     _renderItem = (item) => {
         return (
             <View style={styles.slide}>
@@ -24,12 +37,28 @@ export default class Splash extends Component {
         );
     }
     _onDone = () => {
-        this.props.navigation.navigate("createUserName");
+        this.props.navigation.navigate("ControlBulb");
     }
     render() {
         return <AppIntroSlider renderItem={this._renderItem} slides={constant.splash_slider} onDone={this._onDone} />;
     }
 }
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        _changeLampStateByID(id, data) {
+            return dispatch(SetLampState(id, data));
+        },
+        _fetchAllLights() {
+            return dispatch(GetAllLights())
+        }
+    }
+}
+
+export default connect(
+    null,
+    mapDispatchToProps
+)(Splash)
 
 const styles = StyleSheet.create({
     slide: {

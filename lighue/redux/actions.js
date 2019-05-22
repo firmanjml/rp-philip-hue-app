@@ -85,7 +85,7 @@ export const GetAllLights = () => (dispatch, getState) => {
         })
     }).catch((error) => {
         dispatch(ChangeLoading(false));
-        console.log(error);
+        // console.log(error);
     }).then(dispatch(ChangeLoading(false)));
 };
 
@@ -120,7 +120,7 @@ export const SetLampState = (lampID, lampData) => (dispatch, getState) => {
         }
     }).catch((error) => {
         dispatch(ChangeLoading(false));
-        console.log(error);
+        // console.log(error);
     }).then(dispatch(ChangeLoading(false)));
 };
 

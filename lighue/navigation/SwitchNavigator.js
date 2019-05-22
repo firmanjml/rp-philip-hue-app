@@ -13,8 +13,7 @@ const SwitchNavigator = createSwitchNavigator(
     },
     SplashNavigator: {
       screen: SplashNavigator
-    }
-
+    },
   },
   {
     initialRouteName: "DiscoveryNavigator",

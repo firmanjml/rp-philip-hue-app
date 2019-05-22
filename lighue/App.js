@@ -6,6 +6,7 @@ import { Provider } from "react-redux";
 import { reduxStore, persistor } from "./redux/store";
 import { PersistGate } from "redux-persist/lib/integration/react";
 
+import Controlbulb from './screens/Light/ControlBulb'
 export default class App extends React.Component {
   state = {
     isLoadingComplete: false,

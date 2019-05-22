@@ -60,7 +60,7 @@ class StartPage extends React.Component {
                 <View style={styles.manualButton}>
                     <Button
                         title="Manual IP"
-                        onPress={() => this.props.navigation.navigate("ManualIP")}
+                        onPress={() => this.props.navigation.navigate("Controlbulb")}
                     />
                 </View>
             </View >

@@ -13,7 +13,7 @@
     ],
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/splashscreenwhite.png",
     "splash": {
       "image": "./assets/images/splashscreenwhite.png",
       "resizeMode": "contain",
@@ -25,8 +25,12 @@
     "assetBundlePatterns": [
       "**/*"
     ],
+    "android": {
+      "package": "com.rp.lighue"
+    },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.rp.lighue"
     }
   }
 }

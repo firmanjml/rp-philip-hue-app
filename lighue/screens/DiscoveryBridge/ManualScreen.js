@@ -99,7 +99,7 @@ class ManualScreen extends React.Component {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        _setIP(navigation, ip) {
+        _setIP: (navigation, ip) => {
             return dispatch(GetBridgeIP(navigation, true, ip));
         }
     }
@@ -121,4 +121,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default connect(mapDispatchToProps)(ManualScreen);
+export default connect(null,mapDispatchToProps)(ManualScreen);
