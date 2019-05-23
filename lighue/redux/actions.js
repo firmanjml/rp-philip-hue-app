@@ -51,8 +51,8 @@ export const GetBridgeIP = (navigation, isManual = false, bridgeip = '') => asyn
         });
     } else {
         await axios({
-            // url: 'https://discovery.meethue.com',
-            url: 'https://api.myjson.com/bins/1eqhrc',
+            url: 'https://discovery.meethue.com',
+            // url: 'https://api.myjson.com/bins/1eqhrc',
             method: 'GET'
         }).then((res) => {
             dispatch({
