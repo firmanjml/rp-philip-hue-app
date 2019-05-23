@@ -36,28 +36,27 @@ class ControlBulb extends React.Component {
         bri: 0,
         satPer: 1,
         briPer: 1,
-        isOnDefaultToggleSwitch: true,
+        isOnDefaultToggleSwitch: false,
         name: "Hue Lamp 1"
     };
 
     async componentWillMount() {
         await this.props._fetchAllLights();
-        console.log(this.props.lights)
     }
 
     async componentDidMount() {
         await this.setState({
             name: this.props.lights[this.state.id].name,
             sat: this.props.lights[this.state.id].state.sat,
-            bri: this.props.lights[this.state.id].state.bri
+            bri: this.props.lights[this.state.id].state.bri,
+            isOnDefaultToggleSwitch: this.props.lights[this.state.id].state.on
         })
         await this.calculatePercentage("bri", this.state.bri)
         await this.calculatePercentage("sat", this.state.sat)
-        console.log(this.props.lights)
     }
 
-    calculatePercentage = (arg, values) => {
-        let result = Math.round((values * 100) / 254)
+     calculatePercentage = (arg, values) => {
+        let result = Math.round((values * 100) / 254);
         if (result == 0) {
             if (arg == "sat") {
                 this.setState({ satPer: 1 })
@@ -110,6 +109,16 @@ class ControlBulb extends React.Component {
         this.props._changeLampStateByID(this.state.id, {
             on: boolean
         });
+    }
+
+    changeLightPicker = (value) => {
+        this.setState({
+            id: value,
+            sat: this.props.lights[value].state.sat,
+            bri: this.props.lights[value].state.bri
+        });
+        this.calculatePercentage("bri", this.props.lights[value].state.bri);
+        this.calculatePercentage("sat", this.props.lights[value].state.sat);
     }
 
     renderBriSlider() {
@@ -192,15 +201,7 @@ class ControlBulb extends React.Component {
                 items={lights}
                 style={pickerSelectStyles}
                 useNativeAndroidPickerStyle={false}
-                onValueChange={value => {
-                    this.setState({
-                        id: value,
-                        sat: this.props.lights[value].state.sat,
-                        bri: this.props.lights[value].state.bri
-                    }),
-                    this.calculatePercentage("bri", this.props.lights[value].state.bri),
-                    this.calculatePercentage("sat", this.props.lights[value].state.sat)
-                }}
+                onValueChange={value => {this.changeLightPicker(value)}}
             />
         )
     }
