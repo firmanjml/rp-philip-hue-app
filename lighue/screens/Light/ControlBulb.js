@@ -201,7 +201,7 @@ class ControlBulb extends React.Component {
                 items={lights}
                 style={pickerSelectStyles}
                 useNativeAndroidPickerStyle={false}
-                onValueChange={value => {this.changeLightPicker(value)}}
+                onValueChange={value => this.changeLightPicker(value)}
             />
         )
     }
