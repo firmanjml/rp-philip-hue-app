@@ -97,11 +97,13 @@ class ControlBulb extends React.Component {
             this.props._changeLampStateByID(this.state.id, {
                 sat: values
             });
+            this.calculatePercentage("sat",values);
         }
         else {
             this.props._changeLampStateByID(this.state.id, {
                 bri: values
             });
+            this.calculatePercentage("bri",values);
         }
     }
 
@@ -132,7 +134,7 @@ class ControlBulb extends React.Component {
                 minimumTrackTintColor={theme.colors.secondary}
                 maximumTrackTintColor="rgba(157, 163, 180, 0.10)"
                 value={this.state.bri}
-                onValueChange={value => [this.changeLightState("bri", value), this.calculatePercentage("bri", value)]}
+                onValueChange={value => this.changeLightState("bri", value)}
             />
         )
     }
@@ -148,8 +150,7 @@ class ControlBulb extends React.Component {
                 minimumTrackTintColor={theme.colors.secondary}
                 maximumTrackTintColor="rgba(157, 163, 180, 0.10)"
                 value={this.state.sat}
-                onValueChange={value => [this.changeLightState("sat", value), this.calculatePercentage("sat", value)]}
-            />
+                onValueChange={value => this.changeLightState("sat", value)}
         )
     }
 
@@ -201,7 +202,7 @@ class ControlBulb extends React.Component {
                 items={lights}
                 style={pickerSelectStyles}
                 useNativeAndroidPickerStyle={false}
-                onValueChange={value => {this.changeLightPicker(value)}}
+                onValueChange={value => this.changeLightPicker(value)}
             />
         )
     }
