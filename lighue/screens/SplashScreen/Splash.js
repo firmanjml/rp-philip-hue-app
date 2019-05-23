@@ -16,10 +16,6 @@ class Splash extends Component {
         await this.props._fetchAllLights();
     }
 
-    async componentDidMount() {
-        await this.props._fetchAllLights();
-    }
-
     _renderItem = (item) => {
         return (
             <View style={styles.slide}>

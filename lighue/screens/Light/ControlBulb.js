@@ -32,10 +32,10 @@ class ControlBulb extends React.Component {
 
     state = {
         id: 1,
-        sat: 0,
-        bri: 0,
-        satPer: 1,
-        briPer: 1,
+        sat: null,
+        bri: null,
+        satPer: null,
+        briPer: null,
         isOnDefaultToggleSwitch: false,
         name: "Hue Lamp 1"
     };
@@ -99,7 +99,7 @@ class ControlBulb extends React.Component {
             });
             this.calculatePercentage("sat",values);
         }
-        else {
+        else if (arg == "bri") {
             this.props._changeLampStateByID(this.state.id, {
                 bri: values
             });
@@ -113,14 +113,15 @@ class ControlBulb extends React.Component {
         });
     }
 
-    changeLightPicker = (value) => {
+    changeLightPicker = (idNew) => {
         this.setState({
-            id: value,
-            sat: this.props.lights[value].state.sat,
-            bri: this.props.lights[value].state.bri
+            id: idNew,
+            sat: this.props.lights[idNew].state.sat,
+            bri: this.props.lights[idNew].state.bri,
+            isOnDefaultToggleSwitch: this.props.lights[idNew].state.on
         });
-        this.calculatePercentage("bri", this.props.lights[value].state.bri);
-        this.calculatePercentage("sat", this.props.lights[value].state.sat);
+        this.calculatePercentage("bri", this.props.lights[idNew].state.bri);
+        this.calculatePercentage("sat", this.props.lights[idNew].state.sat);
     }
 
     renderBriSlider() {
@@ -134,7 +135,7 @@ class ControlBulb extends React.Component {
                 minimumTrackTintColor={theme.colors.secondary}
                 maximumTrackTintColor="rgba(157, 163, 180, 0.10)"
                 value={this.state.bri}
-                onValueChange={value => this.changeLightState("bri", value)}
+                onValueChange={(value) => this.changeLightState("bri", value)}
             />
         )
     }
@@ -150,7 +151,8 @@ class ControlBulb extends React.Component {
                 minimumTrackTintColor={theme.colors.secondary}
                 maximumTrackTintColor="rgba(157, 163, 180, 0.10)"
                 value={this.state.sat}
-                onValueChange={value => this.changeLightState("sat", value)}
+                onValueChange={(value) => this.changeLightState("sat", value)}
+                />
         )
     }
 
@@ -187,6 +189,18 @@ class ControlBulb extends React.Component {
             {
                 label: 'Hue Light 3',
                 value: '3',
+            },
+            {
+                label: 'Hue Light 4',
+                value: '4',
+            },
+            {
+                label: 'Hue Light 5',
+                value: '5',
+            },
+            {
+                label: 'Hue Light 6',
+                value: '6',
             }
         ];
 
@@ -202,7 +216,7 @@ class ControlBulb extends React.Component {
                 items={lights}
                 style={pickerSelectStyles}
                 useNativeAndroidPickerStyle={false}
-                onValueChange={value => this.changeLightPicker(value)}
+                onValueChange={(value) => this.changeLightPicker(value)}
             />
         )
     }
