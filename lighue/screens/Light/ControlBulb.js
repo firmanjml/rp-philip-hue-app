@@ -120,18 +120,7 @@ class ControlBulb extends React.Component {
             on: boolean
         });
     }
-
-    changeLightPicker = async (idNew) => {
-        await this.setState({
-            id: idNew,
-            sat: this.props.lights[idNew].state.sat,
-            bri: this.props.lights[idNew].state.bri,
-            isOnDefaultToggleSwitch: this.props.lights[idNew].state.on
-        });
-        await this.calculatePercentage("bri", this.props.lights[idNew].state.bri);
-        await this.calculatePercentage("sat", this.props.lights[idNew].state.sat);
-    }
-
+    
     renderBriSlider() {
         return (
             <Slider
