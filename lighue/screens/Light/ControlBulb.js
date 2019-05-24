@@ -16,7 +16,9 @@ import RNPickerSelect from 'react-native-picker-select';
 
 import axios from 'axios';
 
+var interval;
 class ControlBulb extends React.Component {
+
     static navigationOptions = ({ navigation }) => {
         return {
             headerLeft:
@@ -40,8 +42,12 @@ class ControlBulb extends React.Component {
         name: "Hue Lamp 1"
     };
 
-    async componentWillMount() {
-        await this.props._fetchAllLights();
+    componentWillMount() {
+        this.props._fetchAllLights();
+        interval = setInterval(() => {
+            this.props._fetchAllLights();
+          }, 1000)
+        
     }
 
     async componentDidMount() {
@@ -53,6 +59,10 @@ class ControlBulb extends React.Component {
         })
         await this.calculatePercentage("bri", this.state.bri)
         await this.calculatePercentage("sat", this.state.sat)
+    }
+
+    componentWillUnmount() {
+        clearInterval(interval);
     }
 
      calculatePercentage = (arg, values) => {
@@ -113,15 +123,15 @@ class ControlBulb extends React.Component {
         });
     }
 
-    changeLightPicker = (idNew) => {
-        this.setState({
+    changeLightPicker = async (idNew) => {
+        await this.setState({
             id: idNew,
             sat: this.props.lights[idNew].state.sat,
             bri: this.props.lights[idNew].state.bri,
             isOnDefaultToggleSwitch: this.props.lights[idNew].state.on
         });
-        this.calculatePercentage("bri", this.props.lights[idNew].state.bri);
-        this.calculatePercentage("sat", this.props.lights[idNew].state.sat);
+        await this.calculatePercentage("bri", this.props.lights[idNew].state.bri);
+        await this.calculatePercentage("sat", this.props.lights[idNew].state.sat);
     }
 
     renderBriSlider() {
