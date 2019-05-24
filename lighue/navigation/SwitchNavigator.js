@@ -3,8 +3,13 @@ import DiscoveryNavigatorScreen from '../navigation/DiscoveryNavigator';
 import AppNavigator from './AppNavigator';
 import SplashNavigator from './SplashNavigator';
 
+import VerifyScreen from './Verify';
+
 const SwitchNavigator = createSwitchNavigator(
   {
+    Verify: {
+      screen : VerifyScreen
+    },
     DiscoveryNavigator: {
       screen: DiscoveryNavigatorScreen
     },
@@ -16,7 +21,7 @@ const SwitchNavigator = createSwitchNavigator(
     },
   },
   {
-    initialRouteName: "DiscoveryNavigator",
+    initialRouteName: 'Verify',
     headerMode: 'none'
   }
 );

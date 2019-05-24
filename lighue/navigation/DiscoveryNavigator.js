@@ -8,8 +8,6 @@ import LinkButtonPage from '../screens/DiscoveryBridge/LinkButtonScreen';
 import WelcomeScreen from '../screens/DiscoveryBridge/WelcomeScreen';
 import TestScreen from '../screens/TestScreen';
 
-import ControlBulb from '../screens/Light/ControlBulb';
-
 import {fromRight} from 'react-navigation-transitions';
 import { theme } from '../constants';
 

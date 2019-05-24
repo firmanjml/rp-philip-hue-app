@@ -12,7 +12,7 @@ const SetupNavigatorApp = createStackNavigator(
     }
   },
   {
-    initialRouteName: "createUserName",
+    initialRouteName: "ControlBulb",
     headerMode: 'none'
   }
 );

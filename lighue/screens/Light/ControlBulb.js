@@ -12,7 +12,6 @@ import { theme } from '../../constants';
 import { Block } from '../../components';
 
 import Slider from 'react-native-slider';
-import RNPickerSelect from 'react-native-picker-select';
 
 import axios from 'axios';
 
@@ -46,8 +45,7 @@ class ControlBulb extends React.Component {
         this.props._fetchAllLights();
         interval = setInterval(() => {
             this.props._fetchAllLights();
-          }, 1000)
-        
+        }, 1000)
     }
 
     async componentDidMount() {
@@ -56,16 +54,16 @@ class ControlBulb extends React.Component {
             sat: this.props.lights[this.state.id].state.sat,
             bri: this.props.lights[this.state.id].state.bri,
             isOnDefaultToggleSwitch: this.props.lights[this.state.id].state.on
-        })
-        await this.calculatePercentage("bri", this.state.bri)
-        await this.calculatePercentage("sat", this.state.sat)
+        });
+        await this.calculatePercentage("bri", this.state.bri);
+        await this.calculatePercentage("sat", this.state.sat);
     }
 
     componentWillUnmount() {
         clearInterval(interval);
     }
 
-     calculatePercentage = (arg, values) => {
+    calculatePercentage = (arg, values) => {
         let result = Math.round((values * 100) / 254);
         if (result == 0) {
             if (arg == "sat") {
@@ -107,13 +105,13 @@ class ControlBulb extends React.Component {
             this.props._changeLampStateByID(this.state.id, {
                 sat: values
             });
-            this.calculatePercentage("sat",values);
+            this.calculatePercentage("sat", values);
         }
         else if (arg == "bri") {
             this.props._changeLampStateByID(this.state.id, {
                 bri: values
             });
-            this.calculatePercentage("bri",values);
+            this.calculatePercentage("bri", values);
         }
     }
 
@@ -162,7 +160,7 @@ class ControlBulb extends React.Component {
                 maximumTrackTintColor="rgba(157, 163, 180, 0.10)"
                 value={this.state.sat}
                 onValueChange={(value) => this.changeLightState("sat", value)}
-                />
+            />
         )
     }
 
@@ -190,54 +188,12 @@ class ControlBulb extends React.Component {
         )
     }
 
-    renderLightPicker() {
-        const lights = [
-            {
-                label: 'Hue Light 2',
-                value: '2',
-            },
-            {
-                label: 'Hue Light 3',
-                value: '3',
-            },
-            {
-                label: 'Hue Light 4',
-                value: '4',
-            },
-            {
-                label: 'Hue Light 5',
-                value: '5',
-            },
-            {
-                label: 'Hue Light 6',
-                value: '6',
-            }
-        ];
-
-        const placeholder = {
-            label: "Hue Light 1",
-            value: '1',
-            color: 'black',
-        };
-
-        return (
-            <RNPickerSelect
-                placeholder={placeholder}
-                items={lights}
-                style={pickerSelectStyles}
-                useNativeAndroidPickerStyle={false}
-                onValueChange={(value) => this.changeLightPicker(value)}
-            />
-        )
-    }
-
     render() {
         return (
             <Block style={styles.container}>
                 <Block style={styles.colorControl}>
                     <View style={styles.titleRow}>
-                        {/* <Text style={styles.title}>{this.state.name}</Text> */}
-                        {this.renderLightPicker()}
+                        <Text style={styles.title}>{this.state.name}</Text>
                         {this.renderToggleButton()}
                     </View>
                     <Text style={styles.textControl}>Brightness</Text>
@@ -319,16 +275,3 @@ const styles = StyleSheet.create({
         marginBottom: 10
     }
 })
-
-const pickerSelectStyles = StyleSheet.create({
-    inputIOS: {
-        fontSize: 26,
-        color: 'white',
-        paddingRight: 30
-    },
-    inputAndroid: {
-        fontSize: 26,
-        color: 'white',
-        paddingRight: 30, 
-      },
-});
