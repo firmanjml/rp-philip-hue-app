@@ -126,7 +126,6 @@ class ControlBulb extends React.Component {
             on: boolean
         });
     }
-
     renderBriSlider() {
         return (
             <Slider
