@@ -1,15 +1,15 @@
 import React from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, Image } from 'react-native';
 import { ColorPicker } from 'react-native-color-picker'
 
 import { connect } from 'react-redux'
 import { GetAllLights, SetLampState } from '../../redux/actions'
 import ToggleSwitch from '../../components/ToggleSwitch'
 
-import { ColorConversionToXY } from '../../components/ColorConvert';
+import { ColorConversionToXY, ConvertXYtoHex } from '../../components/ColorConvert';
 import { theme } from '../../constants';
 
-import { Block } from '../../components';
+import { Block, Input, Text } from '../../components';
 
 import Slider from 'react-native-slider';
 
@@ -33,34 +33,40 @@ class ControlBulb extends React.Component {
 
     state = {
         id: 1,
+        color: null,
         sat: null,
         bri: null,
         satPer: null,
         briPer: null,
         isOnDefaultToggleSwitch: false,
-        name: "Hue Lamp 1"
+        roomName : "Bedroom",
+        bulbName: "Hue Lamp 1"
     };
 
     componentWillMount() {
-        this.props._fetchAllLights();
         interval = setInterval(() => {
             this.props._fetchAllLights();
         }, 1000)
     }
 
     async componentDidMount() {
-        await this.setState({
-            name: this.props.lights[this.state.id].name,
-            sat: this.props.lights[this.state.id].state.sat,
-            bri: this.props.lights[this.state.id].state.bri,
-            isOnDefaultToggleSwitch: this.props.lights[this.state.id].state.on
-        });
-        await this.calculatePercentage("bri", this.state.bri);
-        await this.calculatePercentage("sat", this.state.sat);
+        await this.initialState();
     }
 
-    componentWillUnmount() {
-        clearInterval(interval);
+    initialState = async () => {
+        var x = await this.props.lights[this.state.id].state.xy[0]
+        var y = await this.props.lights[this.state.id].state.xy[1]
+        var bri = await this.props.lights[this.state.id].state.bri
+        var result = await ConvertXYtoHex(x, y, bri)
+        this.setState({
+            name: this.props.lights[this.state.id].name,
+            color: result,
+            sat: this.props.lights[this.state.id].state.sat,
+            bri: bri,
+            isOnDefaultToggleSwitch: this.props.lights[this.state.id].state.on
+        });
+        await this.calculatePercentage("bri", this.state.bri)
+        await this.calculatePercentage("sat", this.state.sat)
     }
 
     calculatePercentage = (arg, values) => {
@@ -121,17 +127,6 @@ class ControlBulb extends React.Component {
         });
     }
 
-    changeLightPicker = async (idNew) => {
-        await this.setState({
-            id: idNew,
-            sat: this.props.lights[idNew].state.sat,
-            bri: this.props.lights[idNew].state.bri,
-            isOnDefaultToggleSwitch: this.props.lights[idNew].state.on
-        });
-        await this.calculatePercentage("bri", this.props.lights[idNew].state.bri);
-        await this.calculatePercentage("sat", this.props.lights[idNew].state.sat);
-    }
-
     renderBriSlider() {
         return (
             <Slider
@@ -170,6 +165,7 @@ class ControlBulb extends React.Component {
                 onColorChange={(color) => this.changeLightState("color", color)}
                 style={{ flex: 1 }}
                 hideSliders={true}
+                color={this.state.color}
             />
         )
     }
@@ -193,18 +189,27 @@ class ControlBulb extends React.Component {
             <Block style={styles.container}>
                 <Block style={styles.colorControl}>
                     <View style={styles.titleRow}>
-                        <Text style={styles.title}>{this.state.name}</Text>
+                        <Text style={styles.title}>{this.state.bulbName}</Text>
                         {this.renderToggleButton()}
                     </View>
-                    <Text style={styles.textControl}>Brightness</Text>
-                    {this.renderBriSlider()}
-                    <Text style={styles.textPer}>{this.state.briPer}%</Text>
-                    <Text style={styles.textControl}>Saturation</Text>
-                    {this.renderSatSlider()}
-                    <Text style={styles.textPer}>{this.state.satPer}%</Text>
-                    {this.renderColorPicker()}
-                </Block>
+                    <Text style={styles.textControl}>
+                        Room Name
+                        </Text>
+                    <Input
+                        style={styles.textInput}
+                        editable={false}
+                        value = {this.state.roomName}
+                        placeholderTextColor={theme.colors.gray2}
+                    />
+                    <Text style={[styles.textControl, {marginBottom: 10}]}>Brightness</Text>
+                {this.renderBriSlider()}
+                <Text style={styles.textPer}>{this.state.briPer}%</Text>
+                <Text style={[styles.textControl, {marginBottom: 10}]}>Saturation</Text>
+                {this.renderSatSlider()}
+                <Text style={styles.textPer}>{this.state.satPer}%</Text>
+                {this.renderColorPicker()}
             </Block>
+            </Block >
         );
     }
 }
@@ -242,8 +247,17 @@ const styles = StyleSheet.create({
     lightPicker: {
         width: 10
     },
+    textInput: {
+        height: 20,
+        borderBottomWidth: .5,
+        borderRadius: 0,
+        borderWidth: 0,
+        color: 'white',
+        borderColor: 'white',
+        textAlign: 'left',
+        paddingBottom: 10
+    },
     colorControl: {
-        marginTop: 40,
         marginLeft: theme.sizes.base * 2,
         marginRight: theme.sizes.base * 2
     },
@@ -267,11 +281,10 @@ const styles = StyleSheet.create({
     titleRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginBottom: 30
+        marginBottom: 25
     },
     textControl: {
         textAlign: 'left',
-        color: 'white',
-        marginBottom: 10
+        color: 'white'
     }
 })
