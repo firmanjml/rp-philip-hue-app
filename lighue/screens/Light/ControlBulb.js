@@ -106,6 +106,7 @@ class ControlBulb extends React.Component {
                 url: `http://${this.props.bridgeip}/api/${this.props.username}/lights/${this.state.id}/state`,
                 data: { xy: result }
             })
+            this.setState({color : values})
         }
         else if (arg == "sat") {
             this.props._changeLampStateByID(this.state.id, {
@@ -126,7 +127,6 @@ class ControlBulb extends React.Component {
             on: boolean
         });
     }
-
     renderBriSlider() {
         return (
             <Slider
@@ -248,7 +248,7 @@ const styles = StyleSheet.create({
         width: 10
     },
     textInput: {
-        height: 20,
+        height: 30,
         borderBottomWidth: .5,
         borderRadius: 0,
         borderWidth: 0,
@@ -258,6 +258,7 @@ const styles = StyleSheet.create({
         paddingBottom: 10
     },
     colorControl: {
+        marginTop : 5,
         marginLeft: theme.sizes.base * 2,
         marginRight: theme.sizes.base * 2
     },
