@@ -40,6 +40,7 @@ export default class Typography extends Component {
       gray,
       gray2,
       style,
+      red,
       children,
       ...props
     } = this.props;
@@ -78,6 +79,7 @@ export default class Typography extends Component {
       white && styles.white,
       gray && styles.gray,
       gray2 && styles.gray2,
+      red && styles.red,
       style // rewrite predefined styles
     ];
 
@@ -123,6 +125,7 @@ const styles = StyleSheet.create({
   white: { color: theme.colors.white },
   gray: { color: theme.colors.gray },
   gray2: { color: theme.colors.gray2 },
+  red: { color: theme.colors.accent },
   // fonts
   h1: theme.fonts.h1,
   h2: theme.fonts.h2,

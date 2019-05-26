@@ -5,10 +5,10 @@ import { Constants } from 'expo';
 
 class viewUserName extends React.Component {
     render() {
-        const { navigate } = this.props.navigation;
+        const { bridgeIndex, username } = this.props;
         return (
             <View style={styles.container}>
-                <Text>{this.props.username}</Text>
+                <Text>{username[bridgeIndex]}</Text>
                 <Text>{Constants.deviceName}</Text>
             </View>
         );
@@ -17,7 +17,8 @@ class viewUserName extends React.Component {
 
 const mapStateToProps = state => {
     return {
-        username: state.username
+        username: state.username,
+        bridgeIndex: state.bridgeIndex
     }
 }
 

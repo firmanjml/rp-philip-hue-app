@@ -19,19 +19,20 @@ class LinkButtonScreen extends Component {
                     <TouchableOpacity
                         onPress={() => navigation.goBack()}
                         style={{ height: 40, width: 80, justifyContent: 'center' }}>
-                        <Image source={require('../../assets/images/back.png')} />
+                        <Image source={require('../../assets/icons/back.png')} />
                     </TouchableOpacity>
                 </TouchableOpacity>
         }
     }
 
     createUsername = () => {
-        if (!this.props.username) {
+        const { username, bridgeIndex, bridgeip } = this.props;
+        if (!username[bridgeIndex]) {
             this.props._CreateUser();
             console.log("Link button not pressed!");
         } else {
             console.log("Link button pressed");
-            this.props.navigation.navigate("SplashPage")
+            this.props.navigation.navigate("SplashNavigator")
         }
     }
 
@@ -96,6 +97,7 @@ class LinkButtonScreen extends Component {
 const mapStateToProps = (state) => {
     return {
         bridgeip: state.bridgeip,
+        bridgeIndex: state.bridgeIndex,
         username: state.username
     }
 }

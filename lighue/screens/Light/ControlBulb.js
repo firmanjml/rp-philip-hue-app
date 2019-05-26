@@ -25,7 +25,7 @@ class ControlBulb extends React.Component {
                     <TouchableOpacity
                         onPress={() => navigation.goBack()}
                         style={{ height: 40, width: 80, justifyContent: 'center' }}>
-                        <Image source={require('../../assets/images/back.png')} />
+                        <Image source={require('../../assets/icons/back.png')} />
                     </TouchableOpacity>
                 </TouchableOpacity>
         }
@@ -39,7 +39,7 @@ class ControlBulb extends React.Component {
         satPer: null,
         briPer: null,
         isOnDefaultToggleSwitch: false,
-        roomName : "Bedroom",
+        roomName: "Bedroom",
         bulbName: "Hue Lamp 1"
     };
 
@@ -90,6 +90,7 @@ class ControlBulb extends React.Component {
     }
 
     changeLightState = (arg, values) => {
+        const { bridgeip, username, bridgeIndex } = this.props; 
         if (!this.state.isOnDefaultToggleSwitch) {
             this.props._changeLampStateByID(this.state.id, {
                 on: true
@@ -103,10 +104,10 @@ class ControlBulb extends React.Component {
             let result = ColorConversionToXY(values);
             axios({
                 method: 'PUT',
-                url: `http://${this.props.bridgeip}/api/${this.props.username}/lights/${this.state.id}/state`,
+                url: `http://${bridgeip[bridgeIndex]}/api/${username[bridgeIndex]}/lights/${this.state.id}/state`,
                 data: { xy: result }
             })
-            this.setState({color : values})
+            this.setState({ color: values })
         }
         else if (arg == "sat") {
             this.props._changeLampStateByID(this.state.id, {
@@ -198,18 +199,18 @@ class ControlBulb extends React.Component {
                     <Input
                         style={styles.textInput}
                         editable={false}
-                        value = {this.state.roomName}
+                        value={this.state.roomName}
                         placeholderTextColor={theme.colors.gray2}
                     />
-                    <Text style={[styles.textControl, {marginBottom: 10}]}>Brightness</Text>
-                {this.renderBriSlider()}
-                <Text style={styles.textPer}>{this.state.briPer}%</Text>
-                <Text style={[styles.textControl, {marginBottom: 10}]}>Saturation</Text>
-                {this.renderSatSlider()}
-                <Text style={styles.textPer}>{this.state.satPer}%</Text>
-                {this.renderColorPicker()}
+                    <Text style={[styles.textControl, { marginBottom: 10 }]}>Brightness</Text>
+                    {this.renderBriSlider()}
+                    <Text style={styles.textPer}>{this.state.briPer}%</Text>
+                    <Text style={[styles.textControl, { marginBottom: 10 }]}>Saturation</Text>
+                    {this.renderSatSlider()}
+                    <Text style={styles.textPer}>{this.state.satPer}%</Text>
+                    {this.renderColorPicker()}
+                </Block>
             </Block>
-            </Block >
         );
     }
 }
@@ -229,6 +230,7 @@ const mapDispatchToProps = (dispatch) => {
 const mapStateToProps = (state) => {
     return {
         lights: state.lights,
+        bridgeIndex: state.bridgeIndex,
         bridgeip: state.bridgeip,
         username: state.username
     }
@@ -258,7 +260,7 @@ const styles = StyleSheet.create({
         paddingBottom: 10
     },
     colorControl: {
-        marginTop : 5,
+        marginTop: 5,
         marginLeft: theme.sizes.base * 2,
         marginRight: theme.sizes.base * 2
     },

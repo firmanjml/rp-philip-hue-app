@@ -27,10 +27,11 @@ const mapDispatchToprops = (dispatch) => {
 class StartPage extends React.Component {
 
     componentWillMount() {
-        if (!this.props.bridgeip) {
+        const { bridgeip, username, bridgeIndex } = this.props;
+        if (!bridgeip[bridgeIndex]) {
             this.props._GetBridgeIP()();
         }
-        if (this.props.username) {
+        if (username[bridgeIndex]) {
             this.props.navigation.navigate("viewUserName")
         }
     }
@@ -63,7 +64,7 @@ class StartPage extends React.Component {
                         onPress={() => this.props.navigation.navigate("Controlbulb")}
                     />
                 </View>
-            </View >
+            </View>
         );
     }
 }

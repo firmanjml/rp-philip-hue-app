@@ -14,6 +14,18 @@ export const ChangeLoading = (visibility) => ({
 });
 
 /** 
+ * SwitchBridge
+ * * Allow switching into multiple bridges
+ * @param {number} index This paramter takes in the index of the bridge.
+*/
+export const SwitchBridge = (index = 0) => (dispatch) => {
+    dispatch({
+        type: C.CHANGE_BRIDGE,
+        payload: index
+    })
+}
+
+/** 
  * GetBridgeIP
  * * Discover Bridge IP through NUPNP or set manual IP
  * * https://developers.meethue.com/develop/get-started-2/
@@ -21,7 +33,7 @@ export const ChangeLoading = (visibility) => ({
  * @param {boolean} isManual This paramter takes in boolean data
  * @param {string} bridgeip This paramter takes in the bridge ip address if 'isManual' is true.
 */
-export const GetBridgeIP = (navigation, isManual = false, bridgeip = '') => async (dispatch) => {
+export const GetBridgeIP = (navigation, isManual = false, bridgeip = '') => async (dispatch, getState) => {
     dispatch(ChangeLoading(true));
     if (isManual) {
         await axios({
@@ -51,8 +63,8 @@ export const GetBridgeIP = (navigation, isManual = false, bridgeip = '') => asyn
         });
     } else {
         await axios({
-            url: 'https://discovery.meethue.com',
-            // url: 'https://api.myjson.com/bins/1eqhrc',
+            // url: 'https://discovery.meethue.com',
+            url: 'https://api.myjson.com/bins/1eqhrc',
             method: 'GET'
         }).then((res) => {
             dispatch({
@@ -68,15 +80,26 @@ export const GetBridgeIP = (navigation, isManual = false, bridgeip = '') => asyn
     }
 }
 
+export const AddBridge = (bridgeip = "") => (dispatch) => {
+    dispatch({
+        type: C.ADD_BRIDGE,
+        payload: bridgeip
+    })
+}
+
 /** 
  * GetAllLights
  * * Document 1.1 Get All Light
  * * https://developers.meethue.com/develop/hue-api/lights-api/#get-all-lights
 */
-export const GetAllLights = () => (dispatch, getState) => {
+export const GetAllLights = () => async (dispatch, getState) => {
+    const i = getState().bridgeIndex;
+    const bridgeip = getState().bridgeip[i];
+    const username = getState().username[i];
+
     dispatch(ChangeLoading(true));
-    axios({
-        url: `http://${getState().bridgeip}/api/${getState().username}/lights`,
+    await axios({
+        url: `http://${bridgeip}/api/${username}/lights`,
         method: 'GET'
     }).then((res) => {
         dispatch({
@@ -90,6 +113,42 @@ export const GetAllLights = () => (dispatch, getState) => {
 };
 
 /** 
+ * GetNewLights
+ * * Document 1.2 Get New Lights
+ * * https://developers.meethue.com/develop/hue-api/lights-api/#get-new-lights
+*/
+export const GetNewLights = () => (dispatch, getState) => {
+    const i = getState().bridgeIndex;
+    const bridgeip = getState().bridgeip[i];
+    const username = getState().username[i];
+    axios({
+        url: `http://${bridgeip}/api/${username}/lights/new`,
+        method: 'GET'
+    }).catch((error) => {
+        console.log(error);
+    })
+};
+
+/** 
+ * SearchForNewLights
+ * * Document 1.3 Search For New Light
+ * * https://developers.meethue.com/develop/hue-api/lights-api/#search-for-new-lights
+*/
+export const SearchForNewLights = () => (dispatch, getState) => {
+    const i = getState().bridgeIndex;
+    const bridgeip = getState().bridgeip[i];
+    const username = getState().username[i];
+    axios({
+        url: `http://${bridgeip}/api/${username}/lights`,
+        method: 'POST'
+    }).then(() => {
+        dispatch(GetNewLights());
+    }).catch((error) => {
+        console.log(error);
+    })
+};
+
+/** 
  * SetLampState
  * * Document 1.6 Set Light State
  * * https://developers.meethue.com/develop/hue-api/lights-api/#set-light-state
@@ -97,9 +156,13 @@ export const GetAllLights = () => (dispatch, getState) => {
  * @param {object} lampData This paramter takes in the body argument of the request.
 */
 export const SetLampState = (lampID, lampData) => (dispatch, getState) => {
+    const i = getState().bridgeIndex;
+    const bridgeip = getState().bridgeip[i];
+    const username = getState().username[i];
+
     dispatch(ChangeLoading(true));
     axios({
-        url: `http://${getState().bridgeip}/api/${getState().username}/lights/${lampID}/state`,
+        url: `http://${bridgeip}/api/${username}/lights/${lampID}/state`,
         method: 'PUT',
         data: lampData
     }).then(res => {
@@ -131,9 +194,12 @@ export const SetLampState = (lampID, lampData) => (dispatch, getState) => {
  * @param {number} lampID This paramter takes in the light ID.
 */
 export const DeleteLight = (lampID) => (dispatch, getState) => {
+    const i = getState().bridgeIndex;
+    const bridgeip = getState().bridgeip[i];
+    const username = getState().username[i];
     dispatch(ChangeLoading(true));
     axios({
-        url: `http://${getState().bridgeip}/api/${getState().username}/lights/${lampID}`,
+        url: `http://${bridgeip}/api/${username}/lights/${lampID}`,
         method: 'DELETE'
     }).then((res) => {
         if (res.data[0].success) {
@@ -156,9 +222,12 @@ export const DeleteLight = (lampID) => (dispatch, getState) => {
  * * https://developers.meethue.com/develop/hue-api/groupds-api/#get-all-groups
 */
 export const GetAllGroups = () => (dispatch, getState) => {
+    const i = getState().bridgeIndex;
+    const bridgeip = getState().bridgeip[i];
+    const username = getState().username[i];
     dispatch(ChangeLoading(true));
     axios({
-        url: `http://${getState().bridgeip}/api/${getState().username}/groups`,
+        url: `http://${bridgeip}/api/${username}/groups`,
         method: 'GET'
     }).then((res) => {
         dispatch({
@@ -178,9 +247,13 @@ export const GetAllGroups = () => (dispatch, getState) => {
  * @param {object} groupData This paramter takes in the body argument of the request.
 */
 export const CreateGroup = (groupData) => (dispatch, getState) => {
+    const i = getState().bridgeIndex;
+    const bridgeip = getState().bridgeip[i];
+    const username = getState().username[i];
+
     dispatch(ChangeLoading(true));
     axios({
-        url: `http://${getState().bridgeip}/api/${getState().username}/groups`,
+        url: `http://${bridgeip}/api/${username}/groups`,
         method: 'POST',
         data: groupData
     }).then(res => {
@@ -211,9 +284,13 @@ export const CreateGroup = (groupData) => (dispatch, getState) => {
  * @param {number} groupID This paramter takes in the group ID.
 */
 export const GetGroupAtrributes = (groupID) => (dispatch, getState) => {
+    const i = getState().bridgeIndex;
+    const bridgeip = getState().bridgeip[i];
+    const username = getState().username[i];
+
     dispatch(ChangeLoading(true));
     axios({
-        url: `http://${getState().bridgeip}/api/${getState().username}/groups/${groupID}`,
+        url: `http://${bridgeip}/api/${username}/groups/${groupID}`,
         method: 'GET',
     }).then(res => {
         if (res.data) {
@@ -239,9 +316,13 @@ export const GetGroupAtrributes = (groupID) => (dispatch, getState) => {
  * @param {object} groupData This paramter takes in the body argument of the request.
 */
 export const SetGroupState = (groupID, groupData) => (dispatch, getState) => {
+    const i = getState().bridgeIndex;
+    const bridgeip = getState().bridgeip[i];
+    const username = getState().username[i];
+
     dispatch(ChangeLoading(true));
     axios({
-        url: `http://${getState().bridgeip}/api/${getState().username}/groups/${groupID}/action`,
+        url: `http://${bridgeip}/api/${username}/groups/${groupID}/action`,
         method: 'PUT',
         data: groupData
     }).then(res => {
@@ -273,9 +354,13 @@ export const SetGroupState = (groupID, groupData) => (dispatch, getState) => {
  * @param {number} groupID This paramter takes in the group ID.
 */
 export const DeleteGroup = (groupID) => (dispatch, getState) => {
+    const i = getState().bridgeIndex;
+    const bridgeip = getState().bridgeip[i];
+    const username = getState().username[i];
+
     dispatch(ChangeLoading(true));
     axios({
-        url: `http://${getState().bridgeip}/api/${getState().username}/groups/${groupID}`,
+        url: `http://${bridgeip}/api/${username}/groups/${groupID}`,
         method: 'DELETE'
     }).then((res) => {
         if (res.data[0].success) {
@@ -298,9 +383,12 @@ export const DeleteGroup = (groupID) => (dispatch, getState) => {
  * * https://developers.meethue.com/develop/hue-api/7-configuration-api/#create-user
 */
 export const CreateUser = () => (dispatch, getState) => {
+    const i = getState().bridgeIndex;
+    const bridgeip = getState().bridgeip[i];
+
     dispatch(ChangeLoading(true));
     axios({
-        url: `http://${getState().bridgeip}/api`,
+        url: `http://${bridgeip}/api`,
         method: 'POST',
         data: {
             devicetype: `Lighue#${Constants.deviceName}`
@@ -324,9 +412,13 @@ export const CreateUser = () => (dispatch, getState) => {
  * * https://developers.meethue.com/develop/hue-api/7-configuration-api/#get-configuration 
 */
 export const GetConfig = async (dispatch, getState) => {
+    const i = getState().bridgeIndex;
+    const bridgeip = getState().bridgeip[i];
+    const username = getState().username[i];
+
     dispatch(ChangeLoading(true));
     await axios({
-        url: `http://${getState().bridgeip}/api/${getState().username}/config`,
+        url: `http://${bridgeip}/api/${username}/config`,
         method: 'GET'
     }).then((res) => {
         dispatch({

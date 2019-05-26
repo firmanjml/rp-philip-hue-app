@@ -33,7 +33,7 @@ class Splash extends Component {
         );
     }
     _onDone = () => {
-        this.props.navigation.navigate("ControlBulb");
+        this.props.navigation.navigate("ListRoom");
     }
     render() {
         return <AppIntroSlider renderItem={this._renderItem} slides={constant.splash_slider} onDone={this._onDone} />;

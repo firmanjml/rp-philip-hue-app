@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { StyleSheet, Alert } from 'react-native'
 import { connect } from 'react-redux'
-import { GetAllGroups, SetGroupState, CreateGroup, DeleteGroup, GetAllLights, SetLampState, DeleteLight } from '../redux/actions'
+import { SwitchBridge, AddBridge, GetAllGroups, SetGroupState, CreateGroup, DeleteGroup, GetAllLights, SetLampState, DeleteLight } from '../redux/actions'
 import Spinner from "react-native-loading-spinner-overlay";
 import { Button, Block, Text, Divider } from '../components';
 import { theme } from '../constants';
@@ -17,15 +17,19 @@ class TestScreen extends Component {
         light_on: false,
         name : ''
     }
-    componentWillMount() {
+    async componentWillMount() {
+        // await this.props._setIP();
+        // console.log("TestScreen", this.props.bridgeip);
+        // console.log("TestScreen", this.props.bridgeIndex);
+
         // // before calling get group api
         // console.log(this.props.groups);
         // // after calling get group api
         // console.log(this.props.groups[0].name);
-        this.props._fetchAllGroups();
-        this.props._fetchAllLights();
-        this.setState({ group_on: this.props.groups["1"].action.on })
-        this.setState({ light_on: this.props.lights["1"].state.on })
+        await this.props._fetchAllGroups();
+        // this.props._fetchAllLights();
+        // this.setState({ group_on: this.props.groups["1"].action.on })
+        // this.setState({ light_on: this.props.lights["1"].state.on })
         // this.props._fetchAllLights();
     }
 
@@ -48,11 +52,11 @@ class TestScreen extends Component {
         // this.props._changeLampStateByID(2, {
         //     on : false
         // });
-
+        const { bridgeip, bridgeIndex, username } = this.props;
         if (isLog) {
-            console.log(this.props.groups)
+            console.log("TestScreen.Group", this.props.groups)
         } else {
-            if (this.props.bridgeip && this.props.username) {
+            if (bridgeip[bridgeIndex] && username[bridgeIndex]) {
                 this.setState({ group_on: !this.state.group_on })
                 this.props._changeGroupStateByID(1, {
                     on: this.state.group_on
@@ -74,10 +78,11 @@ class TestScreen extends Component {
     }
 
     light(isLog = false) {
+        const { bridgeip, bridgeIndex, username } = this.props;
         if (isLog) {
-            console.log(this.props.lights)
+            console.log("TestScreen.Light", this.props.lights)
         } else {
-            if (this.props.bridgeip && this.props.username) {
+            if (bridgeip[bridgeIndex] && username[bridgeIndex]) {
                 this.setState({ light_on: !this.state.light_on })
                 this.props._changeLampStateByID(1, {
                     on: this.state.light_on
@@ -96,6 +101,11 @@ class TestScreen extends Component {
             }
 
         }
+    }
+
+    switchBridge() {
+        // this.props._switchBridge(1);
+        
     }
 
 
@@ -122,17 +132,17 @@ class TestScreen extends Component {
                     </Button>
                 </Block>
                 <Block middle flex={0.2} margin={[0, theme.sizes.padding * 2]}>
-                    <Text h1 center bold white style={{ marginTop: 10 }}>Light Test</Text>
-                    <Button shadow onPress={() => this.light()}>
-                        <Text center semibold>Turn {this.state.light_on ? 'On' : 'Off'} Light 1</Text>
+                    <Text h1 center bold white style={{ marginTop: 10 }}>Switch Bridge</Text>
+                    <Button shadow onPress={() => this.switchBridge()}>
+                        <Text center semibold>Switch Bridge</Text>
                     </Button>
                     <Button shadow onPress={() => this.light(true)}>
                         <Text center semibold>Output Light 1 Log Data</Text>
                     </Button>
                 </Block>
                 <Block bottom flex={0.15} margin={[0, theme.sizes.padding * 2]}>
-                    <Text h3 center bold white style={{ marginTop: 10 }}>{this.props.bridgeip ? this.props.bridgeip : 'Not connected to bridge'}</Text>
-                    <Text h3 center bold white style={{ marginTop: 10 }}>{this.props.username ? this.props.username : 'Not linked to bridge'}</Text>
+                    <Text h3 center bold white style={{ marginTop: 10 }}>{this.props.bridgeip[this.props.bridgeIndex] ? this.props.bridgeip[this.props.bridgeIndex] : 'Not connected to bridge'}</Text>
+                    <Text h3 center bold white style={{ marginTop: 10 }}>{this.props.username[this.props.bridgeIndex] ? this.props.username[this.props.bridgeIndex] : 'Not linked to bridge'}</Text>
                 </Block>
             </Block>
         )
@@ -144,6 +154,7 @@ const mapStateToProps = (state) => {
         loading: state.loading,
         groups: state.groups,
         lights: state.lights,
+        bridgeIndex: state.bridgeIndex,
         bridgeip: state.bridgeip,
         username: state.username
     }
@@ -151,6 +162,12 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
+        _setIP() {
+            return dispatch(AddBridge("192.168.1.134"))
+        },
+        _switchBridge(index) {
+            return dispatch(SwitchBridge(index))
+        },
         _fetchAllGroups() {
             return dispatch(GetAllGroups());
         },

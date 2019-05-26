@@ -17,7 +17,7 @@ class ManualScreen extends React.Component {
                     <TouchableOpacity
                         onPress={() => navigation.goBack()}
                         style={{ height: 40, width: 80, justifyContent: 'center' }}>
-                        <Image source={require('../../assets/images/back.png')} />
+                        <Image source={require('../../assets/icons/back.png')} />
                     </TouchableOpacity>
                 </TouchableOpacity>
         }

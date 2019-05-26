@@ -8,27 +8,28 @@ import {
 import { connect } from 'react-redux';
 
 const mapStateToProps = state => {
-    return {
-        bridgeip: state.bridgeip,
-        username: state.username
-    }
+  return {
+    bridgeIndex: state.bridgeIndex,
+    bridgeip: state.bridgeip,
+    username: state.username
+  }
 }
-
 
 class Verify extends React.Component {
 
-    componentWillMount() {
-        this.verifying();
-    }
+  componentWillMount() {
+    this.verifying();
+  }
 
-    verifying() {
-        if (this.props.bridgeip && this.props.username) {
-            this.props.navigation.navigate("ControlBulb")
-        }
-        else {
-            this.props.navigation.navigate("StartPage")
-        }
+  verifying() {
+    const { bridgeip, username, navigation, bridgeIndex } = this.props;
+    if (bridgeip[bridgeIndex] && username[bridgeIndex]) {
+      navigation.navigate("ListRoom")
     }
+    else {
+      navigation.navigate("StartPage")
+    }
+  }
 
   render() {
     return (

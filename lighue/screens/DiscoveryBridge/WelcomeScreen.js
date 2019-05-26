@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Animated, Image, FlatList, StyleSheet } from 'react-native';
+import { Animated, Image, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { Button, Block, Text } from '../../components';
 import { theme } from '../../constants';
 import Layout from '../../constants/Layout';
@@ -26,6 +26,7 @@ class WelcomeScreen extends Component {
         // }, 3000)
         // console.log(Layout.window.height)
         // console.log(Layout.window.width)
+
         await this.props._GetBridgeIP();
         if (this.props.bridgeip) {
             SnackBar.show('New Hue Bridge Found!', { duration: 4000 });

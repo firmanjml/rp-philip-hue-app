@@ -27,15 +27,31 @@ export const nightmode = (state = false, action) => {
 }
 
 /** 
+ * bridgeIndex
+ * * Redux reducer stores the index of the bridge to Redux state.
+*/
+export const bridgeIndex = (state = 0, action) => {
+    switch (action.type) {
+        case C.CHANGE_BRIDGE:
+            return action.payload;
+        default:
+            return state;
+    }
+}
+
+/** 
  * bridgeip
  * * Redux reducer stores bridge ip address data to Redux state.
 */
-export const bridgeip = (state = '', action) => {
+export const bridgeip = (state = [], action) => {
     switch (action.type) {
         case C.FETCH_BRIDGE_IP:
-            return action.payload;
-        case C.CHANGE_BRIDGE_IP:
-            _state = action.payload;
+            _state = JSON.parse(JSON.stringify(state))
+            _state[0] = action.payload;
+            return _state;
+        case C.ADD_BRIDGE:
+            _state = JSON.parse(JSON.stringify(state))
+            _state.push(action.payload);
             return _state;
         default:
             return state;
@@ -46,13 +62,11 @@ export const bridgeip = (state = '', action) => {
  * username
  * * Redux reducer stores username data it recevied from the API to Redux state.
 */
-export const username = (state = '', action) => {
+export const username = (state = [], action) => {
     switch (action.type) {
         case C.FETCH_USERNAME:
-            return action.payload;
-        case C.CHANGE_USERNAME:
-            _state = JSON.parse(JSON.stringify(state));
-            _state.success.username = action.payload;
+            _state = JSON.parse(JSON.stringify(state))
+            _state.push(action.payload)
             return _state;
         default:
             return state;
@@ -129,6 +143,7 @@ export const lights = (state = {}, action) => {
 }
 
 export default combineReducers({
+    bridgeIndex,
     bridgeip,
     config,
     groups,

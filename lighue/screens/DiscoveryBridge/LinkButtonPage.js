@@ -35,7 +35,8 @@ let interval;
 class LinkButtonPage extends React.Component {
 
   createUsername = () => {
-    if (!this.props.username) {
+    const { username, bridgeIndex } = this.props;
+    if (!username[bridgeIndex]) {
       this.props._createUser()()
       console.log("Link button not pressed!")
     }

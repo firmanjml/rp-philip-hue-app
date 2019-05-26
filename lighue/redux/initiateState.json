@@ -1,20 +1,11 @@
 {
   "loading": false,
   "nightmode": true,
-  "bridgeip": "",
-  "username": "",
+  "bridgeIndex": 0,
+  "bridgeip": [],
+  "username": [],
   "config": {},
-  "groups": {
-    "1": {
-      "name": "",
-      "action": {
-        "on": false
-      },
-      "lights": [],
-      "state": {},
-      "class": ""
-    }
-  },
+  "groups": {},
   "lights": {
     "1": {
       "state": {
