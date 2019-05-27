@@ -4,6 +4,7 @@ import ControlBulbScreen from '../screens/Light/ControlBulb';
 import DefaultScreen from '../screens/Rooms/DefaultScreen';
 import TestScreen from '../screens/TestScreen';
 
+import  { Platform } from 'react-native';
 import LightDemo from '../screens/LightDemoMode';
 import SettingsScreen from '../screens/Setting';
 
