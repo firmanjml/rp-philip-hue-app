@@ -3,6 +3,7 @@ import Splash from '../screens/Splash'
 import {fromRight} from 'react-navigation-transitions';
 import { theme } from '../constants';
 
+import {Platform} from 'react-native';
 const SetupNavigatorApp = createStackNavigator(
   {
     Splash: {
