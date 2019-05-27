@@ -1,5 +1,5 @@
 import React from 'react';
-import { Platform, StatusBar, StyleSheet, View } from 'react-native';
+import { Platform, StatusBar, StyleSheet, View} from 'react-native';
 import { AppLoading, Asset, Font, Icon } from 'expo';
 import SwitchNavigator from './navigation/SwitchNavigator';
 import { Provider } from "react-redux";
@@ -13,8 +13,8 @@ export default class App extends React.Component {
   };
 
   render() {
-    // persistor.flush();
-    // persistor.purge();
+    persistor.flush();
+    persistor.purge();
     if (!this.state.isLoadingComplete && !this.props.skipLoadingScreen) {
       return (
         <AppLoading

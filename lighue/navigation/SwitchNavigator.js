@@ -1,7 +1,7 @@
 import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import DiscoveryNavigatorScreen from '../navigation/DiscoveryNavigator';
 import AppNavigator from './AppNavigator';
-import Splash from '../screens/SplashScreen/Splash';
+import SplashNavigator from '../navigation/SplashNavigator';
 
 import VerifyScreen from './Verify';
 
@@ -17,8 +17,8 @@ const SwitchNavigator = createSwitchNavigator(
       screen: AppNavigator
     },
     SplashNavigator: {
-      screen: Splash
-    },
+      screen : SplashNavigator
+    }
   },
   {
     initialRouteName: 'Verify',

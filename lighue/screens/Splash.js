@@ -1,19 +1,26 @@
 import React, { Component } from 'react';
 import { View, Image, StyleSheet } from 'react-native';
-import { Block, Text } from '../../components';
-import { theme, constant } from '../../constants';
+import { Block, Text } from '../components';
+import { theme, constant } from '../constants';
 
 import { connect } from 'react-redux'
-import Layout from '../../constants/Layout';
+import Layout from '../constants/Layout';
 import AppIntroSlider from 'react-native-app-intro-slider';
 
-import { GetAllLights} from '../../redux/actions'
+import { GetAllLights, GetAllGroups } from '../redux/actions'
 
-
+var interval;
 class Splash extends Component {
 
-    async componentWillMount() {
-        await this.props._fetchAllLights();
+    componentWillMount() {
+        interval = setInterval(() => {
+            this.props._fetchAllLights();
+            this.props._fetchAllGroups()
+        }, 1000)
+    }
+
+    componentWillUnmount() {
+        clearInterval(interval);
     }
 
     _renderItem = (item) => {
@@ -42,12 +49,11 @@ class Splash extends Component {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        _changeLampStateByID(id, data) {
-            return dispatch(SetLampState(id, data));
-        },
         _fetchAllLights() {
             return dispatch(GetAllLights())
-        }
+        },
+        _fetchAllGroups: () => dispatch(GetAllGroups()),
+        
     }
 }
 

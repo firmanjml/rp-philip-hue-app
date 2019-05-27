@@ -1,7 +1,6 @@
 import React from 'react';
 import {
   ActivityIndicator,
-  StatusBar,
   View,
 } from 'react-native';
 
@@ -24,10 +23,10 @@ class Verify extends React.Component {
   verifying() {
     const { bridgeip, username, navigation, bridgeIndex } = this.props;
     if (bridgeip[bridgeIndex] && username[bridgeIndex]) {
-      navigation.navigate("ListRoom")
+      navigation.navigate("AppNavigator")
     }
     else {
-      navigation.navigate("StartPage")
+      navigation.navigate("DiscoveryNavigator")
     }
   }
 

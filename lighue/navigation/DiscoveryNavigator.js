@@ -6,6 +6,7 @@ import StepScreen from '../screens/StepbyStep';
 import ManualIPScreen from '../screens/DiscoveryBridge/ManualScreen';
 import LinkButtonPage from '../screens/DiscoveryBridge/LinkButtonScreen';
 import WelcomeScreen from '../screens/DiscoveryBridge/WelcomeScreen';
+
 import TestScreen from '../screens/TestScreen';
 import {fromRight} from 'react-navigation-transitions';
 import { theme } from '../constants';

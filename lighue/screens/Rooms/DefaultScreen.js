@@ -1,12 +1,12 @@
 import React, { Component } from 'react'
-import { Dimensions, Image, StyleSheet, ScrollView, TouchableOpacity, View, RefreshControl } from 'react-native'
+import { Dimensions, Image, StyleSheet, ScrollView, TouchableOpacity, View, RefreshControl, Button } from 'react-native'
 import { Card, Badge, Block, Text } from '../../components';
 import { theme, constant } from '../../constants';
 import Icon from 'react-native-vector-icons';
 import { connect } from 'react-redux';
-import { GetAllGroups } from '../../redux/actions';
+import { GetAllGroups, GetAllLights } from '../../redux/actions';
 import { persistor } from "../../redux/store";
-import { Constants } from 'expo';
+import { Constants, Updates } from 'expo';
 import {
     Menu,
     MenuOptions,
@@ -17,7 +17,11 @@ import {
 
 const { height, width } = Dimensions.get('window');
 
+var interval;
 class DefaultScreen extends Component {
+    static navigationOptions = {
+        header: null
+    }
 
     state = {
         active: 'Rooms',
@@ -25,10 +29,17 @@ class DefaultScreen extends Component {
         refreshing: false
     }
 
-    async componentDidMount() {
-        await this.props._fetchAllGroups();
-        // console.log(JSON.stringify({ name: Constants.deviceName, height, width }, null, 4))
+    componentWillMount() {
+        interval = setInterval(() => {
+            this.props._fetchAllLights();
+            this.props._fetchAllGroups();
+        }, 1000)
     }
+
+    // async componentDidMount() {
+    //     await this.props._fetchAllGroups();
+    //     // console.log(JSON.stringify({ name: Constants.deviceName, height, width }, null, 4))
+    // }
 
     renderTab(tab) {
         const { active } = this.state;
@@ -55,18 +66,34 @@ class DefaultScreen extends Component {
     renderMenu(tab) {
         if (this.state.active === 'Rooms') {
             return (
-                <Menu onSelect={value => this.onMenuSelect(value)}>
+                <Menu onSelect={value => this.onMenuRoomSelect(value)}>
                     <MenuTrigger>
                         <Icon.Entypo name="dots-three-horizontal" size={25} color={theme.colors.gray} />
                     </MenuTrigger>
                     <MenuOptions style={{ padding: 15 }} >
                         <MenuOption value={1}><Text h3>Create new room</Text></MenuOption>
                         <View style={styles.divider} />
-                        <MenuOption value={2}><Text h3>Settings</Text></MenuOption>
+                        <MenuOption value={2}><Text h3>Debug mode</Text></MenuOption>
                         <View style={styles.divider} />
-                        <MenuOption value={3}><Text h3>Debug mode</Text></MenuOption>
+                        <MenuOption value={3}><Text h3>Settings</Text></MenuOption>
                         <View style={styles.divider} />
                         <MenuOption value={4}><Text h3 red>Clear cache</Text></MenuOption>
+                    </MenuOptions>
+                </Menu>
+            )
+        }
+        else if (this.state.active === "Lights") {
+            return (
+                <Menu onSelect={value => this.onMenuLightSelect(value)}>
+                    <MenuTrigger>
+                        <Icon.Entypo name="dots-three-horizontal" size={25} color={theme.colors.gray} />
+                    </MenuTrigger>
+                    <MenuOptions style={{ padding: 15 }} >
+                        <MenuOption value={1}><Text h3>Search for new bulb</Text></MenuOption>
+                        <View style={styles.divider} />
+                        <MenuOption value={2}><Text h3>Demo mode</Text></MenuOption>
+                        <View style={styles.divider} />
+                        <MenuOption value={3}><Text h3>Settings</Text></MenuOption>
                     </MenuOptions>
                 </Menu>
             )
@@ -150,22 +177,35 @@ class DefaultScreen extends Component {
         }
     }
 
-    onMenuSelect(value) {
+    onMenuRoomSelect(value) {
         console.log("DefaultScreen", "press menu " + value);
         if (value == 1) {
             // create Room
             // this.props.navigation.navigate('');
         } else if (value == 2) {
-            // settings
-            // this.props.navigation.navigate('');
-        } else if (value == 3) {
             this.props.navigation.navigate('TestScreen');
-        } else {
+        } else if (value == 3) {
+            // settings
+            this.props.navigation.navigate('Settings');
+        }  else {
             persistor.flush();
             persistor.purge();
             setTimeout(() => {
-                this.props.navigation.navigate("StartPage");
+                // this.props.navigation.navigate("StartPage");
+                Updates.reload()
             }, 1000);
+        }
+    }
+
+    onMenuLightSelect(value) {
+        if (value == 1) {
+            // search new bulb
+            // this.props.navigation.navigate('');
+            console.log("Press bulb")
+        } else if (value == 2) {
+            this.props.navigation.navigate("LightDemo")
+        } else if (value == 3) {
+            this.props.navigation.navigate("Settings")
         }
     }
 

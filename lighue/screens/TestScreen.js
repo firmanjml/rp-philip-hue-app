@@ -12,6 +12,20 @@ import { theme } from '../constants';
  */
 class TestScreen extends Component {
 
+    static navigationOptions = ({ navigation }) => {
+        return {
+            headerLeft:
+                <TouchableOpacity>
+                    <TouchableOpacity
+                        onPress={() => navigation.goBack()}
+                        style={{ height: 40, width: 80, justifyContent: 'center' }}>
+                        <Image source={require('../assets/icons/back.png')} />
+                    </TouchableOpacity>
+                </TouchableOpacity>
+        }
+    }
+
+
     state = {
         group_on: false,
         light_on: false,

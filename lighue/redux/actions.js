@@ -25,6 +25,13 @@ export const SwitchBridge = (index = 0) => (dispatch) => {
     })
 }
 
+export const ChangeThemeMode = (boolean) => (dispatch) => {
+    dispatch({
+        type: C.CHANGE_THEME,
+        payload: boolean
+    })
+}
+
 /** 
  * GetBridgeIP
  * * Discover Bridge IP through NUPNP or set manual IP

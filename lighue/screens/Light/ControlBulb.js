@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 import { ColorPicker } from 'react-native-color-picker'
 
 import { connect } from 'react-redux'
@@ -15,7 +15,6 @@ import Slider from 'react-native-slider';
 
 import axios from 'axios';
 
-var interval;
 class ControlBulb extends React.Component {
 
     static navigationOptions = ({ navigation }) => {
@@ -32,41 +31,46 @@ class ControlBulb extends React.Component {
     }
 
     state = {
-        id: 1,
-        color: null,
+        id: null,
+        // color: null,
         sat: null,
         bri: null,
         satPer: null,
         briPer: null,
         isOnDefaultToggleSwitch: false,
-        roomName: "Bedroom",
-        bulbName: "Hue Lamp 1"
+        roomName: "None",
+        bulbName: null,
+        loading: true
     };
 
     componentWillMount() {
-        interval = setInterval(() => {
-            this.props._fetchAllLights();
-        }, 1000)
+        const id = this.props.navigation.getParam('id', 'NO-ID')
+        this.setState({ id: id })
     }
 
-    async componentDidMount() {
-        await this.initialState();
+    componentDidMount() {
+        this.initialState()
     }
 
-    initialState = async () => {
-        var x = await this.props.lights[this.state.id].state.xy[0]
-        var y = await this.props.lights[this.state.id].state.xy[1]
-        var bri = await this.props.lights[this.state.id].state.bri
-        var result = await ConvertXYtoHex(x, y, bri)
+    initialState() {
+        // var x = this.props.lights[this.state.id].state.xy[0]
+        // var y = this.props.lights[this.state.id].state.xy[1]
+        var bri = this.props.lights[this.state.id].state.bri
+        var sat = this.props.lights[this.state.id].state.sat
+        var on = this.props.lights[this.state.id].state.on
+        var bulbName = this.props.lights[this.state.id].name
+        // var result = ConvertXYtoHex(x, y, 254)
+
+        this.calculatePercentage("bri", bri)
+        this.calculatePercentage("sat", sat)
         this.setState({
-            name: this.props.lights[this.state.id].name,
-            color: result,
-            sat: this.props.lights[this.state.id].state.sat,
+            bulbName: bulbName,
+            sat: sat,
             bri: bri,
-            isOnDefaultToggleSwitch: this.props.lights[this.state.id].state.on
+            isOnDefaultToggleSwitch: on,
+            loading: false
         });
-        await this.calculatePercentage("bri", this.state.bri)
-        await this.calculatePercentage("sat", this.state.sat)
+
     }
 
     calculatePercentage = (arg, values) => {
@@ -90,7 +94,7 @@ class ControlBulb extends React.Component {
     }
 
     changeLightState = (arg, values) => {
-        const { bridgeip, username, bridgeIndex } = this.props; 
+        const { bridgeip, username, bridgeIndex } = this.props;
         if (!this.state.isOnDefaultToggleSwitch) {
             this.props._changeLampStateByID(this.state.id, {
                 on: true
@@ -107,7 +111,7 @@ class ControlBulb extends React.Component {
                 url: `http://${bridgeip[bridgeIndex]}/api/${username[bridgeIndex]}/lights/${this.state.id}/state`,
                 data: { xy: result }
             })
-            this.setState({ color: values })
+            // this.setState({ color: values })
         }
         else if (arg == "sat") {
             this.props._changeLampStateByID(this.state.id, {
@@ -166,7 +170,7 @@ class ControlBulb extends React.Component {
                 onColorChange={(color) => this.changeLightState("color", color)}
                 style={{ flex: 1 }}
                 hideSliders={true}
-                color={this.state.color}
+                // color={this.state.color}
             />
         )
     }
@@ -186,32 +190,43 @@ class ControlBulb extends React.Component {
     }
 
     render() {
-        return (
-            <Block style={styles.container}>
-                <Block style={styles.colorControl}>
-                    <View style={styles.titleRow}>
-                        <Text style={styles.title}>{this.state.bulbName}</Text>
-                        {this.renderToggleButton()}
-                    </View>
-                    <Text style={styles.textControl}>
-                        Room Name
+        if (!this.state.loading) {
+            return (
+                <Block style={styles.container}>
+                    <Block style={styles.colorControl}>
+                        <View style={styles.titleRow}>
+                            <Text style={styles.title}>{this.state.bulbName}</Text>
+                            {this.renderToggleButton()}
+                        </View>
+                        <Text style={styles.textControl}>
+                            Room Name
                         </Text>
-                    <Input
-                        style={styles.textInput}
-                        editable={false}
-                        value={this.state.roomName}
-                        placeholderTextColor={theme.colors.gray2}
-                    />
-                    <Text style={[styles.textControl, { marginBottom: 10 }]}>Brightness</Text>
-                    {this.renderBriSlider()}
-                    <Text style={styles.textPer}>{this.state.briPer}%</Text>
-                    <Text style={[styles.textControl, { marginBottom: 10 }]}>Saturation</Text>
-                    {this.renderSatSlider()}
-                    <Text style={styles.textPer}>{this.state.satPer}%</Text>
-                    {this.renderColorPicker()}
+                        <Input
+                            style={styles.textInput}
+                            editable={false}
+                            value={this.state.roomName}
+                            placeholderTextColor={theme.colors.gray2}
+                        />
+                        <Text style={[styles.textControl, { marginBottom: 10 }]}>Brightness</Text>
+                        {this.renderBriSlider()}
+                        <Text style={styles.textPer}>{this.state.briPer}%</Text>
+                        <Text style={[styles.textControl, { marginBottom: 10 }]}>Saturation</Text>
+                        {this.renderSatSlider()}
+                        <Text style={styles.textPer}>{this.state.satPer}%</Text>
+                        {this.renderColorPicker()}
+                    </Block>
                 </Block>
-            </Block>
-        );
+            )
+        }
+        else {
+            return (
+                <Block style={styles.container}>
+                    <Block style={styles.colorControl}>
+                        <ActivityIndicator size="large" color="black" />
+                    </Block>
+                </Block>
+            )
+        }
     }
 }
 
