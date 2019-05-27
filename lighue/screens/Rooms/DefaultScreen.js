@@ -33,7 +33,7 @@ class DefaultScreen extends Component {
         interval = setInterval(() => {
             this.props._fetchAllLights();
             this.props._fetchAllGroups();
-        }, 1000)
+        }, 2000)
     }
 
     // async componentDidMount() {
