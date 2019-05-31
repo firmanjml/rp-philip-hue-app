@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, Image} from 'react-native';
 import { ColorPicker } from 'react-native-color-picker'
 
 import { connect } from 'react-redux'
@@ -14,6 +14,7 @@ import { Block, Input, Text } from '../../components';
 import Slider from 'react-native-slider';
 
 import axios from 'axios';
+import { booleanLiteral } from '@babel/types';
 
 class ControlBulb extends React.Component {
 
@@ -32,45 +33,71 @@ class ControlBulb extends React.Component {
 
     state = {
         id: null,
-        // color: null,
         sat: null,
         bri: null,
         satPer: null,
         briPer: null,
-        isOnDefaultToggleSwitch: false,
-        roomName: "None",
-        bulbName: null,
-        loading: true
+        roomName: "None"
     };
 
     componentWillMount() {
-        const id = this.props.navigation.getParam('id', 'NO-ID')
-        this.setState({ id: id })
+        this.setState({ id: this.props.navigation.getParam('id', 'NO-ID') })
     }
 
     componentDidMount() {
-        this.initialState()
+        this.calculatePercentage("bri", this.props.lights[this.state.id].state.bri)
+        this.calculatePercentage("sat", this.props.lights[this.state.id].state.sat)
+        this.setState({
+            sat: this.props.lights[this.state.id].state.sat,
+            bri: this.props.lights[this.state.id].state.bri
+        })
     }
 
-    initialState() {
-        // var x = this.props.lights[this.state.id].state.xy[0]
-        // var y = this.props.lights[this.state.id].state.xy[1]
-        var bri = this.props.lights[this.state.id].state.bri
-        var sat = this.props.lights[this.state.id].state.sat
-        var on = this.props.lights[this.state.id].state.on
-        var bulbName = this.props.lights[this.state.id].name
-        // var result = ConvertXYtoHex(x, y, 254)
+    changeColorLightState = (values) => {
+        const { bridgeip, username, bridgeIndex, lights, _changeLampStateByID } = this.props;
 
-        this.calculatePercentage("bri", bri)
-        this.calculatePercentage("sat", sat)
-        this.setState({
-            bulbName: bulbName,
-            sat: sat,
-            bri: bri,
-            isOnDefaultToggleSwitch: on,
-            loading: false
-        });
+        if (!lights[this.state.id].state.on) {
+            _changeLampStateByID(this.state.id, {
+                on: true
+            });
+        }
+            axios({
+                method: 'PUT',
+                url: `http://${bridgeip[bridgeIndex]}/api/${username[bridgeIndex]}/lights/${this.state.id}/state`,
+                data: { xy: ColorConversionToXY(values) }
+            })
+        }
 
+    changeSatLightState = (values) => {
+        const { bridgeip, username, bridgeIndex, lights, _changeLampStateByID } = this.props;
+
+        if (!lights[this.state.id].state.on) {
+            _changeLampStateByID(this.state.id, {
+                on: true
+            });
+        }
+        axios({
+            method: 'PUT',
+            url: `http://${bridgeip[bridgeIndex]}/api/${username[bridgeIndex]}/lights/${this.state.id}/state`,
+            data: { sat: values }
+        })
+        this.calculatePercentage("sat", values);
+    }
+
+    changeBriLightState = (values) => {
+        const { bridgeip, username, bridgeIndex, lights, _changeLampStateByID } = this.props;
+
+        if (!lights[this.state.id].state.on) {
+            _changeLampStateByID(this.state.id, {
+                on: true
+            });
+        }
+        axios({
+            method: 'PUT',
+            url: `http://${bridgeip[bridgeIndex]}/api/${username[bridgeIndex]}/lights/${this.state.id}/state`,
+            data: { bri: values }
+        })
+        this.calculatePercentage("bri", values);
     }
 
     calculatePercentage = (arg, values) => {
@@ -93,46 +120,15 @@ class ControlBulb extends React.Component {
         }
     }
 
-    changeLightState = (arg, values) => {
-        const { bridgeip, username, bridgeIndex } = this.props;
-        if (!this.state.isOnDefaultToggleSwitch) {
-            this.props._changeLampStateByID(this.state.id, {
-                on: true
-            });
-            this.setState({
-                isOnDefaultToggleSwitch: true
-            })
-        }
-
-        if (arg == "color") {
-            let result = ColorConversionToXY(values);
-            axios({
-                method: 'PUT',
-                url: `http://${bridgeip[bridgeIndex]}/api/${username[bridgeIndex]}/lights/${this.state.id}/state`,
-                data: { xy: result }
-            })
-            // this.setState({ color: values })
-        }
-        else if (arg == "sat") {
-            this.props._changeLampStateByID(this.state.id, {
-                sat: values
-            });
-            this.calculatePercentage("sat", values);
-        }
-        else if (arg == "bri") {
-            this.props._changeLampStateByID(this.state.id, {
-                bri: values
-            });
-            this.calculatePercentage("bri", values);
-        }
-    }
-
-    changeOnState = (boolean) => {
+    onLights = (boolean) => {
         this.props._changeLampStateByID(this.state.id, {
-            on: boolean
-        });
+            on:boolean
+        })
     }
+
     renderBriSlider() {
+        const { nightmode } = this.props;
+        const trackTintColor = nightmode ? "rgba(157, 163, 180, 0.10)" : "#DDDDDD"
         return (
             <Slider
                 minimumValue={1}
@@ -141,14 +137,16 @@ class ControlBulb extends React.Component {
                 thumbStyle={styles.thumb}
                 trackStyle={{ height: 10, borderRadius: 10 }}
                 minimumTrackTintColor={theme.colors.secondary}
-                maximumTrackTintColor="rgba(157, 163, 180, 0.10)"
+                maximumTrackTintColor={trackTintColor}
                 value={this.state.bri}
-                onValueChange={(value) => this.changeLightState("bri", value)}
+                onValueChange={this.changeBriLightState}
             />
         )
     }
 
     renderSatSlider() {
+        const { nightmode } = this.props;
+        const trackTintColor = nightmode ? "rgba(157, 163, 180, 0.10)" : "#DDDDDD"
         return (
             <Slider
                 minimumValue={1}
@@ -157,9 +155,9 @@ class ControlBulb extends React.Component {
                 thumbStyle={styles.thumb}
                 trackStyle={{ height: 10, borderRadius: 10 }}
                 minimumTrackTintColor={theme.colors.secondary}
-                maximumTrackTintColor="rgba(157, 163, 180, 0.10)"
+                maximumTrackTintColor={trackTintColor}
                 value={this.state.sat}
-                onValueChange={(value) => this.changeLightState("sat", value)}
+                onValueChange={this.changeSatLightState}
             />
         )
     }
@@ -167,10 +165,11 @@ class ControlBulb extends React.Component {
     renderColorPicker() {
         return (
             <ColorPicker
-                onColorChange={(color) => this.changeLightState("color", color)}
+                onColorChange={this.changeColorLightState}
                 style={{ flex: 1 }}
                 hideSliders={true}
-                // color={this.state.color}
+            // color={ConvertXYtoHex(this.props.lights[this.state.id].state.xy[0], this.props.lights[this.state.id].state.xy[1], 254)}
+            // color={this.state.color}
             />
         )
     }
@@ -178,55 +177,45 @@ class ControlBulb extends React.Component {
     renderToggleButton() {
         return (
             <ToggleSwitch
-                offColor="rgba(157, 163, 180, 0.10)"
+                offColor="#DDDDDD"
                 onColor={theme.colors.secondary}
-                isOn={this.state.isOnDefaultToggleSwitch}
-                onToggle={isOnDefaultToggleSwitch => {
-                    this.setState({ isOnDefaultToggleSwitch });
-                    this.changeOnState(isOnDefaultToggleSwitch);
-                }}
+                isOn={this.props.lights[this.state.id].state.on}
+                onToggle={this.onLights}
             />
         )
     }
 
     render() {
-        if (!this.state.loading) {
-            return (
-                <Block style={styles.container}>
-                    <Block style={styles.colorControl}>
-                        <View style={styles.titleRow}>
-                            <Text style={styles.title}>{this.state.bulbName}</Text>
-                            {this.renderToggleButton()}
-                        </View>
-                        <Text style={styles.textControl}>
-                            Room Name
-                        </Text>
-                        <Input
-                            style={styles.textInput}
-                            editable={false}
-                            value={this.state.roomName}
-                            placeholderTextColor={theme.colors.gray2}
-                        />
-                        <Text style={[styles.textControl, { marginBottom: 10 }]}>Brightness</Text>
-                        {this.renderBriSlider()}
-                        <Text style={styles.textPer}>{this.state.briPer}%</Text>
-                        <Text style={[styles.textControl, { marginBottom: 10 }]}>Saturation</Text>
-                        {this.renderSatSlider()}
-                        <Text style={styles.textPer}>{this.state.satPer}%</Text>
-                        {this.renderColorPicker()}
-                    </Block>
+        const { nightmode } = this.props;
+        const { colors } = theme;
+        const backgroundcolor = { backgroundColor: nightmode ? colors.background : colors.backgroundLight }
+        const titlecolor = { color: nightmode ? colors.white : colors.black }
+        const textcolor = { color: nightmode ? colors.white : colors.gray3 }
+        const bordercolor = { borderColor: nightmode ? colors.white : colors.gray2 }
+        return (
+            <Block style={backgroundcolor}>
+                <Block container>
+                    <View style={styles.titleRow}>
+                        <Text style={[styles.title, titlecolor]}>{this.props.lights[this.state.id].name}</Text>
+                        {this.renderToggleButton()}
+                    </View>
+                    <Text style={[styles.textControl, textcolor]}>Room Name</Text>
+                    <Input
+                        style={[styles.textInput, titlecolor, bordercolor]}
+                        editable={false}
+                        value={this.state.roomName}
+                        placeholderTextColor={nightmode ? colors.gray2 : colors.black}
+                    />
+                    <Text style={[styles.textControl, textcolor, { marginBottom: 10 }]}>Brightness</Text>
+                    {this.renderBriSlider()}
+                    <Text style={[styles.textPer, textcolor]}>{this.state.briPer}%</Text>
+                    <Text style={[styles.textControl, textcolor, { marginBottom: 10 }]}>Saturation</Text>
+                    {this.renderSatSlider()}
+                    <Text style={[styles.textPer, textcolor]}>{this.state.satPer}%</Text>
+                    {this.renderColorPicker()}
                 </Block>
-            )
-        }
-        else {
-            return (
-                <Block style={styles.container}>
-                    <Block style={styles.colorControl}>
-                        <ActivityIndicator size="large" color="black" />
-                    </Block>
-                </Block>
-            )
-        }
+            </Block >
+        )
     }
 }
 
@@ -236,9 +225,7 @@ const mapDispatchToProps = (dispatch) => {
         _changeLampStateByID(id, data) {
             return dispatch(SetLampState(id, data));
         },
-        _fetchAllLights() {
-            return dispatch(GetAllLights())
-        }
+        _fetchAllLights: () => dispatch(GetAllLights())
     }
 }
 
@@ -247,10 +234,10 @@ const mapStateToProps = (state) => {
         lights: state.lights,
         bridgeIndex: state.bridgeIndex,
         bridgeip: state.bridgeip,
-        username: state.username
+        username: state.username,
+        nightmode: state.nightmode
     }
 }
-
 
 export default connect(
     mapStateToProps,
@@ -258,43 +245,32 @@ export default connect(
 )(ControlBulb)
 
 const styles = StyleSheet.create({
-    container: {
-        backgroundColor: theme.colors.background
-    },
     lightPicker: {
-        width: 10
+        width: 10,
     },
     textInput: {
         height: 30,
         borderBottomWidth: .5,
         borderRadius: 0,
         borderWidth: 0,
-        color: 'white',
-        borderColor: 'white',
         textAlign: 'left',
         paddingBottom: 10
-    },
-    colorControl: {
-        marginTop: 5,
-        marginLeft: theme.sizes.base * 2,
-        marginRight: theme.sizes.base * 2
     },
     thumb: {
         width: theme.sizes.base,
         height: theme.sizes.base,
         borderRadius: theme.sizes.base,
+        color: 'white',
         borderColor: 'white',
         borderWidth: 3,
         backgroundColor: theme.colors.secondary,
     },
     textPer: {
-        textAlign: 'right',
-        color: 'white'
+        textAlign: 'right'
     },
     title: {
         fontSize: 26,
-        fontWeight: 'bold',
-        color: 'white'
+        fontWeight: 'bold'
     },
     titleRow: {
         flexDirection: 'row',
@@ -302,7 +278,6 @@ const styles = StyleSheet.create({
         marginBottom: 25
     },
     textControl: {
-        textAlign: 'left',
-        color: 'white'
+        textAlign: 'left'
     }
 })

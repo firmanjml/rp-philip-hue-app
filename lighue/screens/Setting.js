@@ -1,8 +1,10 @@
 import React, { Component } from 'react'
 import { Image, StyleSheet, TouchableOpacity, View, Alert } from 'react-native'
-import { Card, Badge, Block, Text } from '../components';
-import { theme, constant } from '../constants';
+import { Block, Text, Button } from '../components';
+import { theme } from '../constants';
 import { connect } from 'react-redux';
+import { Updates } from 'expo';
+import { persistor } from "../redux/store";
 
 import { ChangeThemeMode } from '../redux/actions'
 
@@ -23,55 +25,60 @@ class Setting extends Component {
         }
     }
 
-    state = {
-        nightmode: false
-    }
-
-    componentWillMount() {
-        this.setState({
-            nightmode: this.props.nightmode
-        })
-    }
-
-    confirmationNightMode = (nightmode) => {
+    confirmationClear() {
         Alert.alert(
             'Are you sure?',
-            'App will be turn to light mode',
+            'This will entirely clear app data!',
             [
                 {
                     text: 'Cancel',
                     onPress: () => console.log('Cancel Pressed'),
                     style: 'cancel',
                 },
-                { text: 'OK', onPress: this.changeNightMode(nightmode)},
+                { text: 'OK', onPress: () => this.clearAppData() },
             ],
-            { cancelable: true },
+            { cancelable: false },
         );
     }
 
-    changeNightMode = (boolean) => {
-        // this.props._changeTheme(boolean)
-        console.log("button pressed")
+    clearAppData() {
+        persistor.flush();
+        persistor.purge();
+        setTimeout(() => {
+            Updates.reload()
+        }, 1000);
     }
 
     render() {
+        const { nightmode } = this.props;
+        const { colors } = theme;
+        const backgroundcolor = { backgroundColor: nightmode ? colors.background : colors.backgroundLight }
+        const textcolor = { color: nightmode ? colors.white : colors.black }
         return (
-            <Block style={styles.container}>
-                <View style={styles.header}>
-                    <Text h1 white bold>Settings</Text>
-                    <View style={styles.row}>
-                        <Text style={{ fontSize: 14, color: 'white' }}>Night Mode</Text>
+            <Block style={backgroundcolor}>
+                <Block container>
+                    <Text h1 bold style={[textcolor, { marginTop: 10 }]}>Settings</Text>
+                    <Block flex={false} row space="between" style={styles.row}>
+                        <Text style={[styles.textSetting, textcolor]}>Dark mode</Text>
                         <ToggleSwitch
-                            offColor="rgba(157, 163, 180, 0.10)"
+                            offColor="#DDDDDD"
                             onColor={theme.colors.secondary}
-                            isOn={this.state.nightmode}
+                            isOn={this.props.nightmode}
                             onToggle={nightmode => {
-                                this.confirmationNightMode(nightmode);
+                                this.props._changeTheme(nightmode);
                             }}
                         />
-                    </View>
+                    </Block>
                     <View style={styles.divider} />
-                </View>
+                    <Block bottom flex={1} style={{ marginBottom: 10 }}>
+                        <Button gradient
+                            startColor='#C40A0A'
+                            endColor='#E86241'
+                            onPress={() => { this.confirmationClear() }}>
+                            <Text center semibold white>Clear data</Text>
+                        </Button>
+                    </Block>
+                </Block>
             </Block>
         )
     }
@@ -98,23 +105,19 @@ export default connect(
 )(Setting)
 
 const styles = StyleSheet.create({
-    container: {
-        backgroundColor: theme.colors.background,
-        paddingHorizontal: theme.sizes.base * 2,
-    },
-    header: {
-        marginTop: 20
-    },
     row: {
         marginTop: 20,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
+    },
+    textSetting: {
+        fontSize: 16,
+        color: 'black',
+        alignSelf: "center"
     },
     divider: {
         marginTop: 20,
         marginVertical: 5,
         marginHorizontal: 2,
         borderBottomWidth: 1,
-        borderColor: '#ccc',
+        borderColor: "#E1E3E8"
     },
 });

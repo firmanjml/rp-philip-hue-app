@@ -22,7 +22,9 @@ class LightDemoMode extends Component {
     }
 
     renderButton() {
-        const { navigation, lights } = this.props;
+        const { navigation, lights, nightmode } = this.props;
+        const { colors } = theme;
+        const textcolor = { color: nightmode ? colors.white : colors.black }
         return (
             Object.keys(lights).map(val => (
                 <TouchableOpacity
@@ -32,14 +34,17 @@ class LightDemoMode extends Component {
                             id: val
                         });
                     }}>
-                    <Text style={{marginBottom : 20, fontSize : 20, color: 'white'}}>{"Bulb " + val}</Text>
+                    <Text style={[{ marginBottom: 20, fontSize: 20 }, textcolor]}>{"Bulb " + val}</Text>
                 </TouchableOpacity>
             )))
-    }
+    }  
 
     render() {
+        const { nightmode } = this.props;
+        const { colors } = theme;
+        const backgroundcolor = { backgroundColor: nightmode ? colors.background : colors.backgroundLight };
         return (
-            <Block style={styles.container}>
+            <Block style={[styles.container, backgroundcolor]}>
                 {this.renderButton()}
             </Block>
         );
@@ -58,7 +63,8 @@ const mapDispatchToProps = (dispatch) => {
 
 const mapStateToProps = (state) => {
     return {
-        lights: state.lights
+        lights: state.lights,
+        nightmode: state.nightmode
     }
 }
 
@@ -71,7 +77,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         alignItems: 'center',
-        backgroundColor: theme.colors.background,
         justifyContent: 'center'
     },
 

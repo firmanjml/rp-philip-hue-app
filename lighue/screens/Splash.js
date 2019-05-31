@@ -11,6 +11,9 @@ import { GetAllLights, GetAllGroups } from '../redux/actions'
 
 var interval;
 class Splash extends Component {
+    static navigationOptions = {
+        header: null
+    }
 
     componentWillMount() {
         interval = setInterval(() => {
@@ -24,26 +27,31 @@ class Splash extends Component {
     }
 
     _renderItem = (item) => {
+        const { nightmode } = this.props;
+        const { colors } = theme;
+        const backgroundcolor = { backgroundColor: nightmode ? colors.background : colors.backgroundLight };
+        const titlecolor = { color: nightmode ? colors.white : colors.black }
+        const textcolor = { color: nightmode ? colors.white : colors.gray3}
         return (
-            <View style={styles.slide}>
-                <View style={styles.imageBlock}>
+            <Block style={backgroundcolor}>
+                <Block container style={styles.slide}>
                     <Image
                         resizeMethod='auto'
                         source={item.image}
                         style={styles.image} />
-                </View>
-                <Block marginTop={20} margin={[0, theme.sizes.base * 3]}>
-                    <Text style={styles.title}>{item.title}</Text>
-                    <Text medium style={styles.text}>{item.text}</Text>
                 </Block>
-            </View>
+                <Block marginTop={20} margin={[0, theme.sizes.base * 3]}>
+                    <Text style={[styles.title,titlecolor]}>{item.title}</Text>
+                    <Text medium style={[styles.text,textcolor]}>{item.text}</Text>
+                </Block>
+            </Block>
         );
     }
     _onDone = () => {
         this.props.navigation.navigate("ListRoom");
     }
     render() {
-        return <AppIntroSlider renderItem={this._renderItem} slides={constant.splash_slider} onDone={this._onDone} />;
+        return <AppIntroSlider renderItem={this._renderItem} slides={constant.splash_slider} onDone={this._onDone} bottomButton />;
     }
 }
 
@@ -53,20 +61,25 @@ const mapDispatchToProps = (dispatch) => {
             return dispatch(GetAllLights())
         },
         _fetchAllGroups: () => dispatch(GetAllGroups()),
-        
+
+    }
+}
+
+const mapStateToProps = (state) => {
+    return {
+        nightmode: state.nightmode
     }
 }
 
 export default connect(
-    null,
+    mapStateToProps,
     mapDispatchToProps
 )(Splash)
 
 const styles = StyleSheet.create({
     slide: {
         flex: 1,
-        alignItems: 'center',
-        backgroundColor: theme.colors.background,
+        alignItems: 'center'
     },
     imageBlock: {
         marginTop: 20
@@ -79,13 +92,11 @@ const styles = StyleSheet.create({
     title: {
         textAlign: 'left',
         fontWeight: '200',
-        color: 'white',
         fontSize: 30
     },
     text: {
         marginTop: 20,
         textAlign: 'left',
         fontSize: 15,
-        color: 'white'
     }
 });

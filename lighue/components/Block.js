@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { StyleSheet, View, Animated } from 'react-native'
+import { StyleSheet, View, Animated, Platform} from 'react-native'
 import { theme } from '../constants';
 
 export default class Block extends Component {
@@ -105,6 +105,8 @@ export default class Block extends Component {
       left,
       right,
       top,
+      container,
+      containerNoHeader,
       bottom,
       card,
       shadow,
@@ -130,6 +132,8 @@ export default class Block extends Component {
       left && styles.left,
       right && styles.right,
       top && styles.top,
+      container && styles.container,
+      containerNoHeader && styles.containerNoHeader,
       bottom && styles.bottom,
       margin && { ...this.handleMargins() },
       padding && { ...this.handlePaddings() },
@@ -184,7 +188,17 @@ export const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   top: {
+    justifyContent: 'flex-start'
+  },
+  container: {
     justifyContent: 'flex-start',
+    marginTop: theme.sizes.base * 5 ,
+    paddingHorizontal: theme.sizes.base * 2,
+  },
+  containerNoHeader: {
+    justifyContent: 'flex-start',
+    marginTop: theme.sizes.base * 3 ,
+    paddingHorizontal: theme.sizes.base * 2,
   },
   bottom: {
     justifyContent: 'flex-end',

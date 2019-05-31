@@ -110,12 +110,15 @@ class WelcomeScreen extends Component {
     }
 
     render() {
-        const { navigation } = this.props;
+        const { navigation, nightmode } = this.props;
+        const { colors } = theme;
+        const backgroundcolor = { backgroundColor: nightmode ? colors.background : colors.backgroundLight };
+        const textcolor = { color: nightmode ? colors.white : colors.black }
         return (
-            <Block style={styles.container}>
+            <Block style={backgroundcolor}>
                 <Block center bottom flex={0.4}>
-                    <Text h1 center bold style={{ color: 'white' }}>
-                        Your Smarter Home.
+                    <Text h1 center bold style={textcolor}>
+                        Your Smarter Home
                     </Text>
                     <Text h3 gray2 style={{ marginTop: theme.sizes.padding / 2 }}>
                         Enjoy the experience
@@ -153,7 +156,8 @@ WelcomeScreen.defaultProps = {
 const mapStateToProps = (state) => {
     return {
         loading: state.loading,
-        bridgeip: state.bridgeip
+        bridgeip: state.bridgeip,
+        nightmode: state.nightmode
     }
 }
 
@@ -166,9 +170,6 @@ const mapDispatchToProps = (dispatch) => {
 }
 
 const styles = StyleSheet.create({
-    container: {
-        backgroundColor: theme.colors.background
-    },
     stepsContainer: {
         position: 'absolute',
         bottom: theme.sizes.base * 3,

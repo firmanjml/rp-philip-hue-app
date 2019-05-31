@@ -5,12 +5,13 @@ import { Block, Text } from '../components';
 import { theme, constant } from '../constants';
 
 import { WebBrowser } from 'expo';
+import {connect} from 'react-redux';
 
 import Layout from '../constants/Layout';
 import AppIntroSlider from 'react-native-app-intro-slider';
 
 
-export default class Splash extends Component {
+class StepbyStep extends Component {
     static navigationOptions = ({ navigation }) => {
         return {
             headerLeft:
@@ -26,42 +27,28 @@ export default class Splash extends Component {
     }
 
     _renderItem = (item) => {
+        const { nightmode } = this.props;
+        const { colors } = theme;
+        const backgroundcolor = { backgroundColor: nightmode ? colors.background : colors.backgroundLight };
+        const textcolor = { color: nightmode ? colors.white : colors.black }
         return (
-            // <Block style={[{backgroundColor: theme.colors.background},styles.slide]}>
-            //     <Block margin={[0, theme.sizes.base * 2]}>
-            //         <Block style={{ marginTop: 10, backgroundColor: 'red' }} >
-            //             <Text style={styles.title}>{item.title}</Text>
-            //             <Text medium style={styles.text}>{item.text}</Text>
-            //             <TouchableOpacity onPress={() => Linking.openURL('https://www.technobezz.com/how-to-find-your-router-ip-address/')}>
-            //                 <Text medium style={styles.text}>{item.url}</Text>
-            //             </TouchableOpacity>
-            //         </Block>
-            //     </Block>
-            //     <Block style={styles.imageBlock}>
-            //             <Image
-            //                 resizeMethod='auto'
-            //                 source={item.image}
-            //                 style={styles.image} />
-            //         </Block>
-            // </Block>
-
-            <View style={styles.slide}>
-                <View style={styles.margin}>
-                    <View style={{ marginTop: 10}} >
-                        <Text style={styles.title}>{item.title}</Text>
-                        <Text medium style={styles.text}>{item.text}</Text>
+            <Block style={backgroundcolor} >
+                <Block container style={styles.slide}>
+                    <View style={{ marginTop: 10 }} >
+                        <Text style={[styles.title,textcolor]}>{item.title}</Text>
+                        <Text medium style={[styles.text,textcolor]}>{item.text}</Text>
                         <TouchableOpacity onPress={this._handlePressButtonAsync}>
-                            <Text medium style={[styles.text,{textDecorationLine: 'underline'}]}>{item.url}</Text>
+                            <Text medium style={[styles.text,textcolor,{ textDecorationLine: 'underline' }]}>{item.url}</Text>
                         </TouchableOpacity>
                     </View>
-                </View>
-                <View style={styles.imageBlock}>
-                        <Image
-                            resizeMethod='auto'
-                            source={item.image}
-                            style={styles.image} />
-                    </View>
-            </View>
+                </Block>
+                {/* <View style={styles.imageBlock}>
+                    <Image
+                        resizeMethod='auto'
+                        source={item.image}
+                        style={styles.image} />
+                </View> */}
+            </Block>
         );
     }
     _onDone = () => {
@@ -70,27 +57,30 @@ export default class Splash extends Component {
 
     _handlePressButtonAsync = async () => {
         await WebBrowser.openBrowserAsync('https://www.technobezz.com/how-to-find-your-router-ip-address/');
-      };
-    
+    };
+
     render() {
-        return <AppIntroSlider renderItem={this._renderItem} slides={constant.step_slider} onDone={this._onDone} />;
+        return <AppIntroSlider renderItem={this._renderItem} slides={constant.step_slider} onDone={this._onDone} bottomButton/>;
     }
 }
+
+const mapStateToProps = (state) => {
+    return {
+        nightmode: state.nightmode
+    }
+}
+
+export default connect(mapStateToProps, null)(StepbyStep);
 
 const styles = StyleSheet.create({
     slide: {
         flex: 1,
         alignItems: 'center',
-        backgroundColor: theme.colors.background
-    },
-    margin: {
-        marginLeft: theme.sizes.base * 2,
-        marginRight: theme.sizes.base * 2
     },
     imageBlock: {
         justifyContent: 'center',
         alignItems: 'center',
-        marginTop : 10
+        marginTop: 10
     },
     image: {
         width: Layout.window.width,
@@ -100,14 +90,12 @@ const styles = StyleSheet.create({
     title: {
         textAlign: 'left',
         fontWeight: '200',
-        color: 'white',
         fontSize: 30
     },
     text: {
         fontWeight: '200',
         textAlign: 'left',
         fontSize: 15,
-        color: 'white',
         marginTop: 10
     },
     list: {

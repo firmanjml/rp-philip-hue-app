@@ -1,12 +1,12 @@
 import React, { Component } from 'react'
-import { Dimensions, Image, StyleSheet, ScrollView, TouchableOpacity, View, RefreshControl, Button } from 'react-native'
+import { Dimensions, Image, StyleSheet, ScrollView, TouchableOpacity, View, RefreshControl, Platform } from 'react-native'
 import { Card, Badge, Block, Text } from '../../components';
 import { theme, constant } from '../../constants';
 import Icon from 'react-native-vector-icons';
 import { connect } from 'react-redux';
 import { GetAllGroups, GetAllLights } from '../../redux/actions';
 import { persistor } from "../../redux/store";
-import { Constants, Updates } from 'expo';
+import { Updates } from 'expo';
 import {
     Menu,
     MenuOptions,
@@ -30,10 +30,12 @@ class DefaultScreen extends Component {
     }
 
     componentWillMount() {
+        this.props._fetchAllLights();
+        this.props._fetchAllGroups();
         interval = setInterval(() => {
             this.props._fetchAllLights();
             this.props._fetchAllGroups();
-        }, 2000)
+        }, 5000)
     }
 
     // async componentDidMount() {
@@ -44,6 +46,9 @@ class DefaultScreen extends Component {
     renderTab(tab) {
         const { active } = this.state;
         const isActive = active === tab;
+        const { nightmode } = this.props;
+        const { colors } = theme;
+        const backgroundcolor = { backgroundColor: nightmode ? colors.background : colors.backgroundLight }
 
         return (
             <TouchableOpacity
@@ -53,6 +58,7 @@ class DefaultScreen extends Component {
                 }}
                 style={[
                     styles.tab,
+                    backgroundcolor,
                     isActive ? styles.active : null
                 ]}
             >
@@ -101,7 +107,12 @@ class DefaultScreen extends Component {
     }
 
     displayLayout() {
-        const { navigation, groups } = this.props;
+        const { navigation, groups, nightmode } = this.props;
+        const { colors } = theme;
+        const refreshtextcolor = nightmode ? colors.white : colors.black
+        const textcolor = { color: nightmode ? colors.white : colors.black }
+        const marginTop = { marginTop: Platform.OS == "android" ? 20 : 0 }
+
         if (this.state.active === 'Rooms') {
             return (
                 <ScrollView
@@ -112,7 +123,7 @@ class DefaultScreen extends Component {
                         <RefreshControl
                             refreshing={this.state.refreshing}
                             title={"Swipe to refresh...."}
-                            titleColor={theme.colors.white}
+                            titleColor={refreshtextcolor}
                             onRefresh={async () => {
                                 this.setState({ refreshing: true })
                                 await this.props._fetchAllGroups();
@@ -121,20 +132,20 @@ class DefaultScreen extends Component {
                                 }, 800);
                             }} />
                     }>
-                    <Block flex={false} row space="between" style={styles.categories}>
+                    <Block flex={false} row space="between" style={[styles.categories, marginTop]}>
                         {
                             Object.entries(groups).length === 0 && groups.constructor === Object ?
                                 <Block middle center>
-                                    <Text h1 white>No Room Created</Text>
+                                    <Text h1 style={textcolor}>No Room Created</Text>
                                 </Block>
                                 :
                                 Object.keys(groups).map(val => (
                                     <TouchableOpacity
                                         key={val}
                                         onPress={() => {
-                                            // this.props.navigation.navigate('', {
-                                            //     roomId: val
-                                            // });
+                                            navigation.navigate('EditRoom', {
+                                                id: val
+                                            });
                                             console.log(this.props.groups)
                                         }}>
                                         <Card center middle shadow style={styles.category}>
@@ -158,20 +169,21 @@ class DefaultScreen extends Component {
             )
         } else if (this.state.active === "Lights") {
             return (
-                <Block>
-                    <Text center h3 white>
-                        Lights is not available at this moment.
+                <Block style={{paddingHorizontal: theme.sizes.base * 2}}>
+                    <Text center h3 style={[textcolor, marginTop]}>
+                        Lights won't be available at all.
                     </Text>
-                    <Text paragraph white center>Please try again later.</Text>
+                    <Text paragraph style={textcolor} center>Please don't try again later hahahahahahaha</Text>
+                    <Text paragraph style={textcolor} center>Call 9126920 for more information</Text>
                 </Block>
             )
         } else {
             return (
-                <Block>
-                    <Text center h3 white>
+                <Block style={{paddingHorizontal: theme.sizes.base * 2}}>
+                    <Text center h3 style={[textcolor, marginTop]}>
                         Scene is not available at this moment.
                     </Text>
-                    <Text paragraph white center>Please try again later.</Text>
+                    <Text paragraph style={textcolor} center>Please try again later.</Text>
                 </Block>
             )
         }
@@ -181,17 +193,16 @@ class DefaultScreen extends Component {
         console.log("DefaultScreen", "press menu " + value);
         if (value == 1) {
             // create Room
-            // this.props.navigation.navigate('');
+            this.props.navigation.navigate('AddRoom');
         } else if (value == 2) {
             this.props.navigation.navigate('TestScreen');
         } else if (value == 3) {
             // settings
             this.props.navigation.navigate('Settings');
-        }  else {
+        } else {
             persistor.flush();
             persistor.purge();
             setTimeout(() => {
-                // this.props.navigation.navigate("StartPage");
                 Updates.reload()
             }, 1000);
         }
@@ -212,21 +223,24 @@ class DefaultScreen extends Component {
     render() {
         const { categories } = this.state;
         const tabs = ['Rooms', 'Lights', 'Scene'];
-
+        const { nightmode } = this.props;
+        const { colors } = theme;
+        const backgroundcolor = { backgroundColor: nightmode ? colors.background : colors.backgroundLight }
+        const textcolor = { color: nightmode ? colors.white : colors.black }
         return (
             <MenuProvider>
-                <Block style={{ backgroundColor: theme.colors.background }}>
+                <Block style={backgroundcolor}>
                     <Block flex={false} center row space="between" style={styles.header}>
-                        <Text h1 white>Explore</Text>
+                        <Text h1 style={[textcolor, { fontWeight: 'bold' }]}>Explore</Text>
                         {this.renderMenu(this.state.active)}
                     </Block>
 
-                    <Block flex={false} row style={styles.tabs}>
+                    <Block flex={false} row style={[styles.tabs, backgroundcolor]}>
                         {tabs.map(tab => this.renderTab(tab))}
                     </Block>
                     {this.displayLayout()}
                 </Block>
-            </MenuProvider>
+            </MenuProvider >
         )
     }
 }
@@ -243,7 +257,8 @@ const mapStateToProps = (state) => {
         groups: state.groups,
         lights: state.lights,
         username: state.username,
-        bridgeip: state.bridgeip
+        bridgeip: state.bridgeip,
+        nightmode: state.nightmode
     }
 }
 
@@ -251,7 +266,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(DefaultScreen);
 
 const styles = StyleSheet.create({
     header: {
-        marginTop: 40,
+        marginTop: 50,
         paddingHorizontal: theme.sizes.base * 2,
     },
     avatar: {
@@ -259,15 +274,14 @@ const styles = StyleSheet.create({
         width: theme.sizes.base * 2.2,
     },
     tabs: {
-        backgroundColor: theme.colors.background,
-        justifyContent: 'space-around',
+        marginTop: 30,
+        justifyContent: 'space-between',
         borderBottomColor: theme.colors.gray2,
         borderBottomWidth: StyleSheet.hairlineWidth,
         marginVertical: theme.sizes.base,
         marginHorizontal: theme.sizes.base * 2,
     },
     tab: {
-        backgroundColor: theme.colors.background,
         paddingBottom: theme.sizes.base
     },
     active: {

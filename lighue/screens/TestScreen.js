@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { StyleSheet, Alert } from 'react-native'
+import { StyleSheet, Alert, TouchableOpacity, Image } from 'react-native'
 import { connect } from 'react-redux'
 import { SwitchBridge, AddBridge, GetAllGroups, SetGroupState, CreateGroup, DeleteGroup, GetAllLights, SetLampState, DeleteLight } from '../redux/actions'
 import Spinner from "react-native-loading-spinner-overlay";
@@ -29,7 +29,7 @@ class TestScreen extends Component {
     state = {
         group_on: false,
         light_on: false,
-        name : ''
+        name: ''
     }
     async componentWillMount() {
         // await this.props._setIP();
@@ -119,7 +119,7 @@ class TestScreen extends Component {
 
     switchBridge() {
         // this.props._switchBridge(1);
-        
+
     }
 
 
@@ -127,36 +127,38 @@ class TestScreen extends Component {
         // Example 
         return (
             <Block style={styles.container}>
-                <Block center top flex={0.1}>
-                    <Text h1 center bold white>
-                        Debug Mode
+                <Block container>
+                    <Block center top flex={0.1}>
+                        <Text h1 center bold white>
+                            Debug Mode
                     </Text>
-                    <Text h3 gray2 style={{ marginTop: theme.sizes.padding / 2 }}>
-                        Enjoy the testing experience
+                        <Text h3 gray2 style={{ marginTop: theme.sizes.padding / 2 }}>
+                            Enjoy the testing experience
                     </Text>
-                </Block>
+                    </Block>
 
-                <Block middle flex={0.4} margin={[0, theme.sizes.padding * 2]}>
-                    <Text h1 center bold white>Group Test</Text>
-                    <Button shadow onPress={() => this.group()}>
-                        <Text center semibold>Turn {this.state.group_on ? 'On' : 'Off'} Group 1 Lights</Text>
-                    </Button>
-                    <Button shadow onPress={() => this.group(true)}>
-                        <Text center semibold>Output Group Log Data</Text>
-                    </Button>
-                </Block>
-                <Block middle flex={0.2} margin={[0, theme.sizes.padding * 2]}>
-                    <Text h1 center bold white style={{ marginTop: 10 }}>Switch Bridge</Text>
-                    <Button shadow onPress={() => this.switchBridge()}>
-                        <Text center semibold>Switch Bridge</Text>
-                    </Button>
-                    <Button shadow onPress={() => this.light(true)}>
-                        <Text center semibold>Output Light 1 Log Data</Text>
-                    </Button>
-                </Block>
-                <Block bottom flex={0.15} margin={[0, theme.sizes.padding * 2]}>
-                    <Text h3 center bold white style={{ marginTop: 10 }}>{this.props.bridgeip[this.props.bridgeIndex] ? this.props.bridgeip[this.props.bridgeIndex] : 'Not connected to bridge'}</Text>
-                    <Text h3 center bold white style={{ marginTop: 10 }}>{this.props.username[this.props.bridgeIndex] ? this.props.username[this.props.bridgeIndex] : 'Not linked to bridge'}</Text>
+                    <Block middle flex={0.4} margin={[0, theme.sizes.padding * 2]}>
+                        <Text h1 center bold white>Group Test</Text>
+                        <Button shadow onPress={() => this.group()}>
+                            <Text center semibold>Turn {this.state.group_on ? 'On' : 'Off'} Group 1 Lights</Text>
+                        </Button>
+                        <Button shadow onPress={() => this.group(true)}>
+                            <Text center semibold>Output Group Log Data</Text>
+                        </Button>
+                    </Block>
+                    <Block middle flex={0.2} margin={[0, theme.sizes.padding * 2]}>
+                        <Text h1 center bold white style={{ marginTop: 10 }}>Switch Bridge</Text>
+                        <Button shadow onPress={() => this.switchBridge()}>
+                            <Text center semibold>Switch Bridge</Text>
+                        </Button>
+                        <Button shadow onPress={() => this.light(true)}>
+                            <Text center semibold>Output Light 1 Log Data</Text>
+                        </Button>
+                    </Block>
+                    <Block bottom flex={0.15} margin={[0, theme.sizes.padding * 2]}>
+                        <Text h3 center bold white style={{ marginTop: 10 }}>{this.props.bridgeip[this.props.bridgeIndex] ? this.props.bridgeip[this.props.bridgeIndex] : 'Not connected to bridge'}</Text>
+                        <Text h3 center bold white style={{ marginTop: 10 }}>{this.props.username[this.props.bridgeIndex] ? this.props.username[this.props.bridgeIndex] : 'Not linked to bridge'}</Text>
+                    </Block>
                 </Block>
             </Block>
         )

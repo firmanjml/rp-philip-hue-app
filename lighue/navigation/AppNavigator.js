@@ -1,15 +1,14 @@
 import { createAppContainer, createStackNavigator } from 'react-navigation';
-import createUserNameScreen from '../screens/viewUserName';
 import ControlBulbScreen from '../screens/Light/ControlBulb';
+import AddRoomScreen from '../screens/Rooms/AddRoomScreen';
+import EditRoomScreen from '../screens/Rooms/EditRoomScreen';
 import DefaultScreen from '../screens/Rooms/DefaultScreen';
 import TestScreen from '../screens/TestScreen';
 
-import  { Platform } from 'react-native';
 import LightDemo from '../screens/LightDemoMode';
 import SettingsScreen from '../screens/Setting';
 
 import { theme } from '../constants';
-import {fromRight} from 'react-navigation-transitions';
 
 const SetupNavigatorApp = createStackNavigator(
   {
@@ -18,6 +17,12 @@ const SetupNavigatorApp = createStackNavigator(
     },
     ControlBulb: {
       screen : ControlBulbScreen
+    },
+    AddRoom: {
+      screen : AddRoomScreen
+    },
+    EditRoom: {
+      screen : EditRoomScreen
     },
     TestScreen: {
       screen: TestScreen
@@ -31,14 +36,14 @@ const SetupNavigatorApp = createStackNavigator(
   },
   {
     initialRouteName: "ListRoom",
-    transitionConfig: () => fromRight(),
     defaultNavigationOptions: {
       headerStyle: {
-        height: Platform.OS === 'ios' ? theme.sizes.base * 4 : theme.sizes.base,
-        backgroundColor: theme.colors.background,
+        backgroundColor: 'transparent',
+        opacity: 1,
         borderBottomColor: "transparent",
         elevation: 0, // for android
       },
+      headerTransparent: true,
       headerBackTitle: null,
       headerLeftContainerStyle: {
         alignItems: 'center',

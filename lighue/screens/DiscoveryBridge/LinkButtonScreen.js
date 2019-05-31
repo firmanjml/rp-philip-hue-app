@@ -36,22 +36,30 @@ class LinkButtonScreen extends Component {
         }
     }
 
-    timer = ({ hours, minutes, seconds, completed }) => {
+    timer = ({ seconds, completed }) => {
+        const { nightmode } = this.props;
+        const { colors } = theme;
+        const textcolor = { color: nightmode ? colors.white : colors.black }
         if (!completed) {
-            return <Text center h1 style={[this.props.style, { color: theme.colors.white, fontFamily: 'space-mono' }]}>{seconds} seconds</Text>;
+            return <Text center h1 style={[this.props.style, { fontFamily: 'space-mono' },textcolor]}>{seconds} seconds</Text>;
         } else {
-            return <Text center h1 style={[this.props.style, { color: theme.colors.white, fontFamily: 'space-mono' }]}>No device link.</Text>;
+            return <Text center h1 style={[this.props.style, { fontFamily: 'space-mono' },textcolor]}>No device link.</Text>;
         }
     };
 
     render() {
+        const { navigation, nightmode } = this.props;
+        const { colors } = theme;
+        const backgroundcolor = { backgroundColor: nightmode ? colors.background : colors.backgroundLight };
+        const titlecolor = { color: nightmode ? colors.white : colors.black }
+        const textcolor = { color: nightmode ? colors.white : colors.gray3}
         return (
-            <Block style={styles.container} >
-                <Block marginTop={20} margin={[0, theme.sizes.base * 2]}>
-                    <Text h1 center bold color={'white'} style={{ textAlign: 'left' }}>
+            <Block style={backgroundcolor} >
+                <Block container>
+                    <Text h1 center bold style={[{ textAlign: 'left' },titlecolor]}>
                         Link to Philips Hue
                     </Text>
-                    <Text paragraph gray2 style={{ marginTop: 20 }}>
+                    <Text paragraph style={[{ marginTop: 20 },textcolor]}>
                         To link this device with the Bridge, press the push-link button of the Hue bridge you want to connect to.
                     </Text>
                     <Block marginTop={30} justifyContent={'center'} alignItems={'center'}>
@@ -72,7 +80,7 @@ class LinkButtonScreen extends Component {
                                     '',
                                     [{
                                         text: "OK", onPress: () => {
-                                            this.props.navigation.goBack();
+                                            navigation.goBack();
                                         }
                                     }],
                                     { cancelable: false }
@@ -83,7 +91,7 @@ class LinkButtonScreen extends Component {
                             }}
                         />}
                         <Block marginTop={20}>
-                            <Text paragraph gray2>
+                            <Text paragraph style={textcolor}>
                                 Note: You will have 30 seconds to press the push-link button
                             </Text>
                         </Block>
@@ -98,7 +106,8 @@ const mapStateToProps = (state) => {
     return {
         bridgeip: state.bridgeip,
         bridgeIndex: state.bridgeIndex,
-        username: state.username
+        username: state.username,
+        nightmode: state.nightmode
     }
 }
 
@@ -111,9 +120,6 @@ const mapDispatchToProps = (dispatch) => {
 }
 
 const styles = StyleSheet.create({
-    container: {
-        backgroundColor: theme.colors.background,
-    },
     textInput: {
         height: 25,
         borderBottomWidth: .5,

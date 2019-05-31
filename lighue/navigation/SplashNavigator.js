@@ -1,6 +1,5 @@
 import { createAppContainer, createStackNavigator } from 'react-navigation';
 import Splash from '../screens/Splash'
-import {fromRight} from 'react-navigation-transitions';
 import { theme } from '../constants';
 
 import {Platform} from 'react-native';
@@ -12,7 +11,6 @@ const SetupNavigatorApp = createStackNavigator(
   },
   {
     initialRouteName: "Splash",
-    transitionConfig: () => fromRight(),
     defaultNavigationOptions: {
       headerStyle: {
         height: Platform.OS === 'ios' ? theme.sizes.base * 4 : theme.sizes.base,
