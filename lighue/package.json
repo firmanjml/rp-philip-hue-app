@@ -23,6 +23,7 @@
     "react-native-check-box": "^2.1.7",
     "react-native-color-picker": "^0.4.0",
     "react-native-loading-spinner-overlay": "^1.0.1",
+    "react-native-modal-datetime-picker": "^7.4.2",
     "react-native-picker-select": "^6.1.0",
     "react-native-popup-menu": "^0.15.6",
     "react-native-slider": "^0.11.0",

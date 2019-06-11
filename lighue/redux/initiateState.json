@@ -6,6 +6,7 @@
   "username": [],
   "config": {},
   "groups": {},
+  "schedules" : {},
   "lights": {
     "1": {
       "state": {

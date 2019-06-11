@@ -3,7 +3,7 @@ import { StyleSheet, View, TouchableOpacity, Image} from 'react-native';
 import { ColorPicker } from 'react-native-color-picker'
 
 import { connect } from 'react-redux'
-import { GetAllLights, SetLampState } from '../../redux/actions'
+import { SetLampState } from '../../redux/actions'
 import ToggleSwitch from '../../components/ToggleSwitch'
 
 import { ColorConversionToXY, ConvertXYtoHex } from '../../components/ColorConvert';
@@ -14,7 +14,6 @@ import { Block, Input, Text } from '../../components';
 import Slider from 'react-native-slider';
 
 import axios from 'axios';
-import { booleanLiteral } from '@babel/types';
 
 class ControlBulb extends React.Component {
 
@@ -55,30 +54,32 @@ class ControlBulb extends React.Component {
 
     changeColorLightState = (values) => {
         const { bridgeip, username, bridgeIndex, lights, _changeLampStateByID } = this.props;
+        const { id } = this.state;
 
-        if (!lights[this.state.id].state.on) {
-            _changeLampStateByID(this.state.id, {
+        if (!lights[id].state.on) {
+            _changeLampStateByID(id, {
                 on: true
             });
         }
             axios({
                 method: 'PUT',
-                url: `http://${bridgeip[bridgeIndex]}/api/${username[bridgeIndex]}/lights/${this.state.id}/state`,
+                url: `http://${bridgeip[bridgeIndex]}/api/${username[bridgeIndex]}/lights/${id}/state`,
                 data: { xy: ColorConversionToXY(values) }
             })
         }
 
     changeSatLightState = (values) => {
         const { bridgeip, username, bridgeIndex, lights, _changeLampStateByID } = this.props;
+        const { id } = this.state;
 
-        if (!lights[this.state.id].state.on) {
-            _changeLampStateByID(this.state.id, {
+        if (!lights[id].state.on) {
+            _changeLampStateByID(id, {
                 on: true
             });
         }
         axios({
             method: 'PUT',
-            url: `http://${bridgeip[bridgeIndex]}/api/${username[bridgeIndex]}/lights/${this.state.id}/state`,
+            url: `http://${bridgeip[bridgeIndex]}/api/${username[bridgeIndex]}/lights/${id}/state`,
             data: { sat: values }
         })
         this.calculatePercentage("sat", values);
@@ -86,6 +87,7 @@ class ControlBulb extends React.Component {
 
     changeBriLightState = (values) => {
         const { bridgeip, username, bridgeIndex, lights, _changeLampStateByID } = this.props;
+        const { id } = this.state;
 
         if (!lights[this.state.id].state.on) {
             _changeLampStateByID(this.state.id, {
@@ -94,14 +96,14 @@ class ControlBulb extends React.Component {
         }
         axios({
             method: 'PUT',
-            url: `http://${bridgeip[bridgeIndex]}/api/${username[bridgeIndex]}/lights/${this.state.id}/state`,
+            url: `http://${bridgeip[bridgeIndex]}/api/${username[bridgeIndex]}/lights/${id}/state`,
             data: { bri: values }
         })
         this.calculatePercentage("bri", values);
     }
 
     calculatePercentage = (arg, values) => {
-        let result = Math.round((values * 100) / 254);
+        const result = Math.round((values * 100) / 254);
         if (result == 0) {
             if (arg == "sat") {
                 this.setState({ satPer: 1 })
@@ -121,13 +123,15 @@ class ControlBulb extends React.Component {
     }
 
     onLights = (boolean) => {
-        this.props._changeLampStateByID(this.state.id, {
+        const { id } = this.state;
+        this.props._changeLampStateByID(id, {
             on:boolean
         })
     }
 
     renderBriSlider() {
         const { nightmode } = this.props;
+        const { bri } = this.state;
         const trackTintColor = nightmode ? "rgba(157, 163, 180, 0.10)" : "#DDDDDD"
         return (
             <Slider
@@ -138,7 +142,7 @@ class ControlBulb extends React.Component {
                 trackStyle={{ height: 10, borderRadius: 10 }}
                 minimumTrackTintColor={theme.colors.secondary}
                 maximumTrackTintColor={trackTintColor}
-                value={this.state.bri}
+                value={bri}
                 onValueChange={this.changeBriLightState}
             />
         )
@@ -175,11 +179,13 @@ class ControlBulb extends React.Component {
     }
 
     renderToggleButton() {
+        const { id } = this.state
+        const { lights } = this.props;
         return (
             <ToggleSwitch
                 offColor="#DDDDDD"
                 onColor={theme.colors.secondary}
-                isOn={this.props.lights[this.state.id].state.on}
+                isOn={lights[id].state.on}
                 onToggle={this.onLights}
             />
         )
@@ -224,8 +230,7 @@ const mapDispatchToProps = (dispatch) => {
     return {
         _changeLampStateByID(id, data) {
             return dispatch(SetLampState(id, data));
-        },
-        _fetchAllLights: () => dispatch(GetAllLights())
+        }
     }
 }
 

@@ -8,6 +8,12 @@ import TestScreen from '../screens/TestScreen';
 import LightDemo from '../screens/LightDemoMode';
 import SettingsScreen from '../screens/Setting';
 
+import AddSchedulesScreen from '../screens/Schedules/AddSchedules'
+import CategoryScreen from '../screens/Schedules/CategoryList'
+import LocationScreen from '../screens/Schedules/LocationList'
+
+import AddSceneScreen from '../screens/Scenes/Camera'
+
 import { theme } from '../constants';
 
 const SetupNavigatorApp = createStackNavigator(
@@ -32,7 +38,19 @@ const SetupNavigatorApp = createStackNavigator(
     },
     Settings: {
       screen : SettingsScreen
-    }
+    },
+    AddSchedules: {
+      screen : AddSchedulesScreen
+    },
+    CategoryListScreen: {
+      screen : CategoryScreen
+    },
+    LocationListScreen: {
+      screen : LocationScreen
+    },
+    AddScenes: {
+      screen : AddSceneScreen
+    },
   },
   {
     initialRouteName: "ListRoom",

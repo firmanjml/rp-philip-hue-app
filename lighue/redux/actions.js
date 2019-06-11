@@ -251,7 +251,7 @@ export const GetAllGroups = () => (dispatch, getState) => {
  * CreateGroup
  * * Document 2.2. Create group
  * * https://developers.meethue.com/develop/hue-api/groupds-api/#create-group
- * @param {object} groupData This paramter takes in the body argument of the request.
+ * @param {object} groupData This parameter takes in the body argument of the request.
 */
 export const CreateGroup = (groupData) => (dispatch, getState) => {
     const i = getState().bridgeIndex;
@@ -432,6 +432,63 @@ export const GetConfig = async (dispatch, getState) => {
             type: C.FETCH_CONFIG,
             payload: res.data
         })
+    }).catch((error) => {
+        dispatch(ChangeLoading(false));
+        console.log(error);
+    }).then(dispatch(ChangeLoading(false)));
+};
+
+/** 
+ * GetSchedules
+ * * Document 3.1. Get schedules
+ * * https://developers.meethue.com/develop/hue-api/3-schedules-api/#get-all-schedules 
+*/
+export const GetSchedules = () => (dispatch, getState) => {
+    const i = getState().bridgeIndex;
+    const bridgeip = getState().bridgeip[i];
+    const username = getState().username[i];
+
+    dispatch(ChangeLoading(true));
+    axios({
+        url: `http://${bridgeip}/api/${username}/schedules`,
+        method: 'GET'
+    }).then((res) => {
+        dispatch({
+            type: C.FETCH_ALL_SCHEDULES,
+            payload: res.data
+        })
+    }).catch((error) => {
+        dispatch(ChangeLoading(false));
+        console.log(error);
+    }).then(dispatch(ChangeLoading(false)));
+};
+
+/** 
+ * CreateSchedules
+ * * Document 3.2. Create schedules
+ * * https://developers.meethue.com/develop/hue-api/3-schedules-api/#create-schedule
+ * @param {object} scheduleData This parameter takes in the body argument of the request.
+*/
+export const CreateSchedules = (scheduleData) => (dispatch, getState) => {
+    const i = getState().bridgeIndex;
+    const bridgeip = getState().bridgeip[i];
+    const username = getState().username[i];
+
+    dispatch(ChangeLoading(true));
+    axios({
+        url: `http://${bridgeip}/api/${username}/schedules`,
+        method: 'POST',
+        data: scheduleData
+    }).then(res => {
+        if (res.data[0].success) {
+            dispatch({
+                type: C.CREATE_SCHEDULE,
+                id: res.data[0].success.id,
+                payload: scheduleData
+            })
+        } else {
+            throw Error('Can\'t create a schedule');
+        }
     }).catch((error) => {
         dispatch(ChangeLoading(false));
         console.log(error);

@@ -142,12 +142,32 @@ export const lights = (state = {}, action) => {
     }
 }
 
+/** 
+ * schedules
+ * * Redux reducer stores schedule data it recevied from the API to Redux state
+*/
+export const schedules = (state = {}, action) => {
+    switch (action.type) {
+        case C.FETCH_ALL_SCHEDULES:
+            _state = JSON.parse(JSON.stringify(state));
+            _state = action.payload;
+            return _state;
+        case C.CREATE_SCHEDULE:
+            _state = JSON.parse(JSON.stringify(state))
+            _state[action.id] = action.payload;
+            return _state;
+        default:
+            return state;
+    }
+}
+
 export default combineReducers({
     bridgeIndex,
     bridgeip,
     config,
     groups,
     lights,
+    schedules,
     loading,
     username,
     nightmode

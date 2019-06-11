@@ -35,7 +35,7 @@ class Splash extends Component {
         return (
             <Block style={backgroundcolor}>
                 <Block container style={styles.slide}>
-                    <Image
+                    <Image 
                         resizeMethod='auto'
                         source={item.image}
                         style={styles.image} />

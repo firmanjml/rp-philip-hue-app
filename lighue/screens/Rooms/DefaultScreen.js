@@ -4,7 +4,7 @@ import { Card, Badge, Block, Text } from '../../components';
 import { theme, constant } from '../../constants';
 import Icon from 'react-native-vector-icons';
 import { connect } from 'react-redux';
-import { GetAllGroups, GetAllLights } from '../../redux/actions';
+import { GetAllGroups, GetAllLights, GetSchedules } from '../../redux/actions';
 import { persistor } from "../../redux/store";
 import { Updates } from 'expo';
 import {
@@ -32,9 +32,11 @@ class DefaultScreen extends Component {
     componentWillMount() {
         this.props._fetchAllLights();
         this.props._fetchAllGroups();
+        this.props._fetchAllSchedules();
         interval = setInterval(() => {
             this.props._fetchAllLights();
             this.props._fetchAllGroups();
+            this.props._fetchAllSchedules();
         }, 5000)
     }
 
@@ -62,7 +64,7 @@ class DefaultScreen extends Component {
                     isActive ? styles.active : null
                 ]}
             >
-                <Text size={16} medium gray={!isActive} secondary={isActive}>
+                <Text size={16} bold gray={!isActive} secondary={isActive}>
                     {tab}
                 </Text>
             </TouchableOpacity>
@@ -169,7 +171,7 @@ class DefaultScreen extends Component {
             )
         } else if (this.state.active === "Lights") {
             return (
-                <Block style={{paddingHorizontal: theme.sizes.base * 2}}>
+                <Block style={{ paddingHorizontal: theme.sizes.base * 2 }}>
                     <Text center h3 style={[textcolor, marginTop]}>
                         Lights won't be available at all.
                     </Text>
@@ -177,13 +179,32 @@ class DefaultScreen extends Component {
                     <Text paragraph style={textcolor} center>Call 9126920 for more information</Text>
                 </Block>
             )
+        } else if (this.state.active === "Schedules") {
+            return (
+                <Block style={{ paddingHorizontal: theme.sizes.base * 2, alignItems: 'center', justifyContent: 'center' }}>
+                    <Text h3 style={[textcolor]}>
+                        No Schedules created
+                    </Text>
+                    <TouchableOpacity
+                        onPress={() => {
+                            navigation.navigate('AddSchedules');
+                        }}>
+                        <Text h3 style={{ marginTop : 5, color: '#20D29B' }}>Add Schedules</Text>
+                    </TouchableOpacity>
+                </Block>
+            )
         } else {
             return (
-                <Block style={{paddingHorizontal: theme.sizes.base * 2}}>
-                    <Text center h3 style={[textcolor, marginTop]}>
-                        Scene is not available at this moment.
+                <Block style={{ paddingHorizontal: theme.sizes.base * 2, alignItems : 'center', justifyContent : 'center' }}>
+                    <Text h3 style={textcolor}>
+                        No Scenes created
                     </Text>
-                    <Text paragraph style={textcolor} center>Please try again later.</Text>
+                    <TouchableOpacity
+                        onPress={() => {
+                            navigation.navigate('AddScenes');
+                        }}>
+                        <Text h3 style={{ marginTop : 5, color: '#20D29B' }}>Add Scenes</Text>
+                    </TouchableOpacity>
                 </Block>
             )
         }
@@ -222,7 +243,7 @@ class DefaultScreen extends Component {
 
     render() {
         const { categories } = this.state;
-        const tabs = ['Rooms', 'Lights', 'Scene'];
+        const tabs = ['Rooms', 'Lights', 'Schedules', 'Scene'];
         const { nightmode } = this.props;
         const { colors } = theme;
         const backgroundcolor = { backgroundColor: nightmode ? colors.background : colors.backgroundLight }
@@ -234,7 +255,6 @@ class DefaultScreen extends Component {
                         <Text h1 style={[textcolor, { fontWeight: 'bold' }]}>Explore</Text>
                         {this.renderMenu(this.state.active)}
                     </Block>
-
                     <Block flex={false} row style={[styles.tabs, backgroundcolor]}>
                         {tabs.map(tab => this.renderTab(tab))}
                     </Block>
@@ -248,9 +268,11 @@ class DefaultScreen extends Component {
 const mapDispatchToProps = (dispatch) => {
     return {
         _fetchAllGroups: () => dispatch(GetAllGroups()),
-        _fetchAllLights: () => dispatch(GetAllLights())
+        _fetchAllLights: () => dispatch(GetAllLights()),
+        _fetchAllSchedules: () => dispatch(GetSchedules())
     }
 }
+
 const mapStateToProps = (state) => {
     return {
         loading: state.loading,
