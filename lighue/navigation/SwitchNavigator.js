@@ -2,7 +2,6 @@ import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import DiscoveryNavigatorScreen from '../navigation/DiscoveryNavigator';
 import AppNavigator from './AppNavigator';
 import SplashNavigator from '../navigation/SplashNavigator';
-
 import VerifyScreen from './Verify';
 
 const SwitchNavigator = createSwitchNavigator(

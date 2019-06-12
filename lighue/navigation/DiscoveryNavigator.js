@@ -1,11 +1,9 @@
 import { createAppContainer, createStackNavigator } from 'react-navigation';
-
 import StepScreen from '../screens/StepbyStep';
 import ManualIPScreen from '../screens/DiscoveryBridge/ManualScreen';
 import LinkButtonPage from '../screens/DiscoveryBridge/LinkButtonScreen';
 import WelcomeScreen from '../screens/DiscoveryBridge/WelcomeScreen';
 import SettingDiscovery from '../screens/Setting';
-
 import TestScreen from '../screens/TestScreen';
 import { theme } from '../constants';
 

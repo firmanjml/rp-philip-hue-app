@@ -1,19 +1,15 @@
 import { createAppContainer, createStackNavigator } from 'react-navigation';
-import ControlBulbScreen from '../screens/Light/ControlBulb';
+import ControlBulbScreen from '../screens/Lights/ControlBulb';
 import AddRoomScreen from '../screens/Rooms/AddRoomScreen';
 import EditRoomScreen from '../screens/Rooms/EditRoomScreen';
 import DefaultScreen from '../screens/Rooms/DefaultScreen';
 import TestScreen from '../screens/TestScreen';
-
 import LightDemo from '../screens/LightDemoMode';
 import SettingsScreen from '../screens/Setting';
-
 import AddSchedulesScreen from '../screens/Schedules/AddSchedules'
 import CategoryScreen from '../screens/Schedules/CategoryList'
 import LocationScreen from '../screens/Schedules/LocationList'
-
 import AddSceneScreen from '../screens/Scenes/Camera'
-
 import { theme } from '../constants';
 
 const SetupNavigatorApp = createStackNavigator(

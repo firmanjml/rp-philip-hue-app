@@ -4,12 +4,10 @@ import {
   Image,
   Alert,
   TouchableOpacity,
-  Picker,
-  FlatList
+  Picker
 } from "react-native";
 import { connect } from "react-redux";
 import validator from "validator";
-import Layout from "../../constants/Layout";
 import { Button, Block, Text, Input } from "../../components";
 import { theme } from "../../constants";
 import { GetAllGroups } from "../../redux/actions";
@@ -39,7 +37,7 @@ class EditRoomScreen extends React.Component {
   };
 
   componentWillMount() {
-    this.setState({ id: this.props.navigation.getParam("id", "NO-ID") });
+    this.setState({ id: this.props.navigation.getParam("id", "1") });
   }
 
   componentDidMount() {

@@ -40,14 +40,8 @@ class DefaultScreen extends Component {
         }, 5000)
     }
 
-    // async componentDidMount() {
-    //     await this.props._fetchAllGroups();
-    //     // console.log(JSON.stringify({ name: Constants.deviceName, height, width }, null, 4))
-    // }
-
     renderTab(tab) {
-        const { active } = this.state;
-        const isActive = active === tab;
+        const { active } = this.state, isActive = active === tab;
         const { nightmode } = this.props;
         const { colors } = theme;
         const backgroundcolor = { backgroundColor: nightmode ? colors.background : colors.backgroundLight }
@@ -62,8 +56,7 @@ class DefaultScreen extends Component {
                     styles.tab,
                     backgroundcolor,
                     isActive ? styles.active : null
-                ]}
-            >
+                ]}>
                 <Text size={16} bold gray={!isActive} secondary={isActive}>
                     {tab}
                 </Text>
@@ -84,8 +77,6 @@ class DefaultScreen extends Component {
                         <MenuOption value={2}><Text h3>Debug mode</Text></MenuOption>
                         <View style={styles.divider} />
                         <MenuOption value={3}><Text h3>Settings</Text></MenuOption>
-                        <View style={styles.divider} />
-                        <MenuOption value={4}><Text h3 red>Clear cache</Text></MenuOption>
                     </MenuOptions>
                 </Menu>
             )
@@ -114,12 +105,12 @@ class DefaultScreen extends Component {
         const refreshtextcolor = nightmode ? colors.white : colors.black
         const textcolor = { color: nightmode ? colors.white : colors.black }
         const marginTop = { marginTop: Platform.OS == "android" ? 20 : 0 }
-
+        var base64Icon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAwBQTFRF7c5J78kt+/Xm78lQ6stH5LI36bQh6rcf7sQp671G89ZZ8c9V8c5U9+u27MhJ/Pjv9txf8uCx57c937Ay5L1n58Nb67si8tVZ5sA68tJX/Pfr7dF58tBG9d5e8+Gc6chN6LM+7spN1pos6rYs6L8+47hE7cNG6bQc9uFj7sMn4rc17cMx3atG8duj+O7B686H7cAl7cEm7sRM26cq/vz5/v767NFY7tJM78Yq8s8y3agt9dte6sVD/vz15bY59Nlb8txY9+y86LpA5LxL67pE7L5H05Ai2Z4m58Vz89RI7dKr+/XY8Ms68dx/6sZE7sRCzIEN0YwZ67wi6rk27L4k9NZB4rAz7L0j5rM66bMb682a5sJG6LEm3asy3q0w3q026sqC8cxJ6bYd685U5a457cIn7MBJ8tZW7c1I7c5K7cQ18Msu/v3678tQ3aMq7tNe6chu6rgg79VN8tNH8c0w57Q83akq7dBb9Nld9d5g6cdC8dyb675F/v327NB6////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/LvB3QAAAMFJREFUeNpiqIcAbz0ogwFKm7GgCjgyZMihCLCkc0nkIAnIMVRw2UhDBGp5fcurGOyLfbhVtJwLdJkY8oscZCsFPBk5spiNaoTC4hnqk801Qi2zLQyD2NlcWWP5GepN5TOtSxg1QwrV01itpECG2kaLy3AYiCWxcRozQWyp9pNMDWePDI4QgVpbx5eo7a+mHFOqAxUQVeRhdrLjdFFQggqo5tqVeSS456UEQgWE4/RBboxyC4AKCEI9Wu9lUl8PEGAAV7NY4hyx8voAAAAASUVORK5CYII=';
+        
         if (this.state.active === 'Rooms') {
             return (
                 <ScrollView
                     showsVerticalScrollIndicator={false}
-                    // style={{ paddingVertical: theme.sizes.base * 2 }}
                     style={{ paddingVertical: theme.sizes.base }}
                     refreshControl={
                         <RefreshControl
@@ -148,16 +139,15 @@ class DefaultScreen extends Component {
                                             navigation.navigate('EditRoom', {
                                                 id: val
                                             });
-                                            console.log(this.props.groups)
                                         }}>
                                         <Card center middle shadow style={styles.category}>
                                             <Badge margin={[0, 0, 15]} size={50} color="rgba(41,216,143,0.20)">
                                                 {
                                                     constant.room_class.indexOf(groups[val].class) > -1
                                                         ?
-                                                        <Image source={constant.class_img[groups[val].class]} />
+                                                        <Image style={{width: constant.class_base64[groups[val].class].width, height: constant.class_base64[groups[val].class].height}} source={{uri: constant.class_base64[groups[val].class].uri}}/>
                                                         :
-                                                        <Image source={constant.class_img["Other"]} />
+                                                        <Image style={{width: constant.class_base64["Other"].width, height: constant.class_base64["Other"].height}} source={{uri: constant.class_base64["Other"].uri}}/>
                                                 }
                                             </Badge>
                                             <Text medium height={30} style={styles.roomText}>{groups[val].name.length > 12 ? groups[val].name.substring(0, 12) + "..." : groups[val].name}</Text>
@@ -175,7 +165,7 @@ class DefaultScreen extends Component {
                     <Text center h3 style={[textcolor, marginTop]}>
                         Lights won't be available at all.
                     </Text>
-                    <Text paragraph style={textcolor} center>Please don't try again later hahahahahahaha</Text>
+                    <Text paragraph style={textcolor} center>Please don't try again later</Text>
                     <Text paragraph style={textcolor} center>Call 9126920 for more information</Text>
                 </Block>
             )
@@ -211,21 +201,12 @@ class DefaultScreen extends Component {
     }
 
     onMenuRoomSelect(value) {
-        console.log("DefaultScreen", "press menu " + value);
         if (value == 1) {
-            // create Room
             this.props.navigation.navigate('AddRoom');
         } else if (value == 2) {
             this.props.navigation.navigate('TestScreen');
         } else if (value == 3) {
-            // settings
             this.props.navigation.navigate('Settings');
-        } else {
-            persistor.flush();
-            persistor.purge();
-            setTimeout(() => {
-                Updates.reload()
-            }, 1000);
         }
     }
 
@@ -242,7 +223,6 @@ class DefaultScreen extends Component {
     }
 
     render() {
-        const { categories } = this.state;
         const tabs = ['Rooms', 'Lights', 'Schedules', 'Scene'];
         const { nightmode } = this.props;
         const { colors } = theme;
@@ -260,7 +240,7 @@ class DefaultScreen extends Component {
                     </Block>
                     {this.displayLayout()}
                 </Block>
-            </MenuProvider >
+            </MenuProvider>
         )
     }
 }
@@ -278,13 +258,9 @@ const mapStateToProps = (state) => {
         loading: state.loading,
         groups: state.groups,
         lights: state.lights,
-        username: state.username,
-        bridgeip: state.bridgeip,
         nightmode: state.nightmode
     }
 }
-
-export default connect(mapStateToProps, mapDispatchToProps)(DefaultScreen);
 
 const styles = StyleSheet.create({
     header: {
@@ -330,3 +306,5 @@ const styles = StyleSheet.create({
         borderColor: '#ccc',
     },
 })
+
+export default connect(mapStateToProps, mapDispatchToProps)(DefaultScreen);
