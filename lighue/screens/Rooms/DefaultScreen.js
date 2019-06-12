@@ -128,7 +128,15 @@ class DefaultScreen extends Component {
                         {
                             Object.entries(groups).length === 0 && groups.constructor === Object ?
                                 <Block middle center>
-                                    <Text h1 style={textcolor}>No Room Created</Text>
+                                    <Text h3 style={[textcolor]}>
+                                        No Room created
+                                    </Text>
+                                    <TouchableOpacity
+                                        onPress={() => {
+                                            navigation.navigate('AddRoom');
+                                        }}>
+                                        <Text h3 style={{ marginTop : 5, color: '#20D29B' }}>Add Rooms</Text>
+                                    </TouchableOpacity>
                                 </Block>
                                 :
                                 Object.keys(groups).map(val => (
@@ -201,7 +209,12 @@ class DefaultScreen extends Component {
 
     onMenuRoomSelect(value) {
         if (value == 1) {
-            this.props.navigation.navigate('AddRoom');
+            this.props.navigation.navigate('PostUpdate', {
+                meta: {
+                    timer: 5000,
+                    nav: "ListRoom"
+                }
+            });
         } else if (value == 2) {
             this.props.navigation.navigate('TestScreen');
         } else if (value == 3) {

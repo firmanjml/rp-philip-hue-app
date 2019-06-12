@@ -6,10 +6,11 @@ import DefaultScreen from '../screens/Rooms/DefaultScreen';
 import TestScreen from '../screens/TestScreen';
 import LightDemo from '../screens/LightDemoMode';
 import SettingsScreen from '../screens/Setting';
-import AddSchedulesScreen from '../screens/Schedules/AddSchedules'
-import CategoryScreen from '../screens/Schedules/CategoryList'
-import LocationScreen from '../screens/Schedules/LocationList'
-import AddSceneScreen from '../screens/Scenes/Camera'
+import AddSchedulesScreen from '../screens/Schedules/AddSchedules';
+import CategoryScreen from '../screens/Schedules/CategoryList';
+import LocationScreen from '../screens/Schedules/LocationList';
+import AddSceneScreen from '../screens/Scenes/Camera';
+import PostUpdateScreen from '../screens/Miscellaneous/PostUpdateScreen';
 import { theme } from '../constants';
 
 const SetupNavigatorApp = createStackNavigator(
@@ -18,35 +19,38 @@ const SetupNavigatorApp = createStackNavigator(
       screen: DefaultScreen
     },
     ControlBulb: {
-      screen : ControlBulbScreen
+      screen: ControlBulbScreen
     },
     AddRoom: {
-      screen : AddRoomScreen
+      screen: AddRoomScreen
     },
     EditRoom: {
-      screen : EditRoomScreen
+      screen: EditRoomScreen
     },
     TestScreen: {
       screen: TestScreen
     },
     LightDemo: {
-      screen : LightDemo
+      screen: LightDemo
     },
     Settings: {
-      screen : SettingsScreen
+      screen: SettingsScreen
     },
     AddSchedules: {
-      screen : AddSchedulesScreen
+      screen: AddSchedulesScreen
     },
     CategoryListScreen: {
-      screen : CategoryScreen
+      screen: CategoryScreen
     },
     LocationListScreen: {
-      screen : LocationScreen
+      screen: LocationScreen
     },
     AddScenes: {
-      screen : AddSceneScreen
+      screen: AddSceneScreen
     },
+    PostUpdate: {
+      screen: PostUpdateScreen
+    }
   },
   {
     initialRouteName: "ListRoom",
