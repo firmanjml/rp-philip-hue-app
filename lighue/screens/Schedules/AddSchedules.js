@@ -165,8 +165,7 @@ class AddSchedules extends Component {
             else if (categories == "Sleep" || categories == "I'm away") {
                 var body = { on: false }
             }
-
-            this.props._CreateSchedules({
+            const scheduleData = {
                 "name": `${name}#${categories}`,
                 "description": description,
                 "status": enabled ? "enabled" : "disabled",
@@ -177,7 +176,8 @@ class AddSchedules extends Component {
                     "body": body
                 },
                 "localtime": localtime
-            });
+            }
+            this.props._CreateSchedules(scheduleData);
 
             Alert.alert(
                 'Result',

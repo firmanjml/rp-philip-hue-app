@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Image, StyleSheet, TouchableOpacity, Modal, ScrollView, Dimensions } from 'react-native'
+import { Image, StyleSheet, TouchableOpacity, Modal, ScrollView, Dimensions, Platform } from 'react-native'
 import { Block, Text, Card, Badge } from '../../components';
 import { theme, constant } from '../../constants';
 import { connect } from 'react-redux';
@@ -86,9 +86,9 @@ class LocationList extends Component {
                                             {
                                                 constant.room_class.indexOf(groups[val].class) > -1
                                                     ?
-                                                    <Image source={constant.class_img[groups[val].class]} />
+                                                    <Image style={{width: constant.class_base64[groups[val].class].width, height: constant.class_base64[groups[val].class].height}} source={{uri: constant.class_base64[groups[val].class].uri}}/>
                                                     :
-                                                    <Image source={constant.class_img["Other"]} />
+                                                    <Image style={{width: constant.class_base64["Other"].width, height: constant.class_base64["Other"].height}} source={{uri: constant.class_base64["Other"].uri}}/>
                                             }
                                         </Badge>
                                         <Text medium height={30} style={styles.roomText}>{groups[val].name.length > 12 ? groups[val].name.substring(0, 12) + "..." : groups[val].name}</Text>
