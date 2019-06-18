@@ -9,7 +9,8 @@ const mapStateToProps = state => {
   return {
     bridgeIndex: state.bridgeIndex,
     bridgeip: state.bridgeip,
-    username: state.username
+    username: state.username,
+    authentication : state.authentication
   }
 }
 
@@ -20,9 +21,14 @@ class Verify extends React.Component {
   }
 
   verifying() {
-    const { bridgeip, username, navigation, bridgeIndex } = this.props;
+    const { bridgeip, username, navigation, bridgeIndex, authentication} = this.props;
     if (bridgeip[bridgeIndex] && username[bridgeIndex]) {
-      navigation.navigate("AppNavigator")
+      if (authentication) {
+        navigation.navigate("Authenticate")
+      }
+      else {
+        navigation.navigate("AppNavigator")
+      }
     }
     else {
       navigation.navigate("DiscoveryNavigator")

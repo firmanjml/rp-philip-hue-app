@@ -33,6 +33,30 @@ export const ChangeThemeMode = (boolean) => (dispatch) => {
 }
 
 /** 
+ * Authentication
+ * * Enable authentication 
+ * @param {number} boolean This parameter takes in the boolean
+*/
+export const ChangeAuthentication = (boolean) => (dispatch) => {
+    dispatch({
+        type : C.CHANGE_AUTHENTICATION_STATE,
+        payload : boolean
+    })
+}
+
+/** 
+ * Hardware Support
+ * * Index "1" for Fingerprint (Android, iPhone 5s > iPhone 8), Index "2" for Face ID (iPhone X & newer)
+ * @param {number} index This paramter takes in the index of hardware support
+*/
+export const ChangeHardwareSupport = (index = 0) => (dispatch) => {
+    dispatch({
+        type : C.CHANGE_HARDWARE_SUPPORT,
+        payload : index
+    })
+}
+
+/** 
  * GetBridgeIP
  * * Discover Bridge IP through NUPNP or set manual IP
  * * https://developers.meethue.com/develop/get-started-2/

@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Image, StyleSheet, TouchableOpacity, View, ScrollView, Alert } from 'react-native'
+import { Image, StyleSheet, TouchableOpacity, View, ScrollView, Alert, Platform } from 'react-native'
 import { Block, Text, Button, Input } from '../../components';
 import { theme } from '../../constants';
 import { CreateSchedules } from '../../redux/actions';
@@ -130,7 +130,7 @@ class AddSchedules extends Component {
     }
 
 
-    confirmAddSchedule = async() => {
+    confirmAddSchedule = async () => {
         const { username, bridgeIndex } = this.props;
         const { homeSelected, roomSelected, bulbSelected,
             categories, time, name, description, enabled, repeat } = this.state;
@@ -138,8 +138,7 @@ class AddSchedules extends Component {
         if (name == null ||
             time == "Add time" ||
             categories == "Add categories" ||
-            (homeSelected == false && roomSelected == null && bulbSelected == null)) 
-            {
+            (homeSelected == false && roomSelected == null && bulbSelected == null)) {
             Alert.alert(
                 'Invalid Input',
                 'Please fill the required field to proceed',
@@ -178,16 +177,12 @@ class AddSchedules extends Component {
                 "localtime": localtime
             }
             this.props._CreateSchedules(scheduleData);
-
-            Alert.alert(
-                'Result',
-                'Name : ' + name +
-                '\nCategories : ' + categories +
-                '\nDateTime : ' + localtime +
-                '\nAddress : ' + address +
-                '\nBody : ' + scheduleData,
-                { cancelable: true },
-            );
+            this.props.navigation.navigate("PostUpdate", {
+                meta: {
+                    title : "Successfully added!"
+                }
+            }
+            )
         }
     }
 
@@ -442,7 +437,6 @@ class AddSchedules extends Component {
         const { nightmode } = this.props;
         const { colors } = theme;
         const backgroundcolor = { backgroundColor: nightmode ? colors.background : colors.backgroundLight }
-        const textcolor = { color: nightmode ? colors.gray2 : colors.black }
         const titlecolor = { color: nightmode ? colors.white : colors.black }
         return (
             <Block style={backgroundcolor}>
@@ -451,23 +445,23 @@ class AddSchedules extends Component {
                     <ScrollView
                         showsVerticalScrollIndicator={false}>
                         {this.renderInput()}
-                        <Text style={[styles.textControl, textcolor, { marginTop: 10 }]}>Days of the week</Text>
+                        <Text bold style={[styles.textControl, titlecolor, { marginTop: 10 }]}>Days of the week</Text>
                         <Block flex={false} row space="between" style={{ marginTop: 20 }}>
                             {this.renderDay()}
                         </Block>
                         <View style={[styles.divider, { marginTop: 30 }]} />
                         <Block flex={false} row space="between" style={{ marginTop: 10 }}>
-                            <Text style={titlecolor}>Categories</Text>
+                            <Text bold style={titlecolor}>Categories</Text>
                             {this.renderCategories()}
                         </Block>
                         <View style={[styles.divider, { marginTop: 10 }]} />
                         <Block flex={false} row space="between" style={{ marginTop: 10 }}>
-                            <Text style={[titlecolor, { alignSelf: 'center' }]}>When</Text>
+                            <Text bold style={[titlecolor, { alignSelf: 'center' }]}>When</Text>
                             {this.renderWhen()}
                         </Block>
                         <View style={[styles.divider, { marginTop: 10 }]} />
                         <Block flex={false} row space="between" style={{ marginTop: 10 }}>
-                            <Text style={[titlecolor, { alignSelf: 'center' }]}>Where</Text>
+                            <Text bold style={[titlecolor, { alignSelf: 'center' }]}>Where</Text>
                             {this.renderWhere()}
                         </Block>
                         <View style={[styles.divider, { marginTop: 10 }]} />

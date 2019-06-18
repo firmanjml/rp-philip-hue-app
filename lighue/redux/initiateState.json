@@ -1,6 +1,8 @@
 {
   "loading": false,
   "nightmode": true,
+  "authentication" : false,
+  "hardwareSupport" : 0,
   "bridgeIndex": 0,
   "bridgeip": [],
   "username": [],

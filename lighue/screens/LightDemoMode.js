@@ -5,8 +5,6 @@ import { theme } from '../constants';
 
 import { connect } from 'react-redux'
 
-import { GetAllLights } from '../redux/actions'
-
 class LightDemoMode extends Component {
     static navigationOptions = ({ navigation }) => {
         return {
@@ -34,7 +32,7 @@ class LightDemoMode extends Component {
                             id: val
                         });
                     }}>
-                    <Text style={[{ marginBottom: 20, fontSize: 20 }, textcolor]}>{"Bulb " + val}</Text>
+                    <Text style={[{ marginBottom: 20, fontSize: 20 }, textcolor]}>{lights[val].name}</Text>
                 </TouchableOpacity>
             )))
     }  
@@ -51,16 +49,6 @@ class LightDemoMode extends Component {
     }
 }
 
-const mapDispatchToProps = (dispatch) => {
-    return {
-        _fetchAllLights() {
-            return dispatch(GetAllLights())
-        },
-        _fetchAllGroups: () => dispatch(GetAllGroups()),
-
-    }
-}
-
 const mapStateToProps = (state) => {
     return {
         lights: state.lights,
@@ -70,7 +58,7 @@ const mapStateToProps = (state) => {
 
 export default connect(
     mapStateToProps,
-    mapDispatchToProps
+    null
 )(LightDemoMode)
 
 const styles = StyleSheet.create({

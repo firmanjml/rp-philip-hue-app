@@ -1,10 +1,15 @@
 import React, { Component } from 'react'
-import { Image, StyleSheet, TouchableOpacity, View, Alert } from 'react-native'
+import { Image, StyleSheet, TouchableOpacity, Dimensions, View, Modal } from 'react-native'
 import { Block, Text, Button } from '../components';
 import { theme } from '../constants';
 import { connect } from 'react-redux';
 import { Updates } from 'expo';
 import { persistor } from "../redux/store";
+import { BlurView } from 'expo';
+import Swipe from '../components/Swipe';
+import { MaterialIcons, AntDesign } from '@expo/vector-icons';
+
+const { width } = Dimensions.get('window');
 
 import { ChangeThemeMode } from '../redux/actions'
 
@@ -24,29 +29,52 @@ class Setting extends Component {
                 </TouchableOpacity>
         }
     }
-
-    confirmationClear() {
-        Alert.alert(
-            'Are you sure?',
-            'This will entirely clear app data!',
-            [
-                {
-                    text: 'Cancel',
-                    onPress: () => console.log('Cancel Pressed'),
-                    style: 'cancel',
-                },
-                { text: 'OK', onPress: () => this.clearAppData() },
-            ],
-            { cancelable: false },
-        );
+    state = {
+        clearDataModal: false
     }
 
     clearAppData() {
         persistor.flush();
         persistor.purge();
         setTimeout(() => {
-            Updates.reload()
-        }, 1000);
+            // Updates.reload()
+            this.props.navigation.navigate("DiscoveryNavigator")
+        }, 4000);
+    }
+
+    renderClearData() {
+        return (
+            <Modal
+                animationType={"fade"}
+                transparent={true}
+                visible={this.state.clearDataModal}>
+                <BlurView tint="dark" intensity={100} style={StyleSheet.absoluteFill}>
+                    <View style={{ marginTop: 90, paddingLeft: 30, paddingRight: 30, height : 60 }}>
+                        <Swipe
+                            width={width - 50}
+                            buttonSize={70}
+                            buttonColor="white"
+                            backgroundColor="rgb(176,176,176)"
+                            textColor="#37474F"
+                            borderRadius={40}
+                            borderColor="transparent"
+                            okButton={{ visible: true, duration: 400 }}
+                            icon={<AntDesign name="arrowright" size={30} color='red' />}
+                            onVerified={() => this.clearAppData()}>
+                            <Text bold>               slide to clear data</Text>
+                        </Swipe>
+                    </View>
+                    <Block bottom flex={1} style={{ marginBottom: 40 }}>
+                        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+                            <TouchableOpacity onPress={() => this.setState({ clearDataModal: false })}>
+                                <MaterialIcons name="cancel" size={80} color='white' />
+                            </TouchableOpacity>
+                            <Text center white>Cancel</Text>
+                        </View>
+                    </Block>
+                </BlurView>
+            </Modal>
+        )
     }
 
     render() {
@@ -70,12 +98,13 @@ class Setting extends Component {
                         />
                     </Block>
                     <View style={styles.divider} />
+                    {this.renderClearData()}
                     <Block bottom flex={1} style={{ marginBottom: 10 }}>
                         <Button gradient
                             startColor='#C40A0A'
                             endColor='#E86241'
-                            onPress={() => { this.confirmationClear() }}>
-                            <Text center semibold white>Clear data</Text>
+                            onPress={() => this.setState({ clearDataModal: true })}>
+                            <Text center semibold white>Clear app data</Text>
                         </Button>
                     </Block>
                 </Block>

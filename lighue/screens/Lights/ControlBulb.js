@@ -137,11 +137,11 @@ class ControlBulb extends React.Component {
         const { colors } = theme;
         const trackTintColor = nightmode ? "rgba(157, 163, 180, 0.10)" : "#DDDDDD"
         const textcolor = { color: nightmode ? colors.white : colors.gray3 }
-        const control = dimmableType ? ["Brightness"] : ["Brightness", "Saturation"]
+        const controls = dimmableType ? ["Brightness"] : ["Brightness", "Saturation"]
         return (
-            Object.keys(control).map(val => (
+            controls.map(control => (
                 <View>
-                    <Text style={[styles.textControl, textcolor, { marginBottom: 10 }]}>{control[val]}</Text>
+                    <Text style={[styles.textControl, textcolor, { marginBottom: 10 }]}>{control}</Text>
                     <Slider
                         minimumValue={1}
                         maximumValue={254}
@@ -150,12 +150,12 @@ class ControlBulb extends React.Component {
                         trackStyle={{ height: 10, borderRadius: 10 }}
                         minimumTrackTintColor={theme.colors.secondary}
                         maximumTrackTintColor={trackTintColor}
-                        value={control[val] == "Brightness" ? bri : sat}
-                        onValueChange={control[val] == "Brightness" ? this.changeBriLightState : this.changeSatLightState}
+                        value={control == "Brightness" ? bri : sat}
+                        onValueChange={control == "Brightness" ? this.changeBriLightState : this.changeSatLightState}
                     />
-                    <Text style={[styles.textPer, textcolor]}>{control[val] == "Brightness" ? briPer : satPer}</Text>
+                    <Text style={[styles.textPer, textcolor]}>{control == "Brightness" ? briPer : satPer}</Text>
                 </View>
-            )))
+            )))      
     }
 
     renderColorPicker() {
@@ -254,7 +254,6 @@ const styles = StyleSheet.create({
         width: theme.sizes.base,
         height: theme.sizes.base,
         borderRadius: theme.sizes.base,
-        color: 'white',
         borderColor: 'white',
         borderWidth: 3,
         backgroundColor: theme.colors.secondary,

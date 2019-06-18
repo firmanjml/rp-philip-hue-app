@@ -3,6 +3,7 @@ import { Image, StyleSheet, TouchableOpacity, Modal, ScrollView, Dimensions, Pla
 import { Block, Text, Card, Badge } from '../../components';
 import { theme, constant } from '../../constants';
 import { connect } from 'react-redux';
+import { BlurView } from 'expo';
 
 const { height, width } = Dimensions.get('window');
 
@@ -33,16 +34,10 @@ class LocationList extends Component {
             navigation.goBack()
         }
         else if (this.state.location[value] == "Room") {
-            // navigation.state.params.returnData(this.state.location[value])
-            // navigation.goBack()
             this.setState({ roomModal: true })
         }
         else {
-            // navigation.state.params.returnData(this.state.location[value])
-            // navigation.goBack()
-            // navigation.navigate("BulbListScreen")
             this.setState({ bulbModal: true })
-            console.log(this.state.bulbModal)
         }
     }
 
@@ -74,7 +69,13 @@ class LocationList extends Component {
                     {
                         Object.entries(groups).length === 0 && groups.constructor === Object ?
                             <Block middle center>
-                                <Text h1 style={textcolor}>No Room Created</Text>
+                                <Text h3 style={textcolor}>
+                                    No Rooms created
+                                    </Text>
+                                <TouchableOpacity
+                                    onPress={() => this.setState({roomModal : false})}>
+                                    <Text h3 style={{ marginTop: 5, color: '#20D29B' }}>Go Back</Text>
+                                </TouchableOpacity>
                             </Block>
                             :
                             Object.keys(groups).map(val => (
@@ -86,9 +87,9 @@ class LocationList extends Component {
                                             {
                                                 constant.room_class.indexOf(groups[val].class) > -1
                                                     ?
-                                                    <Image style={{width: constant.class_base64[groups[val].class].width, height: constant.class_base64[groups[val].class].height}} source={{uri: constant.class_base64[groups[val].class].uri}}/>
+                                                    <Image style={{ width: constant.class_base64[groups[val].class].width, height: constant.class_base64[groups[val].class].height }} source={{ uri: constant.class_base64[groups[val].class].uri }} />
                                                     :
-                                                    <Image style={{width: constant.class_base64["Other"].width, height: constant.class_base64["Other"].height}} source={{uri: constant.class_base64["Other"].uri}}/>
+                                                    <Image style={{ width: constant.class_base64["Other"].width, height: constant.class_base64["Other"].height }} source={{ uri: constant.class_base64["Other"].uri }} />
                                             }
                                         </Badge>
                                         <Text medium height={30} style={styles.roomText}>{groups[val].name.length > 12 ? groups[val].name.substring(0, 12) + "..." : groups[val].name}</Text>
@@ -105,8 +106,8 @@ class LocationList extends Component {
     redirectionRoom = (val) => {
         const { navigation } = this.props;
         navigation.state.params.returnData("room", val)
-        navigation.goBack()
         this.setState({ roomModal: false })
+        navigation.goBack()
     }
 
     renderModalRoom() {
@@ -115,18 +116,17 @@ class LocationList extends Component {
         const backgroundcolor = { backgroundColor: nightmode ? colors.background : colors.backgroundLight }
         const titlecolor = { color: nightmode ? colors.white : colors.black }
         return (
-            <Modal animationType={"slide"}
+            <Modal animationType={"fade"}
                 transparent={false}
-                visible={this.state.roomModal}
-                onRequestClose={() => console.log("Modal has been closed.")}>
-                <Block style={backgroundcolor}>
+                visible={this.state.roomModal}>
+                <BlurView tint="dark" intensity={100} style={StyleSheet.absoluteFill}>
                     <Block container>
                         <Text h1 style={[titlecolor, { fontWeight: 'bold' }]}>Choose room</Text>
-                        <Block flex={false} row style={[styles.tabs, backgroundcolor]}>
+                        <Block flex={false} row style={[styles.tabs]}>
                             {this.renderListRoom()}
                         </Block>
                     </Block>
-                </Block>
+                </BlurView>
             </Modal>
         )
     }
@@ -152,9 +152,9 @@ class LocationList extends Component {
                                 <TouchableOpacity
                                     key={val}
                                     onPress={() => this.redirectionBulb(val)}>
-                                    <Block flex={false} row space="between" style={{ marginTop: 10, marginBottom: 30 }}>
-                                        <Text bold style={[styles.textControl, textcolor]}>{lights[val].name}</Text>
-                                        <Text bold style={[styles.textControl, textcolor]}>></Text>
+                                    <Block flex={false} row space="between" style={{ marginTop: 30, marginBottom: 30 }}>
+                                        <Text h2 style={[styles.textControl, textcolor]}>{lights[val].name}</Text>
+                                        <Text h2 style={[styles.textControl, textcolor]}>></Text>
                                     </Block>
                                 </TouchableOpacity>
                             ))
@@ -167,8 +167,8 @@ class LocationList extends Component {
     redirectionBulb = (val) => {
         const { navigation } = this.props;
         navigation.state.params.returnData("bulb", val)
-        navigation.goBack()
         this.setState({ bulbModal: false })
+        navigation.goBack()
     }
 
     renderModalBulb() {
@@ -177,18 +177,18 @@ class LocationList extends Component {
         const backgroundcolor = { backgroundColor: nightmode ? colors.background : colors.backgroundLight }
         const titlecolor = { color: nightmode ? colors.white : colors.black }
         return (
-            <Modal animationType={"slide"}
+            <Modal animationType={"fade"}
                 transparent={false}
                 visible={this.state.bulbModal}
                 onRequestClose={() => this.setState({ bulbModal: !this.state.bulbModal })}>
-                <Block style={backgroundcolor}>
+                <BlurView tint="dark" intensity={100} style={StyleSheet.absoluteFill}>
                     <Block container>
                         <Text h1 style={[titlecolor, { fontWeight: 'bold' }]}>Choose bulb</Text>
-                        <Block flex={false} row style={[styles.tabs, backgroundcolor]}>
+                        <Block flex={false} row style={styles.tabs}>
                             {this.renderListBulb()}
                         </Block>
                     </Block>
-                </Block>
+                </BlurView>
             </Modal>
         )
     }

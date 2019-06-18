@@ -29,9 +29,7 @@ class LinkButtonScreen extends Component {
         const { username, bridgeIndex, bridgeip } = this.props;
         if (!username[bridgeIndex]) {
             this.props._CreateUser();
-            console.log("Link button not pressed!");
         } else {
-            console.log("Link button pressed");
             this.props.navigation.navigate("SplashNavigator")
         }
     }

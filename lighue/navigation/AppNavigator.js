@@ -9,10 +9,11 @@ import SettingsScreen from '../screens/Setting';
 import AddSchedulesScreen from '../screens/Schedules/AddSchedules';
 import CategoryScreen from '../screens/Schedules/CategoryList';
 import LocationScreen from '../screens/Schedules/LocationList';
-import AddSceneScreen from '../screens/Scenes/Camera';
+import AddSceneScreen from '../screens/Scenes/AddScenes';
 import PostUpdateScreen from '../screens/Miscellaneous/PostUpdateScreen';
+import ControlRoomScreen from '../screens/Rooms/ControlRoomScreen';
 import { theme } from '../constants';
-
+import {fromRight} from 'react-navigation-transitions';
 const SetupNavigatorApp = createStackNavigator(
   {
     ListRoom: {
@@ -50,10 +51,14 @@ const SetupNavigatorApp = createStackNavigator(
     },
     PostUpdate: {
       screen: PostUpdateScreen
+    },
+    ControlRoom : {
+      screen : ControlRoomScreen
     }
   },
   {
     initialRouteName: "ListRoom",
+    transitionConfig: () => fromRight(),
     defaultNavigationOptions: {
       headerStyle: {
         backgroundColor: 'transparent',

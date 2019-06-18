@@ -26,7 +26,10 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.rp.lighue"
+      "bundleIdentifier": "com.rp.lighue",
+      "infoPlist" : {
+        "NSFaceIDUsageDescription" : "This app uses FaceID to authenticate users for usage on this app."
+      }
     }
   }
 }

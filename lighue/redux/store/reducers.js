@@ -27,6 +27,32 @@ export const nightmode = (state = false, action) => {
 }
 
 /** 
+ * authentication
+ * * Redux reducer stores authentication data to Redux state.
+*/
+export const authentication = (state = false, action) => {
+    if (action.type === C.CHANGE_AUTHENTICATION_STATE) {
+        return action.payload;
+    }
+    else { 
+        return state
+    }
+}
+
+/** 
+ * hardware
+ * * Redux reducer stores authentication hardware support data to Redux state.
+*/
+export const hardwareSupport = (state = 0, action) => {
+    if (action.type === C.CHANGE_HARDWARE_SUPPORT) {
+        return action.payload;
+    }
+    else {
+        return state
+    }
+}
+
+/** 
  * bridgeIndex
  * * Redux reducer stores the index of the bridge to Redux state.
 */
@@ -166,6 +192,8 @@ export default combineReducers({
     bridgeip,
     config,
     groups,
+    authentication,
+    hardwareSupport,
     lights,
     schedules,
     loading,

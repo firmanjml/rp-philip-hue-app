@@ -14,7 +14,6 @@ import {
     MenuOptions,
     MenuOption,
     MenuTrigger,
-    MenuProvider,
 } from 'react-native-popup-menu';
 
 
@@ -73,7 +72,6 @@ class ManualScreen extends React.Component {
         const bordercolor = { borderColor: nightmode ? colors.white : colors.gray2 }
         const placeholdercolor = nightmode ? colors.gray2 : colors.gray3
         return (
-            <MenuProvider>
                 <Block style={backgroundcolor} >
                     <Block container>
                         <Block flex={false} row space="between">
@@ -132,7 +130,6 @@ class ManualScreen extends React.Component {
                         </Block>
                     </Block>
                 </Block>
-            </MenuProvider>
         );
     }
 }

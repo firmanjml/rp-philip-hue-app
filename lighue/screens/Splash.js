@@ -6,8 +6,11 @@ import { theme, constant } from '../constants';
 import { connect } from 'react-redux'
 import Layout from '../constants/Layout';
 import AppIntroSlider from 'react-native-app-intro-slider';
+import Security from '../assets/lottie/cloud-security.json'
+import { LocalAuthentication, DangerZone } from 'expo';
+const { Lottie } = DangerZone;
 
-import { GetAllLights, GetAllGroups } from '../redux/actions'
+import { GetAllLights, GetAllGroups, GetSchedules, ChangeHardwareSupport } from '../redux/actions'
 
 var interval;
 class Splash extends Component {
@@ -15,15 +18,91 @@ class Splash extends Component {
         header: null
     }
 
+    state = {
+        animation: null
+    };
+
     componentWillMount() {
+        this.props._fetchAllLights();
+        this.props._fetchAllGroups();
+        this.props._fetchAllSchedules();
         interval = setInterval(() => {
             this.props._fetchAllLights();
-            this.props._fetchAllGroups()
-        }, 1000)
+            this.props._fetchAllGroups();
+            this.props._fetchAllSchedules();
+        }, 3000)
+    }
+
+    componentDidMount() {
+        this.checkAuthenticationSupport();
+        this.animation1.play()
+        this.animation2.play()
+        this.animation3.play()
     }
 
     componentWillUnmount() {
         clearInterval(interval);
+    }
+
+
+    checkAuthenticationSupport = async () => {
+        let supported = await LocalAuthentication.hasHardwareAsync();
+        let whatHardware = await LocalAuthentication.supportedAuthenticationTypesAsync();
+        let isEnrolled = await LocalAuthentication.isEnrolledAsync();
+        if (supported && isEnrolled) {
+            if (whatHardware[0] == 1) {
+                this.props._UpdateHardwareSupport(1);
+            }
+            else {
+                this.props._UpdateHardwareSupport(2);
+            }
+        }
+    }
+
+
+    renderLottie(item) {
+        if (item.key == 0) {
+            return (
+                <Block container style={styles.slide}>
+                    {constant.splash_slider[0].lottie &&
+                        <Lottie
+                            ref={animation1 => {
+                                this.animation1 = animation1;
+                            }}
+                            speed={1}
+                            source={constant.splash_slider[0].lottie}
+                        />}
+                </Block>
+            );
+        }
+        else if (item.key == 1) {
+            return (
+                <Block container style={styles.slide}>
+                    {constant.splash_slider[1].lottie &&
+                        <Lottie
+                            ref={animation2 => {
+                                this.animation2 = animation2;
+                            }}
+                            speed={2}
+                            source={constant.splash_slider[1].lottie}
+                        />}
+                </Block>
+            );
+        }
+        else {
+            return (
+                <Block container style={styles.slide}>
+                    {constant.splash_slider[2].lottie &&
+                        <Lottie
+                            ref={animation3 => {
+                                this.animation3 = animation3; 
+                            }}
+                            speed={2}
+                            source={constant.splash_slider[2].lottie}
+                        />}
+                </Block>
+            );
+        }
     }
 
     _renderItem = (item) => {
@@ -31,43 +110,53 @@ class Splash extends Component {
         const { colors } = theme;
         const backgroundcolor = { backgroundColor: nightmode ? colors.background : colors.backgroundLight };
         const titlecolor = { color: nightmode ? colors.white : colors.black }
-        const textcolor = { color: nightmode ? colors.white : colors.gray3}
+        const textcolor = { color: nightmode ? colors.white : colors.gray3 }
         return (
             <Block style={backgroundcolor}>
-                <Block container style={styles.slide}>
-                    <Image 
-                        resizeMethod='auto'
-                        source={item.image}
-                        style={styles.image} />
-                </Block>
+                {this.renderLottie(item)}
                 <Block marginTop={20} margin={[0, theme.sizes.base * 3]}>
-                    <Text style={[styles.title,titlecolor]}>{item.title}</Text>
-                    <Text medium style={[styles.text,textcolor]}>{item.text}</Text>
+                    <Text style={[styles.title, titlecolor]}>{item.title}</Text>
+                    <Text medium style={[styles.text, textcolor]}>{item.text}</Text>
                 </Block>
             </Block>
         );
     }
+
     _onDone = () => {
-        this.props.navigation.navigate("ListRoom");
+        const { navigation, hardwareSupport } = this.props;
+        if (hardwareSupport != 0) {
+            navigation.navigate("AuthenticationSetting")
+        }
+        else {
+            navigation.navigate("ListRoom")
+        }
     }
+
+
     render() {
-        return <AppIntroSlider renderItem={this._renderItem} slides={constant.splash_slider} onDone={this._onDone} bottomButton />;
+        return <AppIntroSlider
+            renderItem={this._renderItem}
+            slides={constant.splash_slider}
+            onDone={this._onDone}
+            bottomButton />;
     }
 }
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        _fetchAllLights() {
-            return dispatch(GetAllLights())
-        },
         _fetchAllGroups: () => dispatch(GetAllGroups()),
-
+        _fetchAllLights: () => dispatch(GetAllLights()),
+        _fetchAllSchedules: () => dispatch(GetSchedules()),
+        _UpdateHardwareSupport(index) {
+            return dispatch(ChangeHardwareSupport(index))
+        },
     }
 }
 
 const mapStateToProps = (state) => {
     return {
-        nightmode: state.nightmode
+        nightmode: state.nightmode,
+        hardwareSupport: state.hardwareSupport
     }
 }
 

@@ -5,14 +5,12 @@ import { theme, constant } from '../../constants';
 import Icon from 'react-native-vector-icons';
 import { connect } from 'react-redux';
 import { GetAllGroups, GetAllLights, GetSchedules } from '../../redux/actions';
-import { persistor } from "../../redux/store";
-import { Updates } from 'expo';
+
 import {
     Menu,
     MenuOptions,
     MenuOption,
     MenuTrigger,
-    MenuProvider,
 } from 'react-native-popup-menu';
 
 const { height, width } = Dimensions.get('window');
@@ -97,6 +95,34 @@ class DefaultScreen extends Component {
                 </Menu>
             )
         }
+        else if (this.state.active === "Schedules") {
+            return (
+                <Menu onSelect={value => this.onMenuScheduleSelect(value)}>
+                    <MenuTrigger>
+                        <Icon.Entypo name="dots-three-horizontal" size={25} color={theme.colors.gray} />
+                    </MenuTrigger>
+                    <MenuOptions style={{ padding: 15 }} >
+                        <MenuOption value={1}><Text h3>Add Schedules</Text></MenuOption>
+                        <View style={styles.divider} />
+                        <MenuOption value={2}><Text h3>Settings</Text></MenuOption>
+                    </MenuOptions>
+                </Menu>
+            )
+        }
+        else if (this.state.active === "Scenes") {
+            return (
+                <Menu onSelect={value => this.onMenuSceneSelect(value)}>
+                    <MenuTrigger>
+                        <Icon.Entypo name="dots-three-horizontal" size={25} color={theme.colors.gray} />
+                    </MenuTrigger>
+                    <MenuOptions style={{ padding: 15 }} >
+                        <MenuOption value={1}><Text h3>Add Scenes</Text></MenuOption>
+                        <View style={styles.divider} />
+                        <MenuOption value={2}><Text h3>Settings</Text></MenuOption>
+                    </MenuOptions>
+                </Menu>
+            )
+        }
     }
 
     displayLayout() {
@@ -128,14 +154,14 @@ class DefaultScreen extends Component {
                         {
                             Object.entries(groups).length === 0 && groups.constructor === Object ?
                                 <Block middle center>
-                                    <Text h3 style={[textcolor]}>
+                                    <Text h1 bold style={[textcolor]}>
                                         No Room created
                                     </Text>
                                     <TouchableOpacity
                                         onPress={() => {
                                             navigation.navigate('AddRoom');
                                         }}>
-                                        <Text h3 style={{ marginTop : 5, color: '#20D29B' }}>Add Rooms</Text>
+                                        <Text h2 style={{ marginTop : 5, color: '#20D29B' }}>Add Rooms</Text>
                                     </TouchableOpacity>
                                 </Block>
                                 :
@@ -143,7 +169,7 @@ class DefaultScreen extends Component {
                                     <TouchableOpacity
                                         key={val}
                                         onPress={() => {
-                                            navigation.navigate('EditRoom', {
+                                            navigation.navigate('ControlRoom', {
                                                 id: val
                                             });
                                         }}>
@@ -179,28 +205,28 @@ class DefaultScreen extends Component {
         } else if (this.state.active === "Schedules") {
             return (
                 <Block style={{ paddingHorizontal: theme.sizes.base * 2, alignItems: 'center', justifyContent: 'center' }}>
-                    <Text h3 style={[textcolor]}>
-                        No Schedules created
+                    <Text h1 bold style={[textcolor]}>
+                        No schedules created.
                     </Text>
                     <TouchableOpacity
                         onPress={() => {
                             navigation.navigate('AddSchedules');
                         }}>
-                        <Text h3 style={{ marginTop : 5, color: '#20D29B' }}>Add Schedules</Text>
+                        <Text h2 style={{ marginTop : 5, color: '#20D29B' }}>Add schedules</Text>
                     </TouchableOpacity>
                 </Block>
             )
         } else {
             return (
                 <Block style={{ paddingHorizontal: theme.sizes.base * 2, alignItems : 'center', justifyContent : 'center' }}>
-                    <Text h3 style={textcolor}>
-                        No Scenes created
+                    <Text h1 bold style={textcolor}>
+                        No scenes created.
                     </Text>
                     <TouchableOpacity
                         onPress={() => {
                             navigation.navigate('AddScenes');
                         }}>
-                        <Text h3 style={{ marginTop : 5, color: '#20D29B' }}>Add Scenes</Text>
+                        <Text h2 style={{ marginTop : 5, color: '#20D29B' }}>Add scenes</Text>
                     </TouchableOpacity>
                 </Block>
             )
@@ -222,6 +248,14 @@ class DefaultScreen extends Component {
         }
     }
 
+    onMenuScheduleSelect(value) {
+        if (value == 1) {
+            this.props.navigation.navigate('AddSchedules');
+        } else if (value == 2) {
+            this.props.navigation.navigate('Settings');
+        }
+    }
+
     onMenuLightSelect(value) {
         if (value == 1) {
             // search new bulb
@@ -234,14 +268,21 @@ class DefaultScreen extends Component {
         }
     }
 
+    onMenuSceneSelect(value) {
+        if (value == 1) {
+            this.props.navigation.navigate("AddScenes")
+        } else if (value == 2) {
+            this.props.navigation.navigate("Settings")
+        }
+    }
+
     render() {
-        const tabs = ['Rooms', 'Lights', 'Schedules', 'Scene'];
+        const tabs = ['Rooms', 'Lights', 'Schedules', 'Scenes'];
         const { nightmode } = this.props;
         const { colors } = theme;
         const backgroundcolor = { backgroundColor: nightmode ? colors.background : colors.backgroundLight }
         const textcolor = { color: nightmode ? colors.white : colors.black }
         return (
-            <MenuProvider>
                 <Block style={backgroundcolor}>
                     <Block flex={false} center row space="between" style={styles.header}>
                         <Text h1 style={[textcolor, { fontWeight: 'bold' }]}>Explore</Text>
@@ -252,7 +293,6 @@ class DefaultScreen extends Component {
                     </Block>
                     {this.displayLayout()}
                 </Block>
-            </MenuProvider>
         )
     }
 }

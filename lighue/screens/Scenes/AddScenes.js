@@ -1,9 +1,10 @@
 import React, { Component } from 'react'
-import { Image, StyleSheet, TouchableOpacity, Button } from 'react-native'
-import { Block, Text } from '../../components';
+import { Image, StyleSheet, TouchableOpacity, Button, Modal } from 'react-native'
+import { Block, Text, Input } from '../../components';
 import { theme } from '../../constants';
 import { connect } from 'react-redux';
-import { ImagePicker, Permissions, Constants, Camera } from 'expo';
+import { ImagePicker, Permissions, Constants } from 'expo';
+import CameraScreen from './Camera'
 
 class AddScenes extends Component {
     static navigationOptions = ({ navigation }) => {
@@ -20,9 +21,10 @@ class AddScenes extends Component {
     }
 
     state = {
+        name: null,
         image: null,
         hasCameraPermission: null,
-        type: Camera.Constants.Type.back,
+        cameraModal: false
     };
 
     componentDidMount() {
@@ -54,6 +56,42 @@ class AddScenes extends Component {
         }
     };
 
+    changeNameText = (value) => {
+        this.setState({ name: value })
+    }
+
+    renderInput() {
+        const { nightmode } = this.props;
+        const { colors } = theme;
+        const bordercolor = { borderColor: nightmode ? colors.white : colors.gray2 }
+        const textcolor = { color: nightmode ? colors.gray2 : colors.black }
+        const titlecolor = { color: nightmode ? colors.white : colors.black }
+        return (
+            <Block>
+                <Text bold h3 style={[styles.textControl, titlecolor, styles.row]}>Name</Text>
+                <Input
+                    style={[styles.textInput, textcolor, bordercolor]}
+                    editable={true}
+                    value={this.state.name}
+                    placeholderTextColor={nightmode ? colors.gray2 : colors.black}
+                    onChangeText={this.changeNameText}
+                />
+            </Block>
+        )
+    }
+
+    renderCamera() {
+        return (
+            <Modal
+                animationType={"slide"}
+                transparent={false}
+                style={{position: 'absolute'}}
+                visible={this.state.cameraModal}>
+                <CameraScreen/>
+            </Modal>
+        )
+    }
+
     render() {
         let { image } = this.state;
         const { nightmode } = this.props;
@@ -62,22 +100,16 @@ class AddScenes extends Component {
         const titlecolor = { color: nightmode ? colors.white : colors.black }
         return (
             <Block style={backgroundcolor}>
-                <Camera style={{ flex: 1 }} type={this.state.type}>
-                    <Block container>
-
-                        <Text h1 bold style={[titlecolor, { marginTop: 10 }]}>Add Scenes</Text>
-                        <Button
-                            title="Pick an image from camera roll"
-                            onPress={this._pickImage}
-                        />
-                        <Button
-                            title="Click to take picture"
-                            onPress={this._pickImage}
-                        />
-                        {image &&
-                            <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />}
-                    </Block>
-                </Camera>
+                <Block container>
+                    <Text h1 bold style={[titlecolor, { marginTop: 10 }]}>Add Scenes</Text>
+                    {this.renderInput()}
+                    <Button
+                        title="Pick an image from camera roll"
+                        onPress={this._pickImage}
+                    />
+                    {image &&
+                        <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />}
+                </Block>
             </Block>
         )
     }
@@ -104,5 +136,13 @@ const styles = StyleSheet.create({
         fontSize: 24,
         color: 'black',
         alignSelf: "center"
-    }
+    },
+    textInput: {
+        height: 30,
+        borderBottomWidth: .5,
+        borderRadius: 0,
+        borderWidth: 0,
+        textAlign: 'left',
+        paddingBottom: 10
+    },
 });
