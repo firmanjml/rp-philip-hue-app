@@ -41,7 +41,9 @@ class ControlRoomScreen extends React.Component {
   };
 
   componentWillMount() {
-    this.setState({ id: this.props.navigation.getParam("id", "NO-ID") });
+    this.setState({ 
+      id: this.props.navigation.getParam("id", "NO-ID"),
+      type : this.props.navigation.getParam("class", "Other") });
   }
 
   componentDidMount() {
@@ -54,17 +56,23 @@ class ControlRoomScreen extends React.Component {
       this.props.groups[this.state.id].action.sat
     );
     this.setState({
-      type: this.props.groups[this.state.id].class == null ? "Other" : this.props.groups[this.state.id].class,
       sat: this.props.groups[this.state.id].action.sat,
       bri: this.props.groups[this.state.id].action.bri
     });
   }
 
   renderType() {
+    const { nightmode } = this.props;
+    const { colors } = theme;
+    const titlecolor = { color: nightmode ? colors.white : colors.black };
+    const textcolor = { color: nightmode ? colors.white : colors.gray3 };
+    const bordercolor = {
+      borderColor: nightmode ? colors.white : colors.gray2
+    };
     const {type} = this.state;
     return (
       <View>
-        <Text style={[styles.textControl, textcolor]}>Type</Text>
+        <Text style={[styles.textControl, textcolor]}>Room Type</Text>
         <Input
           style={[styles.textInput, titlecolor, bordercolor]}
           editable={false}
@@ -284,9 +292,6 @@ class ControlRoomScreen extends React.Component {
     };
     const titlecolor = { color: nightmode ? colors.white : colors.black };
     const textcolor = { color: nightmode ? colors.white : colors.gray3 };
-    const bordercolor = {
-      borderColor: nightmode ? colors.white : colors.gray2
-    };
     return (
       <Block style={backgroundcolor}>
         <Block flex={false} center row space="between" style={styles.header}>

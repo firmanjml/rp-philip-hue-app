@@ -147,7 +147,6 @@ class AddSchedules extends Component {
         }
         else {
             var utcDaySelected = await this.calculateRepDay();
-            var localtime = `${utcDaySelected}/T${time}:00`
             if (homeSelected == true) {
                 var address = `/api/${username[bridgeIndex]}/api/groups/0/action`
             }
@@ -174,7 +173,7 @@ class AddSchedules extends Component {
                     "method": "PUT",
                     "body": body
                 },
-                "localtime": localtime
+                "localtime": `${utcDaySelected}/T${time}:00`
             }
             this.props._CreateSchedules(scheduleData);
             this.props.navigation.navigate("PostUpdate", {
@@ -276,7 +275,7 @@ class AddSchedules extends Component {
 
     handleTimePicked = (time) => {
         var datetime = new Date(time);
-        var hour = datetime.getUTCHours()
+        var hour = datetime.getUTCHours() 
         var minute = datetime.getUTCMinutes()
         if (hour <= 9) {
             hour = "0" + hour

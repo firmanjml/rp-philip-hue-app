@@ -170,7 +170,8 @@ class DefaultScreen extends Component {
                                         key={val}
                                         onPress={() => {
                                             navigation.navigate('ControlRoom', {
-                                                id: val
+                                                id: val,
+                                                class : groups[val].class > -1 ? groups[val].class : "Other"
                                             });
                                         }}>
                                         <Card center middle shadow style={styles.category}>
