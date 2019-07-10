@@ -1,5 +1,6 @@
 {
   "expo": {
+    "scheme": "lighue",
     "name": "lighue",
     "slug": "lighue",
     "privacy": "public",

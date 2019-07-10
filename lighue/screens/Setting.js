@@ -1,31 +1,24 @@
 import React, { Component } from 'react'
-import { Image, StyleSheet, TouchableOpacity, Dimensions, View, Modal } from 'react-native'
+import { Image, StyleSheet, TouchableOpacity, Dimensions, View, Modal, Alert } from 'react-native'
 import { Block, Text, Button } from '../components';
 import { theme } from '../constants';
 import { connect } from 'react-redux';
-import { Updates } from 'expo';
+import { Updates, BlurView, AuthSession, Constants, WebBrowser } from 'expo';
 import { persistor } from "../redux/store";
-import { BlurView } from 'expo';
 import Swipe from '../components/Swipe';
 import { MaterialIcons, AntDesign } from '@expo/vector-icons';
-
 const { width } = Dimensions.get('window');
-
 import { ChangeThemeMode } from '../redux/actions'
-
 import ToggleSwitch from '../components/ToggleSwitch'
-
 
 class Setting extends Component {
     static navigationOptions = ({ navigation }) => {
         return {
             headerLeft:
-                <TouchableOpacity>
-                    <TouchableOpacity
-                        onPress={() => navigation.goBack()}
-                        style={{ height: 40, width: 80, justifyContent: 'center' }}>
-                        <Image source={require('../assets/icons/back.png')} />
-                    </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={() => navigation.goBack()}
+                    style={{ height: 40, width: 80, justifyContent: 'center' }}>
+                    <Image source={require('../assets/icons/back.png')} />
                 </TouchableOpacity>
         }
     }
@@ -98,6 +91,13 @@ class Setting extends Component {
                         />
                     </Block>
                     <View style={styles.divider} />
+                    <Block flex={false} row space="between" style={styles.row}>
+                        <TouchableOpacity
+                        onPress={() => this._handleoAuth()}>
+                            <Text style={[styles.textSetting, textcolor]}>Setup Remote Control via Cloud</Text>
+                        </TouchableOpacity>
+                    </Block>
+                    <View style={styles.divider} />
                     {this.renderClearData()}
                     <Block bottom flex={1} style={{ marginBottom: 10 }}>
                         <Button gradient
@@ -111,8 +111,51 @@ class Setting extends Component {
             </Block>
         )
     }
+    _handleoAuth = async () => {
+        let redirectUrl = AuthSession.getRedirectUrl();
+    
+        const queryParams = toQueryString({
+            clientid: 'SFL5STvqIFZb219NUAflwg8UIeQm7KmD',
+            deviceid: Constants.installationId,
+            appid: 'lighue',
+            state: 'test'
+        });
+    
+        let result = await AuthSession.startAsync({
+            authUrl: `https://api.meethue.com/oauth2/auth${queryParams}`,
+        })
 
+        if (result.params.status === "error") {
+            Alert.alert(
+                'There\'s something wrong with the authentication right now.',
+                "Please try again.",
+                [{ text: "OK" }],
+                { cancelable: false }
+            );
+        } else if (result.params.status === "success") {
+            Alert.alert(
+                result.params,
+                [{ text: "OK" }],
+                { cancelable: false }
+            );
+        } else {
+            Alert.alert(
+                'Hacking attempt an invalid request.',
+                'Please try again. 😉',
+                [{ text: "OK" }],
+                { cancelable: false }
+            );
+        }
+    }
 }
+
+function toQueryString(params) {
+    return '?' + Object.entries(params)
+      .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+      .join('&');
+  }
+
+
 
 const mapDispatchToProps = (dispatch) => {
     return {
@@ -147,6 +190,6 @@ const styles = StyleSheet.create({
         marginVertical: 5,
         marginHorizontal: 2,
         borderBottomWidth: 1,
-        borderColor: "#E1E3E8"
+        borderColor: "#747880"
     },
 });
