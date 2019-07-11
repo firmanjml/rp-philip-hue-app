@@ -13,6 +13,30 @@ export const ChangeLoading = (visibility) => ({
     payload: visibility
 });
 
+export const ChangeCloudState = (boolean) => ({
+    type: C.CHANGE_CLOUD,
+    payload: true
+});
+
+export const ChangeCloudToken = (code = '') => (dispatch) => {
+    let b64 = "U0ZMNVNUdnFJRlpiMjE5TlVBZmx3ZzhVSWVRbTdLbUQ6M2dmNUtrdE9GaUhaa3BScw==";
+    axios({
+        url: `https://api.meethue.com/oauth2/token?code=${code}&grant_type=authorization_code`,
+        method: "POST",
+        headers : {
+            'Authorization': `Bearer ${b64}`
+        }
+    }).then((res) => {
+        dispatch({
+            type: C.CHANGE_CLOUD_TOKEN,
+            payload: res.access_token
+        });
+    }).catch((error) => {
+        // unauthroize 401
+        console.log(error);
+    })
+};
+
 /** 
  * SwitchBridge
  * * Allow switching into multiple bridges

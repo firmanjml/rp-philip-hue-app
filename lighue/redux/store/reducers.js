@@ -26,6 +26,22 @@ export const nightmode = (state = false, action) => {
     }
 }
 
+export const cloud = (state = false, action) => {
+    if (action.type === C.CHANGE_CLOUD) {
+        return action.payload
+    } else {
+        return state;
+    }
+}
+
+export const token = (state = false, action) => {
+    if (action.type === C.CHANGE_CLOUD_TOKEN) {
+        return action.payload
+    } else {
+        return state;
+    }
+}
+
 /** 
  * authentication
  * * Redux reducer stores authentication data to Redux state.
@@ -191,6 +207,8 @@ export default combineReducers({
     bridgeIndex,
     bridgeip,
     config,
+    cloud,
+    token,
     groups,
     authentication,
     hardwareSupport,

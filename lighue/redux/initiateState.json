@@ -1,5 +1,7 @@
 {
   "loading": false,
+  "cloud": false,
+  "token": "",
   "nightmode": true,
   "authentication" : false,
   "hardwareSupport" : 0,
