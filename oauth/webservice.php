@@ -1,13 +1,14 @@
 <?php
 
-$code = isset($_GET['code']);
-$state = isset($_GET['state']);
+$code = $_GET['code'];
+$state = $_GET['state'];
 
-if($code && $state)
+if(isset($_GET['code']) && isset($_GET['state']))
 {
-    header("Location: exp://expo.io/@firmanjml/lighue?status=success&code=<?php echo $code; ?>&state=<?php echo $state; ?>");
+    $url = "exp://expo.io/@firmanjml/lighue?status=success&code=" . $code . "&state=" . $state;
+    header("Location: " . $url);
 } else {
     header("Location: exp://expo.io/@firmanjml/lighue?status=error");
 }
 
-?>
+?>		
