@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import { Constants } from 'expo';
 import { DangerZone } from 'expo';
 import { theme, constant } from '../constants';
-import { ChangeAuthentication } from '../redux/actions'
+import { ChangeAuthentication, RefreshCloudToken } from '../redux/actions'
 import Security from '../assets/lottie/cloud-security.json'
 const { Lottie } = DangerZone;
 
@@ -18,6 +18,9 @@ class AuthenticationSetting extends React.Component {
     }
 
     componentWillMount() {
+        if (this.props.cloud_enable === true) {
+            this.props._refreshCloudToken();
+        }
         this._playAnimation();
     }
 
@@ -106,7 +109,8 @@ const mapStateToProps = (state) => {
     return {
         nightmode: state.nightmode,
         authentication: state.authentication,
-        hardwareSupport: state.hardwareSupport
+        hardwareSupport: state.hardwareSupport,
+        cloud_enable: state.cloud_enable
     }
 }
 
@@ -115,6 +119,9 @@ const mapDispatchToProps = (dispatch) => {
         _UpdateAuthentication(boolean) {
             return dispatch(ChangeAuthentication(boolean))
         },
+        _refreshCloudToken() {
+            return dispatch(RefreshCloudToken());
+        }
     }
 }
 
