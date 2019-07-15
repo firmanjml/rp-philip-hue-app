@@ -8,8 +8,8 @@ import { persistor } from "../redux/store";
 import Swipe from '../components/Swipe';
 import { MaterialIcons, AntDesign } from '@expo/vector-icons';
 const { width } = Dimensions.get('window');
-import { ChangeThemeMode } from '../redux/actions'
-import ToggleSwitch from '../components/ToggleSwitch'
+import { ChangeThemeMode, ChangeCloudToken, ChangeCloudState } from '../redux/actions'
+import ToggleSwitch from '../components/ToggleSwitch';
 
 class Setting extends Component {
     static navigationOptions = ({ navigation }) => {
@@ -30,48 +30,13 @@ class Setting extends Component {
         persistor.flush();
         persistor.purge();
         setTimeout(() => {
-            // Updates.reload()
+            Updates.reload()
             this.props.navigation.navigate("DiscoveryNavigator")
         }, 4000);
     }
 
-    renderClearData() {
-        return (
-            <Modal
-                animationType={"fade"}
-                transparent={true}
-                visible={this.state.clearDataModal}>
-                <BlurView tint="dark" intensity={100} style={StyleSheet.absoluteFill}>
-                    <View style={{ marginTop: 90, paddingLeft: 30, paddingRight: 30, height : 60 }}>
-                        <Swipe
-                            width={width - 50}
-                            buttonSize={70}
-                            buttonColor="white"
-                            backgroundColor="rgb(176,176,176)"
-                            textColor="#37474F"
-                            borderRadius={40}
-                            borderColor="transparent"
-                            okButton={{ visible: true, duration: 400 }}
-                            icon={<AntDesign name="arrowright" size={30} color='red' />}
-                            onVerified={() => this.clearAppData()}>
-                            <Text bold>               slide to clear data</Text>
-                        </Swipe>
-                    </View>
-                    <Block bottom flex={1} style={{ marginBottom: 40 }}>
-                        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                            <TouchableOpacity onPress={() => this.setState({ clearDataModal: false })}>
-                                <MaterialIcons name="cancel" size={80} color='white' />
-                            </TouchableOpacity>
-                            <Text center white>Cancel</Text>
-                        </View>
-                    </Block>
-                </BlurView>
-            </Modal>
-        )
-    }
-
     render() {
-        const { nightmode } = this.props;
+        const { nightmode, cloud_enable } = this.props;
         const { colors } = theme;
         const backgroundcolor = { backgroundColor: nightmode ? colors.background : colors.backgroundLight }
         const textcolor = { color: nightmode ? colors.white : colors.black }
@@ -92,18 +57,29 @@ class Setting extends Component {
                     </Block>
                     <View style={styles.divider} />
                     <Block flex={false} row space="between" style={styles.row}>
+                        {
+                            this.props.cloud_enable === true ?
+                            <Text style={[styles.textSetting, { color: theme.colors.gray2 }]}>Connected via Cloud</Text>
+                            :
+                            <TouchableOpacity
+                                onPress={() => this._handleoAuth()}>
+                                <Text style={[styles.textSetting, textcolor]}>Setup Remote Control via Cloud</Text>
+                            </TouchableOpacity>
+                        }
+                    </Block>
+                    <View style={styles.divider} />
+                    <Block flex={false} row space="between" style={styles.row}>
                         <TouchableOpacity
-                        onPress={() => this._handleoAuth()}>
-                            <Text style={[styles.textSetting, textcolor]}>Setup Remote Control via Cloud</Text>
+                        onPress={() => this.props.navigation.navigate("TestScreen")}>
+                            <Text style={[styles.textSetting, textcolor]}>TestScreen</Text>
                         </TouchableOpacity>
                     </Block>
                     <View style={styles.divider} />
-                    {this.renderClearData()}
                     <Block bottom flex={1} style={{ marginBottom: 10 }}>
                         <Button gradient
                             startColor='#C40A0A'
                             endColor='#E86241'
-                            onPress={() => this.setState({ clearDataModal: true })}>
+                            onPress={() => this.clearAppData() }>
                             <Text center semibold white>Clear app data</Text>
                         </Button>
                     </Block>
@@ -112,36 +88,51 @@ class Setting extends Component {
         )
     }
     _handleoAuth = async () => {
-        let redirectUrl = AuthSession.getRedirectUrl();
-    
+        const redirectUrl = AuthSession.getRedirectUrl();
+        const csrf = 'lighue' + Constants.installationId + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+
         const queryParams = toQueryString({
             clientid: 'SFL5STvqIFZb219NUAflwg8UIeQm7KmD',
             deviceid: Constants.installationId,
             appid: 'lighue',
-            state: 'test'
+            state: csrf
         });
     
         let result = await AuthSession.startAsync({
             authUrl: `https://api.meethue.com/oauth2/auth${queryParams}`,
         })
+        console.log(csrf);
 
         if (result.params.status === "error") {
             Alert.alert(
-                'There\'s something wrong with the authentication right now.',
                 "Please try again.",
+                'There\'s something wrong with the authentication right now.',
                 [{ text: "OK" }],
                 { cancelable: false }
             );
         } else if (result.params.status === "success") {
-            Alert.alert(
-                result.params,
-                [{ text: "OK" }],
-                { cancelable: false }
-            );
+            if (result.params.state === csrf) {
+                this.props._changeCloudToken(result.params.code);
+                Alert.alert(
+                    'Hooray 🥳',
+                    'Successfully paired to cloud.',
+                    [{ text: "OK", onPress: () => {
+                        
+                    }}],
+                    { cancelable: false }
+                );
+            } else {
+                Alert.alert(
+                    "Validation Error",
+                    'Fail to validate data.',
+                    [{ text: "OK" }],
+                    { cancelable: false }
+                );
+            }
         } else {
             Alert.alert(
-                'Hacking attempt an invalid request.',
                 'Please try again. 😉',
+                'Hacking attempt an invalid request.',
                 [{ text: "OK" }],
                 { cancelable: false }
             );
@@ -155,12 +146,13 @@ function toQueryString(params) {
       .join('&');
   }
 
-
-
 const mapDispatchToProps = (dispatch) => {
     return {
         _changeTheme: (boolean) => {
             return dispatch(ChangeThemeMode(boolean));
+        },
+        _changeCloudToken: (code) => {
+            return dispatch(ChangeCloudToken(code));
         }
     }
 }
@@ -168,6 +160,7 @@ const mapDispatchToProps = (dispatch) => {
 const mapStateToProps = (state) => {
     return {
         nightmode: state.nightmode,
+        cloud_enable: state.cloud_enable
     }
 }
 

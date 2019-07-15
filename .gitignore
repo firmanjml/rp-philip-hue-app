@@ -61,3 +61,4 @@ typings/
 .next
 hue-app-design/.DS_Store
 lightin/.DS_Store
+lighue/package-lock.json

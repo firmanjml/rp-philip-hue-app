@@ -1,7 +1,10 @@
 {
   "loading": false,
-  "cloud": false,
-  "token": "",
+  "cloud_enable": false,
+  "cloud": {
+    "token": "",
+    "refresh_token": ""
+  },
   "nightmode": true,
   "authentication" : false,
   "hardwareSupport" : 0,

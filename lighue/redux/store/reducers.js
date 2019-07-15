@@ -26,7 +26,7 @@ export const nightmode = (state = false, action) => {
     }
 }
 
-export const cloud = (state = false, action) => {
+export const cloud_enable = (state = false, action) => {
     if (action.type === C.CHANGE_CLOUD) {
         return action.payload
     } else {
@@ -34,7 +34,10 @@ export const cloud = (state = false, action) => {
     }
 }
 
-export const token = (state = false, action) => {
+export const cloud = (state = {
+        "token": "",
+        "refresh_token": ""
+    }, action) => {
     if (action.type === C.CHANGE_CLOUD_TOKEN) {
         return action.payload
     } else {
@@ -207,8 +210,8 @@ export default combineReducers({
     bridgeIndex,
     bridgeip,
     config,
+    cloud_enable,
     cloud,
-    token,
     groups,
     authentication,
     hardwareSupport,

@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { StyleSheet, Alert, TouchableOpacity, Image } from 'react-native'
 import { connect } from 'react-redux'
-import { SwitchBridge, AddBridge, GetAllGroups, SetGroupState, CreateGroup, DeleteGroup, GetAllLights, SetLampState, DeleteLight } from '../redux/actions'
+import { SwitchBridge, AddBridge, GetAllGroups, SetGroupState, CreateGroup, DeleteGroup, GetAllLights, SetLampState, DeleteLight, RefreshCloudToken } from '../redux/actions'
 import Spinner from "react-native-loading-spinner-overlay";
 import { Button, Block, Text, Divider } from '../components';
 import { theme } from '../constants';
@@ -135,17 +135,18 @@ class TestScreen extends Component {
                             Enjoy the testing experience
                     </Text>
                     </Block>
-
                     <Block middle flex={0.4} margin={[0, theme.sizes.padding * 2]}>
-                        <Text h1 center bold white>Group Test</Text>
-                        <Button shadow onPress={() => this.group()}>
-                            <Text center semibold>Turn {this.state.group_on ? 'On' : 'Off'} Group 1 Lights</Text>
+                        <Text h1 center bold white>Token Refresh</Text>
+                        <Button shadow onPress={async () => {
+                            await this.props._refreshToken();
+                            console.log(this.props.cloud);
+                        }}>
+                            <Text center semibold>Refresh Token</Text>
                         </Button>
-                        <Button shadow onPress={() => this.group(true)}>
-                            <Text center semibold>Output Group Log Data</Text>
-                        </Button>
+                        <Text center bold white>{this.props.cloud.token}</Text>
+                        <Text center bold white>{this.props.cloud.refresh_token}</Text>
                     </Block>
-                    <Block middle flex={0.2} margin={[0, theme.sizes.padding * 2]}>
+                    {/* <Block middle flex={0.2} margin={[0, theme.sizes.padding * 2]}>
                         <Text h1 center bold white style={{ marginTop: 10 }}>Switch Bridge</Text>
                         <Button shadow onPress={() => this.switchBridge()}>
                             <Text center semibold>Switch Bridge</Text>
@@ -157,7 +158,7 @@ class TestScreen extends Component {
                     <Block bottom flex={0.15} margin={[0, theme.sizes.padding * 2]}>
                         <Text h3 center bold white style={{ marginTop: 10 }}>{this.props.bridgeip[this.props.bridgeIndex] ? this.props.bridgeip[this.props.bridgeIndex] : 'Not connected to bridge'}</Text>
                         <Text h3 center bold white style={{ marginTop: 10 }}>{this.props.username[this.props.bridgeIndex] ? this.props.username[this.props.bridgeIndex] : 'Not linked to bridge'}</Text>
-                    </Block>
+                    </Block> */}
                 </Block>
             </Block>
         )
@@ -171,7 +172,8 @@ const mapStateToProps = (state) => {
         lights: state.lights,
         bridgeIndex: state.bridgeIndex,
         bridgeip: state.bridgeip,
-        username: state.username
+        username: state.username,
+        cloud: state.cloud
     }
 }
 
@@ -203,6 +205,9 @@ const mapDispatchToProps = (dispatch) => {
         },
         _deleteLampByID(id) {
             return dispatch(DeleteLight(id));
+        },
+        _refreshToken() {
+            return dispatch(RefreshCloudToken());
         }
     }
 }

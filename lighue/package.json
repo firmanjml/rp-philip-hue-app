@@ -17,6 +17,7 @@
     "expo-cli": "^2.20.0",
     "lodash": "^4.17.11",
     "native-base": "^2.12.1",
+    "qs": "^6.7.0",
     "react": "16.5.0",
     "react-countdown-now": "^2.1.0",
     "react-native": "https://github.com/expo/react-native/archive/sdk-32.0.0.tar.gz",
