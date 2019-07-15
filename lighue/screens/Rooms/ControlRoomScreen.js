@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet, View, TouchableOpacity, Image, Modal } from "react-native";
 import { ColorPicker } from "react-native-color-picker";
-
+import { ColorWheel } from 'react-native-color-wheel';
 import { connect } from "react-redux";
 import { SetGroupState } from "../../redux/actions";
 import ToggleSwitch from "../../components/ToggleSwitch";
@@ -42,7 +42,7 @@ class ControlRoomScreen extends React.Component {
 
   componentWillMount() {
     this.setState({ 
-      id: this.props.navigation.getParam("id", "NO-ID"),
+      id: this.props.navigation.getParam("id", "1"),
       type : this.props.navigation.getParam("class", "Other") });
   }
 
@@ -128,6 +128,17 @@ class ControlRoomScreen extends React.Component {
       _changeGroupStateByID
     } = this.props;
 
+
+    let h = Math.sign(values.h) === -1 ? 360 + (values.h) : values.h
+    let s = values.s;
+    let v = values. v;
+    
+    let colors = {
+      h,
+      s,
+      v
+    }
+
     if (!groups[this.state.id].action.on) {
       _changeGroupStateByID(this.state.id, {
         on: true
@@ -138,7 +149,7 @@ class ControlRoomScreen extends React.Component {
       url: `http://${bridgeip[bridgeIndex]}/api/${
         username[bridgeIndex]
         }/groups/${this.state.id}/action`,
-      data: { xy: ColorConversionToXY(values) }
+      data: { xy: ColorConversionToXY(colors) }
     });
   };
 
@@ -253,12 +264,16 @@ class ControlRoomScreen extends React.Component {
 
   renderColorPicker() {
     return (
-      <ColorPicker
-        onColorChange={this.changeColorGroupState}
+      // <ColorPicker
+      //   onColorChange={this.changeColorGroupState}
+      //   style={{ flex: 1 }}
+      //   hideSliders={true}
+      // // color={ConvertXYtoHex(this.props.lights[this.state.id].state.xy[0], this.props.lights[this.state.id].state.xy[1], 254)}
+      // // color={this.state.color}
+      // />
+      <ColorWheel
+        onColorChangeComplete={this.changeColorGroupState}
         style={{ flex: 1 }}
-        hideSliders={true}
-      // color={ConvertXYtoHex(this.props.lights[this.state.id].state.xy[0], this.props.lights[this.state.id].state.xy[1], 254)}
-      // color={this.state.color}
       />
     );
   }
@@ -319,7 +334,7 @@ class ControlRoomScreen extends React.Component {
           {this.renderSatSlider()}
           <Text style={[styles.textPer, textcolor]}>
             {this.state.satPer}%
-            </Text>
+          </Text>
           {this.renderColorPicker()}
         </Block>
       </Block>

@@ -14,17 +14,5 @@
   "config": {},
   "groups": {},
   "schedules" : {},
-  "lights": {
-    "1": {
-      "state": {
-        "on": false
-      },
-      "type": "",
-      "name": "",
-      "modelid": "",
-      "manufacturername": "",
-      "uniqueid": "",
-      "swversion": ""
-    }
-  }
+  "lights": {}
 }

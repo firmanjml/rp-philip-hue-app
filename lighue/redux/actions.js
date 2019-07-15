@@ -148,14 +148,15 @@ export const GetBridgeIP = (navigation, isManual = false, bridgeip = '') => asyn
         });
     } else {
         await axios({
-            // url: 'https://discovery.meethue.com',
-            url: 'https://api.myjson.com/bins/1eqhrc',
+            url: 'https://discovery.meethue.com',
             method: 'GET'
         }).then((res) => {
-            dispatch({
-                type: C.FETCH_BRIDGE_IP,
-                payload: res.data[0].internalipaddress
-            })
+            if (res.data.length > 0) {
+                dispatch({
+                    type: C.FETCH_BRIDGE_IP,
+                    payload: res.data[0].internalipaddress
+                })
+            }
         }).catch((error) => {
             dispatch(ChangeLoading(false));
             console.log(error)
@@ -177,7 +178,7 @@ export const AddBridge = (bridgeip = "") => (dispatch) => {
  * * Document 1.1 Get All Light
  * * https://developers.meethue.com/develop/hue-api/lights-api/#get-all-lights
 */
-export const GetAllLights = () => async (dispatch, getState) => {
+export const GetAllLights = () => (dispatch, getState) => {
     const i = getState().bridgeIndex;
     const bridgeip = getState().bridgeip[i];
     const username = getState().username[i];
@@ -185,7 +186,7 @@ export const GetAllLights = () => async (dispatch, getState) => {
     const headers = getState().cloud_enable === true ? {"Authorization": `Bearer ${getState().cloud.token}`, "Content-Type": "application/json"} : {"Content-Type": "application/json"};
 
     dispatch(ChangeLoading(true));
-    await axios({
+    axios({
         url,
         method: 'GET',
         headers
@@ -216,6 +217,8 @@ export const GetNewLights = () => (getState) => {
         url,
         method: 'GET',
         headers
+    }).then((res) => {
+        console.log(res)
     }).catch((error) => {
         console.log(error);
     })
@@ -237,10 +240,11 @@ export const SearchForNewLights = () => (dispatch, getState) => {
         url,
         method: 'POST',
         headers
-    }).then(() => {
+    }).then((res) => {
         dispatch(GetNewLights());
     }).catch((error) => {
         console.log(error);
+        console.log("here")
     })
 };
 
@@ -529,13 +533,13 @@ export const CreateUser = () => (dispatch, getState) => {
  * * Document 7.2. Get configuration
  * * https://developers.meethue.com/develop/hue-api/7-configuration-api/#get-configuration 
 */
-export const GetConfig = async (dispatch, getState) => {
+export const GetConfig = (dispatch, getState) => {
     const i = getState().bridgeIndex;
     const bridgeip = getState().bridgeip[i];
     const username = getState().username[i];
 
     dispatch(ChangeLoading(true));
-    await axios({
+    axios({
         url: `http://${bridgeip}/api/${username}/config`,
         method: 'GET'
     }).then((res) => {

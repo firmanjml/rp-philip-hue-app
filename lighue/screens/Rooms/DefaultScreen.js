@@ -4,7 +4,7 @@ import { Card, Badge, Block, Text } from '../../components';
 import { theme, constant } from '../../constants';
 import Icon from 'react-native-vector-icons';
 import { connect } from 'react-redux';
-import { GetAllGroups, GetAllLights, GetSchedules } from '../../redux/actions';
+import { GetAllGroups, GetAllLights, GetSchedules, SearchForNewLights } from '../../redux/actions';
 
 import {
     Menu,
@@ -261,6 +261,7 @@ class DefaultScreen extends Component {
         if (value == 1) {
             // search new bulb
             // this.props.navigation.navigate('');
+            this.props._searchBulb();
             console.log("Press bulb")
         } else if (value == 2) {
             this.props.navigation.navigate("LightDemo")
@@ -302,7 +303,8 @@ const mapDispatchToProps = (dispatch) => {
     return {
         _fetchAllGroups: () => dispatch(GetAllGroups()),
         _fetchAllLights: () => dispatch(GetAllLights()),
-        _fetchAllSchedules: () => dispatch(GetSchedules())
+        _fetchAllSchedules: () => dispatch(GetSchedules()),
+        _searchBulb: () => dispatch(SearchForNewLights())
     }
 }
 
