@@ -1,15 +1,15 @@
-import React from 'react';
-import { StyleSheet, View, TouchableOpacity, Image } from 'react-native';
+import React, { Component } from 'react';
+import { View, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { Block, Text } from '../../components';
-import { theme } from '../../constants';
+import { theme, constant } from '../../constants';
+import { connect } from 'react-redux'
+import Layout from '../../constants/Layout';
 import { DangerZone } from 'expo';
-import tick from '../../assets/lottie/tick.json';
-import cross from '../../assets/lottie/cross.json';
+import tick from '../../assets/lottie/676-done';
 import _ from 'lodash';
 const { Lottie } = DangerZone;
 
-export default class PostUpdateScreen extends React.Component {
-
+class PostUpdateScreen extends Component {
   static navigationOptions = ({ navigation }) => {
     return {
       headerLeft:
@@ -22,64 +22,88 @@ export default class PostUpdateScreen extends React.Component {
   }
 
   state = {
-    animation: null,
+    animation: null
   };
+
+  componentDidMount() {
+    this.animation1.play()
+  }
 
   async componentWillMount() {
     const { timer, nav } = this.props.navigation.getParam("meta", {});
-    const delay = timer === undefined ? 3000 : timer;
+    const delay = timer === undefined ? 2000 : timer;
     const navPath = nav === undefined ? "ListRoom" : nav;
     _.delay(() => this.props.navigation.navigate(navPath), delay);
-    this._playAnimation();
   }
 
-  _playAnimation = () => {
-    if (!this.state.animation) {
-      this._loadAnimationAsync();
-    } else {
-      this.animation.reset();
-      this.animation.play();
-    }
-  };
-
-  _loadAnimationAsync = async () => {
-    const { type } = this.props.navigation.getParam("meta", {});
-    const anim = type === undefined ? tick : cross;
-    this.setState({ animation: anim }, this._playAnimation);
-  };
-
-  render() {
-    const { title } = this.props.navigation.getParam("meta", {});
-    const header = title === undefined ? "empty" : title;
+  renderLottie() {
     return (
-      <Block style={styles.container}>
-        <Block flex={false} container>
-          <Text white h1>{header}</Text>
-          <Block flex={false} middle>
-          {this.state.animation &&
-            <Lottie
-              ref={animation => {
-                this.animation = animation;
-              }}
-              style={{
-                width: "100%",
-                height: "100%"
-              }}
-              loop={false}
-              source={this.state.animation}
-            />}
-          </Block>
-        </Block>
-        
+      <Block style={styles.slide}>
+        {constant.splash_slider[0].lottie &&
+          <Lottie
+            ref={animation1 => {
+              this.animation1 = animation1;
+            }}
+            speed={1}
+            source={tick}
+            loop={false}
+          />}
       </Block>
     )
   }
+
+  render() {
+    const { nightmode } = this.props;
+    const { colors } = theme;
+    const backgroundcolor = { backgroundColor: nightmode ? colors.background : colors.backgroundLight };
+    const titlecolor = { color: nightmode ? colors.white : colors.black }
+    const { title } = this.props.navigation.getParam("meta", {});
+    const header = title === undefined ? "empty" : title;
+    
+    return (
+      <Block style={backgroundcolor}>
+        <Block container>
+          <Text h1 bold style={[titlecolor, { marginTop: 10 }]}>{header}</Text>
+          {this.renderLottie()}
+        </Block>
+      </Block>
+    );
+  }
 }
 
+const mapStateToProps = (state) => {
+  return {
+    nightmode: state.nightmode,
+    hardwareSupport: state.hardwareSupport
+  }
+}
+
+export default connect(
+  mapStateToProps,
+  null
+)(PostUpdateScreen)
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: theme.colors.background,
-    flex: 1
+  slide: {
+    flex: 1,
+    alignItems: 'center'
+  },
+  imageBlock: {
+    marginTop: 20
+  },
+  image: {
+    width: Layout.window.width,
+    height: Layout.window.height / 2.5,
+    resizeMode: 'contain'
+  },
+  title: {
+    textAlign: 'left',
+    fontWeight: '200',
+    fontSize: 30
+  },
+  text: {
+    marginTop: 20,
+    textAlign: 'left',
+    fontSize: 15,
   }
-})
+});
