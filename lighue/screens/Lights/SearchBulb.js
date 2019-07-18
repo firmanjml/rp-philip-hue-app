@@ -66,8 +66,7 @@ class Setting extends Component {
         return (
             <Block style={backgroundcolor}>
                 <Block container>
-                        <Text h1 bold style={[textcolor, { marginTop: 10 }]}>List of Bulb found</Text>
-                    
+                    <Text h1 bold style={[textcolor, { marginTop: 10 }]}>List of Bulb found</Text>
                     {
                         Object.keys(bulbs).map(i => (
                             <Block flex={false} row space="between" style={styles.row}>

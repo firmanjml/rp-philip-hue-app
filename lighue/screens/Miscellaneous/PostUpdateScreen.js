@@ -31,7 +31,7 @@ class PostUpdateScreen extends Component {
 
   async componentWillMount() {
     const { timer, nav } = this.props.navigation.getParam("meta", {});
-    const delay = timer === undefined ? 2000 : timer;
+    const delay = timer === undefined ? 1000 : timer;
     const navPath = nav === undefined ? "ListRoom" : nav;
     _.delay(() => this.props.navigation.navigate(navPath), delay);
   }
@@ -39,7 +39,7 @@ class PostUpdateScreen extends Component {
   renderLottie() {
     return (
       <Block style={styles.slide}>
-        {constant.splash_slider[0].lottie &&
+        {tick &&
           <Lottie
             ref={animation1 => {
               this.animation1 = animation1;
@@ -87,14 +87,6 @@ const styles = StyleSheet.create({
   slide: {
     flex: 1,
     alignItems: 'center'
-  },
-  imageBlock: {
-    marginTop: 20
-  },
-  image: {
-    width: Layout.window.width,
-    height: Layout.window.height / 2.5,
-    resizeMode: 'contain'
   },
   title: {
     textAlign: 'left',
