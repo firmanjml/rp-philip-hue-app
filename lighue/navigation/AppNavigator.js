@@ -12,6 +12,7 @@ import LocationScreen from '../screens/Schedules/LocationList';
 import AddSceneScreen from '../screens/Scenes/AddScenes';
 import PostUpdateScreen from '../screens/Miscellaneous/PostUpdateScreen';
 import ControlRoomScreen from '../screens/Rooms/ControlRoomScreen';
+import SearchScreen from '../screens/Lights/SearchBulb';
 import { theme } from '../constants';
 import {fromRight} from 'react-navigation-transitions';
 const SetupNavigatorApp = createStackNavigator(
@@ -30,6 +31,9 @@ const SetupNavigatorApp = createStackNavigator(
     },
     TestScreen: {
       screen: TestScreen
+    },
+    SearchBulbScreen: {
+      screen: SearchScreen
     },
     LightDemo: {
       screen: LightDemo

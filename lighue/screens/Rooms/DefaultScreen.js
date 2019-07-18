@@ -259,10 +259,7 @@ class DefaultScreen extends Component {
 
     onMenuLightSelect(value) {
         if (value == 1) {
-            // search new bulb
-            // this.props.navigation.navigate('');
-            this.props._searchBulb();
-            console.log("Press bulb")
+            this.props.navigation.navigate('SearchBulbScreen');
         } else if (value == 2) {
             this.props.navigation.navigate("LightDemo")
         } else if (value == 3) {

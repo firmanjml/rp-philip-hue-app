@@ -202,29 +202,6 @@ export const GetAllLights = () => (dispatch, getState) => {
 };
 
 /** 
- * GetNewLights
- * * Document 1.2 Get New Lights
- * * https://developers.meethue.com/develop/hue-api/lights-api/#get-new-lights
-*/
-export const GetNewLights = () => (getState) => {
-    const i = getState().bridgeIndex;
-    const bridgeip = getState().bridgeip[i];
-    const username = getState().username[i];
-    const url = getState().cloud_enable === false ? `http://${bridgeip}/api/${username}/lights/new` : `https://api.meethue.com/bridge/${username}/lights/new`;
-    const headers = getState().cloud_enable === true ? {"Authorization": `Bearer ${getState().cloud.token}`, "Content-Type": "application/json"} : {"Content-Type": "application/json"};
-
-    axios({
-        url,
-        method: 'GET',
-        headers
-    }).then((res) => {
-        console.log(res)
-    }).catch((error) => {
-        console.log(error);
-    })
-};
-
-/** 
  * SearchForNewLights
  * * Document 1.3 Search For New Light
  * * https://developers.meethue.com/develop/hue-api/lights-api/#search-for-new-lights
@@ -240,11 +217,8 @@ export const SearchForNewLights = () => (dispatch, getState) => {
         url,
         method: 'POST',
         headers
-    }).then((res) => {
-        dispatch(GetNewLights());
     }).catch((error) => {
         console.log(error);
-        console.log("here")
     })
 };
 
