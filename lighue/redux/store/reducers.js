@@ -35,9 +35,9 @@ export const cloud_enable = (state = false, action) => {
 }
 
 export const cloud = (state = {
-        "token": "",
-        "refresh_token": ""
-    }, action) => {
+    "token": "",
+    "refresh_token": ""
+}, action) => {
     if (action.type === C.CHANGE_CLOUD_TOKEN) {
         return action.payload
     } else {
@@ -53,7 +53,7 @@ export const authentication = (state = false, action) => {
     if (action.type === C.CHANGE_AUTHENTICATION_STATE) {
         return action.payload;
     }
-    else { 
+    else {
         return state
     }
 }
@@ -177,6 +177,10 @@ export const lights = (state = {}, action) => {
         case C.CHANGE_LIGHT_STATE:
             _state = JSON.parse(JSON.stringify(state));
             _state[action.id].state = action.payload;
+            return _state;
+        case C.CHANGE_LIGHT_ATTR:
+            _state = JSON.parse(JSON.stringify(state));
+            _state[action.id] = action.payload;
             return _state;
         case C.DELETE_LIGHT:
             _state = JSON.parse(JSON.stringify(state));

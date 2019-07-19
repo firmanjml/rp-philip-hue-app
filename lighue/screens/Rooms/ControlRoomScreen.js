@@ -273,7 +273,6 @@ class ControlRoomScreen extends React.Component {
       // />
       <ColorWheel
         onColorChangeComplete={this.changeColorGroupState}
-        style={{ flex: 1 }}
       />
     );
   }

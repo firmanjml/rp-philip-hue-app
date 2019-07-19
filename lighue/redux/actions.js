@@ -223,6 +223,48 @@ export const SearchForNewLights = () => (dispatch, getState) => {
 };
 
 /** 
+ * SetLampAttributes
+ * * Document 1.5 Set Light Attributes
+ * * https://developers.meethue.com/develop/hue-api/lights-api/#set-light-state
+ * @param {number} lampID This paramter takes in the light ID.
+ * @param {object} lampData This paramter takes in the body argument of the request.
+*/
+export const SetLampAttributes = (lampID, lampData) => (dispatch, getState) => {
+    const i = getState().bridgeIndex;
+    const bridgeip = getState().bridgeip[i];
+    const username = getState().username[i];
+    const url = getState().cloud_enable === false ? `http://${bridgeip}/api/${username}/lights/${lampID}` : `https://api.meethue.com/bridge/${username}/lights/${lampID}`;
+    const headers = getState().cloud_enable === true ? {"Authorization": `Bearer ${getState().cloud.token}`, "Content-Type": "application/json"} : {"Content-Type": "application/json"};
+
+    dispatch(ChangeLoading(true));
+    axios({
+        url,
+        method: 'PUT',
+        headers,
+        data: lampData
+    }).then(res => {
+        var payload = {};
+        res.data.map((data) => {
+            let key = Object.keys(data.success)[0].substring(Object.keys(data.success)[0].lastIndexOf('/') + 1);
+            let value = Object.values(data.success)[0];
+            payload[key] = value;
+        })
+        if (payload) {
+            dispatch({
+                type: C.CHANGE_LIGHT_ATTR,
+                id: lampID,
+                payload: payload
+            })
+        } else {
+            throw Error('An error has occur');
+        }
+    }).catch((error) => {
+        dispatch(ChangeLoading(false));
+        // console.log(error);
+    }).then(dispatch(ChangeLoading(false)));
+};
+
+/** 
  * SetLampState
  * * Document 1.6 Set Light State
  * * https://developers.meethue.com/develop/hue-api/lights-api/#set-light-state
