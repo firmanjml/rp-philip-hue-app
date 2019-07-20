@@ -4,6 +4,7 @@ import { ColorWheel } from 'react-native-color-wheel';
 import { connect } from 'react-redux'
 import { SetLampState } from '../../redux/actions'
 import ToggleSwitch from '../../components/ToggleSwitch'
+import _ from 'lodash'
 
 import { ColorConversionToXY, ConvertXYtoHex } from '../../components/ColorConvert';
 import { theme } from '../../constants';
@@ -54,7 +55,7 @@ class ControlBulb extends React.Component {
     }
 
 
-    changeColorLightState = values => {
+    changeColorLightState = _.debounce((values) => {
         const { bridgeip, username, bridgeIndex, lights, _changeLampStateByID } = this.props;
         const { id } = this.state;
 
@@ -80,8 +81,8 @@ class ControlBulb extends React.Component {
                 username[bridgeIndex]
                 }/lights/${this.state.id}/state`,
             data: { xy: ColorConversionToXY(colors) }
-        });
-    };
+        })
+    },20);
 
 
     changeSatLightState = (values) => {
