@@ -59,6 +59,19 @@ export const authentication = (state = false, action) => {
 }
 
 /** 
+ * status
+ * * Redux reducer stores connection status data to Redux state.
+*/
+export const status = (state = false, action) => {
+    if (action.type === C.CHANGE_STATUS) {
+        return action.payload;
+    }
+    else {
+        return state
+    }
+}
+
+/** 
  * hardware
  * * Redux reducer stores authentication hardware support data to Redux state.
 */
@@ -210,6 +223,33 @@ export const schedules = (state = {}, action) => {
     }
 }
 
+/** 
+ * scenes
+ * * Redux reducer stores scene data it recevied from the API to Redux state
+*/
+export const scenes = (state = {}, action) => {
+    switch (action.type) {
+        case C.FETCH_ALL_SCENES:
+            _state = JSON.parse(JSON.stringify(state));
+            _state = action.payload;
+            return _state;
+        case C.CREATE_SCENE:
+            _state = JSON.parse(JSON.stringify(state))
+            _state[action.id] = action.payload;
+            return _state;
+        case C.CHANGE_SCENES_STATE:
+            _state = JSON.parse(JSON.stringify(state));
+            _state[action.id].state = action.payload;
+            return _state;
+        case C.DELETE_SCENE:
+            _state = JSON.parse(JSON.stringify(state));
+            delete _state[payload]
+            return _state;
+        default:
+            return state;
+    }
+}
+
 export default combineReducers({
     bridgeIndex,
     bridgeip,
@@ -222,6 +262,8 @@ export default combineReducers({
     lights,
     schedules,
     loading,
+    scenes,
+    status,
     username,
     nightmode
 });

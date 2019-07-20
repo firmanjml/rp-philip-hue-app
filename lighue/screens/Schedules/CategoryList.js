@@ -19,7 +19,7 @@ class CategoryList extends Component {
     }
 
     state = {
-        task: ["Wake up", "Sleep", "I'm home", "I'm away", "Other"]
+        task: ["Wake up", "Sleep", "I'm home", "I'm away"]
     }
 
     renderList() {

@@ -1,8 +1,7 @@
 import React from 'react';
-import { Platform, StatusBar, StyleSheet, View } from 'react-native';
+import { Platform, StatusBar, StyleSheet, View, AsyncStorage} from 'react-native';
 import { AppLoading, Asset, Font, Icon } from 'expo';
 import SwitchNavigator from './navigation/SwitchNavigator';
-import Testing from './screens/Splash'
 import { Provider } from "react-redux";
 import { reduxStore, persistor } from "./redux/store";
 import { PersistGate } from "redux-persist/lib/integration/react";
@@ -16,6 +15,9 @@ export default class App extends React.Component {
   };
 
   render() {
+    // persistor.flush();
+    // persistor.purge();
+    // AsyncStorage.clear();
     if (!this.state.isLoadingComplete && !this.props.skipLoadingScreen) {
       return (
         <AppLoading
@@ -33,7 +35,6 @@ export default class App extends React.Component {
               <MenuProvider>
                 <SwitchNavigator />
               </MenuProvider>
-              {/* <Testing/> */}
             </View>
           </PersistGate>
         </Provider>

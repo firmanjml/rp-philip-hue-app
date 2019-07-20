@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Image, StyleSheet, TouchableOpacity, View, ScrollView, Alert, Platform } from 'react-native'
+import { Image, StyleSheet, TouchableOpacity, View, ScrollView, Alert, Modal, ActivityIndicator } from 'react-native'
 import { Block, Text, Button, Input } from '../../components';
 import { theme } from '../../constants';
 import { CreateSchedules } from '../../redux/actions';
@@ -31,9 +31,10 @@ class AddSchedules extends Component {
         roomSelected: null,
         bulbSelected: null,
         enabled: true,
-        repeat: true,
+        date: "Add date",
+        mode: "Repeat",
         isTimePickerVisible: false,
-        loading: false
+        isDatePickerVisible: false
     }
 
 
@@ -110,6 +111,24 @@ class AddSchedules extends Component {
         }
     };
 
+    renderLoadingModal() {
+        return (
+            <Modal
+                transparent={true}
+                animationType={'none'}
+                visible={this.props.loading}
+                onRequestClose={() => { console.log('close modal') }}>
+                <View style={styles.modalBackground}>
+                    <View style={styles.activityIndicatorWrapper}>
+                        <ActivityIndicator
+                            animating={this.props.loading}
+                            color="#00ff00" />
+                    </View>
+                </View>
+            </Modal>
+        )
+    }
+
     updateDay = (val) => {
         const newBoolean = !this.dayOpacity[val].selected;
         this.dayOpacity[val].selected = newBoolean
@@ -133,7 +152,7 @@ class AddSchedules extends Component {
     confirmAddSchedule = async () => {
         const { username, bridgeIndex } = this.props;
         const { homeSelected, roomSelected, bulbSelected,
-            categories, time, name, description, enabled, repeat } = this.state;
+            categories, time, name, description, enabled, mode, date } = this.state;
 
         if (name == null ||
             time == "Add time" ||
@@ -148,48 +167,73 @@ class AddSchedules extends Component {
         else {
             var utcDaySelected = await this.calculateRepDay();
             if (homeSelected == true) {
-                var address = `/api/${username[bridgeIndex]}/api/groups/0/action`
+                var address = `/api/${username[bridgeIndex]}/groups/0/action`
             }
             else if (roomSelected != null) {
-                var address = `/api/${username[bridgeIndex]}/api/groups/${roomSelected}/action`
+                var address = `/api/${username[bridgeIndex]}/groups/${roomSelected}/action`
             }
             else if (bulbSelected != null) {
-                var address = `/api/${username[bridgeIndex]}/api/lights/${bulbSelected}/action`
+                var address = `/api/${username[bridgeIndex]}/lights/${bulbSelected}/action`
             }
 
             if (categories == "Wake up" || categories == "I'm home") {
-                var body = { on: true }
+                var on = true
             }
             else if (categories == "Sleep" || categories == "I'm away") {
-                var body = { on: false }
+                var on = false
             }
-            const scheduleData = {
+
+            if (mode == "Repeat") {
+                var datetime = `${utcDaySelected}/T${time}:00`
+            }
+            else if (mode == "Specific Date") {
+                var datetime = `${date}T${time}:00`
+            }
+
+            const scheduleData =
+            {
                 "name": `${name}#${categories}`,
                 "description": description,
                 "status": enabled ? "enabled" : "disabled",
-                "autodelete": repeat ? false : true,
                 "command": {
                     "address": address,
                     "method": "PUT",
-                    "body": body
+                    "body": {
+                        "on": on
+                    }
                 },
-                "localtime": `${utcDaySelected}/T${time}:00`
+                "localtime": datetime,
             }
-            this.props._CreateSchedules(scheduleData);
-            this.props.navigation.navigate("PostUpdate", {
-                meta: {
-                    title : "Successfully added!"
-                }
-            }
-            )
+            console.log(scheduleData)
+            this.props._CreateSchedules(scheduleData, this.props.navigation);
         }
     }
 
+    renderTab(tab, backgroundcolor) {
+        const { mode } = this.state, isActive = mode === tab;
 
-    renderCategories() {
-        const { nightmode, navigation } = this.props;
-        const { colors } = theme;
-        const textcolor = { color: nightmode ? colors.gray2 : colors.black }
+        return (
+            <TouchableOpacity
+                key={`tab-${tab}`}
+                onPress={() => {
+                    this.setState({ mode: tab })
+                }}
+                style={[
+                    styles.tab,
+                    backgroundcolor,
+                    isActive ? styles.active : null
+                ]}>
+                <Text size={16} bold gray={!isActive} secondary={isActive}>
+                    {tab}
+                </Text>
+            </TouchableOpacity>
+        )
+    }
+
+
+
+    renderCategories(textcolor) {
+        const { navigation } = this.props;
         if (this.state.categories == "Add categories") {
             return (
                 <TouchableOpacity
@@ -218,16 +262,14 @@ class AddSchedules extends Component {
         }
     }
 
-    renderWhere() {
-        const { nightmode, navigation } = this.props;
+    renderWhere(textcolor) {
+        const { navigation } = this.props;
         const { roomSelected, bulbSelected, homeSelected } = this.state;
-        const { colors } = theme;
-        const textcolor = { color: nightmode ? colors.gray2 : colors.black }
         if (homeSelected == false && roomSelected == null && bulbSelected == null) {
             return (
                 <TouchableOpacity
                     onPress={() => {
-                        navigation.navigate('LocationListScreen', { returnData: this.returnLocationData.bind(this) });
+                        navigation.navigate('ScheduleLocationListScreen', { returnData: this.returnLocationData.bind(this) });
                     }}>
                     <Block flex={false} row space="between" style={{ alignSelf: 'center' }} >
                         <Text style={textcolor}>Add location</Text>
@@ -239,10 +281,10 @@ class AddSchedules extends Component {
         else {
             return (
                 <Block flex={false} row space="between" style={{ alignSelf: 'center' }} >
-                    {this.renderWhereText()}
+                    {this.renderWhereText(textcolor)}
                     <TouchableOpacity
                         onPress={() => {
-                            navigation.navigate('LocationListScreen', { returnData: this.returnLocationData.bind(this) });
+                            navigation.navigate('ScheduleLocationListScreen', { returnData: this.returnLocationData.bind(this) });
                         }}>
                         <Text style={[{ color: '#20D29B' }]}> Edit</Text>
                     </TouchableOpacity>
@@ -251,11 +293,9 @@ class AddSchedules extends Component {
         }
     }
 
-    renderWhereText() {
-        const { nightmode, groups, lights } = this.props;
+    renderWhereText(textcolor) {
+        const { groups, lights } = this.props;
         const { roomSelected, bulbSelected, homeSelected } = this.state;
-        const { colors } = theme;
-        const textcolor = { color: nightmode ? colors.gray2 : colors.black }
         if (roomSelected != null) {
             return (
                 <Text style={textcolor}>{groups[roomSelected].name}</Text>
@@ -275,7 +315,7 @@ class AddSchedules extends Component {
 
     handleTimePicked = (time) => {
         var datetime = new Date(time);
-        var hour = datetime.getUTCHours() 
+        var hour = datetime.getUTCHours()
         var minute = datetime.getUTCMinutes()
         if (hour <= 9) {
             hour = "0" + hour
@@ -291,10 +331,16 @@ class AddSchedules extends Component {
         })
     };
 
-    renderWhen() {
-        const { nightmode } = this.props;
-        const { colors } = theme;
-        const textcolor = { color: nightmode ? colors.gray2 : colors.black }
+    handleDatePicked = (date) => {
+        var Dates = new Date(date);
+        var newDate = `${Dates.getFullYear()}-${Dates.getMonth() + 1}-${Dates.getDate()}`
+        this.setState({
+            isDatePickerVisible: false,
+            date: newDate
+        })
+    }
+
+    renderWhen(textcolor) {
         if (this.state.time == "Add time") {
             return (
                 <TouchableOpacity
@@ -303,7 +349,7 @@ class AddSchedules extends Component {
                         <Text style={textcolor}>{this.state.time}</Text>
                         <Text style={textcolor}> ></Text>
                     </Block>
-                    {this.renderDatePicker()}
+                    {this.renderTimePicker()}
                 </TouchableOpacity>
             )
         }
@@ -315,13 +361,13 @@ class AddSchedules extends Component {
                         onPress={() => this.setState({ isTimePickerVisible: true })}>
                         <Text style={{ color: '#20D29B' }}> Edit</Text>
                     </TouchableOpacity>
-                    {this.renderDatePicker()}
+                    {this.renderTimePicker()}
                 </Block>
             )
         }
     }
 
-    renderDatePicker() {
+    renderTimePicker() {
         return (
             <DateTimePicker
                 isVisible={this.state.isTimePickerVisible}
@@ -337,54 +383,91 @@ class AddSchedules extends Component {
         )
     }
 
-    renderDay() {
-        const { dayOpacity } = this;
-        const { nightmode } = this.props;
-        const { colors } = theme;
-        const textcolor = { color: nightmode ? colors.white : colors.black }
+    renderDatePicker() {
         return (
-            Object.keys(dayOpacity).map(val => (
-                <TouchableOpacity
-                    key={val}
-                    style={[styles.roundDay, {
-                        borderColor: dayOpacity[val].selected ? colors.secondary : 'white',
-                        backgroundColor: dayOpacity[val].selected ? colors.secondary : null
-                    }]}
-                    onPress={() => this.updateDay(val)}>
-                    <Text style={textcolor}>{val.charAt(0)}</Text>
-                </TouchableOpacity>
-            )))
+            <DateTimePicker
+                isVisible={this.state.isDatePickerVisible}
+                onConfirm={this.handleDatePicked}
+                titleIOS="Pick a date"
+                onCancel={() => { this.setState({ isDatePickerVisible: false }) }}
+                mode="date"
+                dismissOnBackdropPressIOS={true}
+            />
+        )
     }
 
-    renderOn() {
-        const { nightmode } = this.props;
+
+    renderRepetitiveText(titlecolor) {
+        if (this.state.mode == "Repeat") {
+            return (
+                <Text bold style={[styles.textControl, titlecolor, { marginTop: 15 }]}>Day of the week</Text>
+            )
+        }
+        else if (this.state.mode == "Specific Date") {
+            return (
+                <Text bold style={[styles.textControl, titlecolor, { marginTop: 15 }]}>Choose Date</Text>
+            )
+        }
+    }
+
+    renderDay(textcolor) {
+        const { dayOpacity } = this;
         const { colors } = theme;
-        const textcolor = { color: nightmode ? colors.white : colors.black }
+        if (this.state.mode == "Repeat") {
+            return (
+                Object.keys(dayOpacity).map(val => (
+                    <TouchableOpacity
+                        key={val}
+                        style={[styles.roundDay, {
+                            borderColor: dayOpacity[val].selected ? colors.secondary : 'white',
+                            backgroundColor: dayOpacity[val].selected ? colors.secondary : null
+                        }]}
+                        onPress={() => this.updateDay(val)}>
+                        <Text style={textcolor}>{val.charAt(0)}</Text>
+                    </TouchableOpacity>
+                ))
+            )
+        }
+        else {
+            return (
+                this.renderDate(textcolor)
+            )
+        }
+    }
+
+    renderDate(textcolor) {
+        if (this.state.date == "Add date") {
+            return (
+                <TouchableOpacity
+                    onPress={() => { this.setState({ isDatePickerVisible: true }) }} >
+                    <Text style={[styles.textControl, textcolor]}>Add date</Text>
+                    {this.renderDatePicker()}
+                </TouchableOpacity>
+            )
+        }
+        else {
+            return (
+                <Block flex={false} row space="between" style={{ alignSelf: 'center' }}>
+                    <TouchableOpacity
+                        onPress={() => this.setState({ isDatePickerVisible: true })}>
+                        {/* <Text style={{ color: '#20D29B' }}>Edit</Text> */}
+                        <Text style={{color : '#20D29B', alignSelf: 'center' }}>{this.state.date}</Text>
+                    </TouchableOpacity>
+                    {this.renderDatePicker()}
+                </Block>
+            )
+        }
+    }
+
+    renderOn(textcolor) {
         return (
-            <Block row space="between" style={{ marginTop: 40 }}>
+            <Block row space="between" style={{ marginTop: 40, marginBottom: 20 }}>
                 <Text bold style={[styles.textControl, textcolor, { alignSelf: 'center' }]}>Enable Schedule</Text>
                 <ToggleSwitch
                     offColor="#DDDDDD"
                     onColor={theme.colors.secondary}
                     isOn={this.state.enabled}
                     onToggle={(boolean) => this.setState({ enabled: boolean })}
-                />
-            </Block>
-        )
-    }
-
-    renderRepeat() {
-        const { nightmode } = this.props;
-        const { colors } = theme;
-        const textcolor = { color: nightmode ? colors.white : colors.black }
-        return (
-            <Block row space="between" style={{ marginTop: 40, marginBottom: 20 }}>
-                <Text bold style={[styles.textControl, textcolor, { alignSelf: 'center' }]}>Repeat</Text>
-                <ToggleSwitch
-                    offColor="#DDDDDD"
-                    onColor={theme.colors.secondary}
-                    isOn={this.state.repeat}
-                    onToggle={(boolean) => this.setState({ repeat: boolean })}
                 />
             </Block>
         )
@@ -403,12 +486,7 @@ class AddSchedules extends Component {
         )
     }
 
-    renderInput() {
-        const { nightmode } = this.props;
-        const { colors } = theme;
-        const bordercolor = { borderColor: nightmode ? colors.white : colors.gray2 }
-        const textcolor = { color: nightmode ? colors.gray2 : colors.black }
-        const titlecolor = { color: nightmode ? colors.white : colors.black }
+    renderInput(titlecolor, bordercolor, textcolor, nightmode, colors) {
         return (
             <Block>
                 <Text bold h3 style={[styles.textControl, titlecolor, styles.row]}>Name</Text>
@@ -433,39 +511,45 @@ class AddSchedules extends Component {
     }
 
     render() {
+        const tabs = ['Repeat', 'Specific Date'];
         const { nightmode } = this.props;
         const { colors } = theme;
         const backgroundcolor = { backgroundColor: nightmode ? colors.background : colors.backgroundLight }
         const titlecolor = { color: nightmode ? colors.white : colors.black }
+        const textcolor = { color: nightmode ? colors.gray2 : colors.black }
+        const bordercolor = { borderColor: nightmode ? colors.white : colors.gray2 }
         return (
             <Block style={backgroundcolor}>
                 <Block container style={{ marginBottom: 20 }}>
+                    {this.renderLoadingModal()}
                     <Text h1 bold style={titlecolor}>Add Schedules</Text>
                     <ScrollView
                         showsVerticalScrollIndicator={false}>
-                        {this.renderInput()}
-                        <Text bold style={[styles.textControl, titlecolor, { marginTop: 10 }]}>Days of the week</Text>
-                        <Block flex={false} row space="between" style={{ marginTop: 20 }}>
-                            {this.renderDay()}
-                        </Block>
+                        {this.renderInput(titlecolor, bordercolor, textcolor, nightmode, colors)}
                         <View style={[styles.divider, { marginTop: 30 }]} />
                         <Block flex={false} row space="between" style={{ marginTop: 10 }}>
                             <Text bold style={titlecolor}>Categories</Text>
-                            {this.renderCategories()}
+                            {this.renderCategories(textcolor)}
                         </Block>
                         <View style={[styles.divider, { marginTop: 10 }]} />
                         <Block flex={false} row space="between" style={{ marginTop: 10 }}>
                             <Text bold style={[titlecolor, { alignSelf: 'center' }]}>When</Text>
-                            {this.renderWhen()}
+                            {this.renderWhen(textcolor)}
                         </Block>
                         <View style={[styles.divider, { marginTop: 10 }]} />
                         <Block flex={false} row space="between" style={{ marginTop: 10 }}>
                             <Text bold style={[titlecolor, { alignSelf: 'center' }]}>Where</Text>
-                            {this.renderWhere()}
+                            {this.renderWhere(textcolor)}
                         </Block>
                         <View style={[styles.divider, { marginTop: 10 }]} />
-                        {this.renderOn()}
-                        {this.renderRepeat()}
+                        <Block flex={false} row style={[styles.tabs, backgroundcolor]}>
+                            {tabs.map(tab => this.renderTab(tab, backgroundcolor))}
+                        </Block>
+                        {this.renderRepetitiveText(textcolor)}
+                        <Block flex={false} row space="between" style={{ marginTop: 20 }}>
+                            {this.renderDay(textcolor, titlecolor)}
+                        </Block>
+                        {this.renderOn(textcolor)}
                         {this.renderCreateButton()}
                     </ScrollView>
                 </Block>
@@ -483,15 +567,16 @@ const mapStateToProps = (state) => {
         username: state.username,
         groups: state.groups,
         lights: state.lights,
-        schedules: state.schedules
+        schedules: state.schedules,
+        loading: state.loading
     }
 }
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        _CreateSchedules(data) {
-            return dispatch(CreateSchedules(data));
-        },
+        _CreateSchedules(data, navigation) {
+            return dispatch(CreateSchedules(data, navigation));
+        }
     }
 }
 
@@ -503,6 +588,37 @@ export default connect(
 const styles = StyleSheet.create({
     row: {
         marginTop: 20,
+    },
+    modalBackground: {
+        flex: 1,
+        alignItems: 'center',
+        flexDirection: 'column',
+        justifyContent: 'space-around',
+        backgroundColor: '#00000040'
+    },
+    tabs: {
+        marginTop: 30,
+        justifyContent: 'space-between',
+        borderBottomColor: theme.colors.gray2,
+        borderBottomWidth: StyleSheet.hairlineWidth,
+        // marginVertical: theme.sizes.base,
+        // marginHorizontal: theme.sizes.base * 2,
+    },
+    tab: {
+        paddingBottom: theme.sizes.base
+    },
+    active: {
+        borderBottomColor: theme.colors.secondary,
+        borderBottomWidth: 3,
+    },
+    activityIndicatorWrapper: {
+        backgroundColor: '#FFFFFF',
+        height: 100,
+        width: 100,
+        borderRadius: 10,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-around'
     },
     textRow: {
         fontSize: 16,

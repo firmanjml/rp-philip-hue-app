@@ -4,7 +4,7 @@ import { Card, Badge, Block, Text } from '../../components';
 import { theme, constant } from '../../constants';
 import Icon from 'react-native-vector-icons';
 import { connect } from 'react-redux';
-import { GetAllGroups, GetAllLights, GetSchedules, SearchForNewLights } from '../../redux/actions';
+import { GetAllGroups, GetAllLights, GetSchedules, SearchForNewLights, GetConfig } from '../../redux/actions';
 
 import {
     Menu,
@@ -31,19 +31,17 @@ class DefaultScreen extends Component {
         this.props._fetchAllLights();
         this.props._fetchAllGroups();
         this.props._fetchAllSchedules();
+        this.props._fetchAllConfig();
         interval = setInterval(() => {
             this.props._fetchAllLights();
             this.props._fetchAllGroups();
             this.props._fetchAllSchedules();
+            this.props._fetchAllConfig();
         }, 5000)
     }
 
-    renderTab(tab) {
+    renderTab(tab, backgroundcolor) {
         const { active } = this.state, isActive = active === tab;
-        const { nightmode } = this.props;
-        const { colors } = theme;
-        const backgroundcolor = { backgroundColor: nightmode ? colors.background : colors.backgroundLight }
-
         return (
             <TouchableOpacity
                 key={`tab-${tab}`}
@@ -125,11 +123,8 @@ class DefaultScreen extends Component {
         }
     }
 
-    displayLayout() {
-        const { navigation, groups, nightmode } = this.props;
-        const { colors } = theme;
-        const refreshtextcolor = nightmode ? colors.white : colors.black
-        const textcolor = { color: nightmode ? colors.white : colors.black }
+    displayLayout(textcolor, refreshtextcolor) {
+        const { navigation, groups } = this.props;
         const marginTop = { marginTop: Platform.OS == "android" ? 20 : 0 }
 
         if (this.state.active === 'Rooms') {
@@ -195,12 +190,14 @@ class DefaultScreen extends Component {
             )
         } else if (this.state.active === "Lights") {
             return (
-                <Block style={{ paddingHorizontal: theme.sizes.base * 2 }}>
-                    <Text center h3 style={[textcolor, marginTop]}>
-                        Lights won't be available at all.
-                    </Text>
-                    <Text paragraph style={textcolor} center>Please don't try again later</Text>
-                    <Text paragraph style={textcolor} center>Call 9126920 for more information</Text>
+                <Block style={{ paddingHorizontal: theme.sizes.base * 2, alignItems: 'center', justifyContent: 'center' }}>
+                    <Text h1 bold style={[textcolor]}>
+                        No lights is found.
+                </Text>
+                    <TouchableOpacity
+                        onPress={() => console.log("Search for new bulb")}>
+                        <Text h2 style={{ marginTop: 5, color: '#20D29B' }}>Search for new lights</Text>
+                    </TouchableOpacity>
                 </Block>
             )
         } else if (this.state.active === "Schedules") {
@@ -219,17 +216,17 @@ class DefaultScreen extends Component {
             )
         } else {
             return (
-                <Block style={{ paddingHorizontal: theme.sizes.base * 2, alignItems : 'center', justifyContent : 'center' }}>
-                    <Text h1 bold style={textcolor}>
-                        No scenes created.
-                    </Text>
-                    <TouchableOpacity
-                        onPress={() => {
-                            navigation.navigate('AddScenes');
-                        }}>
-                        <Text h2 style={{ marginTop : 5, color: '#20D29B' }}>Add scenes</Text>
-                    </TouchableOpacity>
-                </Block>
+                <Block style={{ paddingHorizontal: theme.sizes.base * 2, alignItems: 'center', justifyContent: 'center' }}>
+                <Text h1 bold style={textcolor}>
+                    No scenes created.
+                </Text>
+                <TouchableOpacity
+                    onPress={() => {
+                        navigation.navigate('SceneLocationListScreen');
+                    }}>
+                    <Text h2 style={{ marginTop: 5, color: '#20D29B' }}>Add scenes</Text>
+                </TouchableOpacity>
+            </Block>
             )
         }
     }
@@ -281,17 +278,18 @@ class DefaultScreen extends Component {
         const { colors } = theme;
         const backgroundcolor = { backgroundColor: nightmode ? colors.background : colors.backgroundLight }
         const textcolor = { color: nightmode ? colors.white : colors.black }
+        const refreshtextcolor = nightmode ? colors.white : colors.black
         return (
-                <Block style={backgroundcolor}>
-                    <Block flex={false} center row space="between" style={styles.header}>
-                        <Text h1 style={[textcolor, { fontWeight: 'bold' }]}>Explore</Text>
-                        {this.renderMenu(this.state.active)}
-                    </Block>
-                    <Block flex={false} row style={[styles.tabs, backgroundcolor]}>
-                        {tabs.map(tab => this.renderTab(tab))}
-                    </Block>
-                    {this.displayLayout()}
+            <Block style={backgroundcolor}>
+                <Block flex={false} center row space="between" style={styles.header}>
+                    <Text h1 style={[textcolor, { fontWeight: 'bold' }]}>Explore</Text>
+                    {this.renderMenu(this.state.active)}
                 </Block>
+                <Block flex={false} row style={[styles.tabs, backgroundcolor]}>
+                    {tabs.map(tab => this.renderTab(tab, backgroundcolor))}
+                </Block>
+                {this.displayLayout(textcolor, refreshtextcolor)}
+            </Block>
         )
     }
 }
@@ -301,7 +299,8 @@ const mapDispatchToProps = (dispatch) => {
         _fetchAllGroups: () => dispatch(GetAllGroups()),
         _fetchAllLights: () => dispatch(GetAllLights()),
         _fetchAllSchedules: () => dispatch(GetSchedules()),
-        _searchBulb: () => dispatch(SearchForNewLights())
+        _searchBulb: () => dispatch(SearchForNewLights()),
+        _fetchAllConfig: () => dispatch(GetConfig())
     }
 }
 

@@ -13,6 +13,9 @@ import AddSceneScreen from '../screens/Scenes/AddScenes';
 import PostUpdateScreen from '../screens/Miscellaneous/PostUpdateScreen';
 import ControlRoomScreen from '../screens/Rooms/ControlRoomScreen';
 import SearchScreen from '../screens/Lights/SearchBulb';
+import ScheduleLocationScreen from '../screens/Schedules/LocationList';
+import SceneLocationScreen from '../screens/Scenes/SceneLocationList';
+import BridgeInfoScreen from '../screens/BridgeInfo';
 import { theme } from '../constants';
 import {fromRight} from 'react-navigation-transitions';
 const SetupNavigatorApp = createStackNavigator(
@@ -44,6 +47,9 @@ const SetupNavigatorApp = createStackNavigator(
     AddSchedules: {
       screen: AddSchedulesScreen
     },
+    ScheduleLocationListScreen: {
+      screen: ScheduleLocationScreen
+    },
     CategoryListScreen: {
       screen: CategoryScreen
     },
@@ -52,6 +58,12 @@ const SetupNavigatorApp = createStackNavigator(
     },
     AddScenes: {
       screen: AddSceneScreen
+    },
+    SceneLocationListScreen : {
+      screen : SceneLocationScreen
+    },
+    BridgeInfo : {
+      screen : BridgeInfoScreen
     },
     PostUpdate: {
       screen: PostUpdateScreen

@@ -99,6 +99,18 @@ export const ChangeAuthentication = (boolean) => (dispatch) => {
 }
 
 /** 
+ * Status
+ * * Change status regards to connection of the Bridge
+ * @param {number} boolean This parameter takes in the boolean
+*/
+export const ChangeStatus = (boolean) => (dispatch) => {
+    dispatch({
+        type : C.CHANGE_STATUS,
+        payload : boolean
+    })
+}
+
+/** 
  * Hardware Support
  * * Index "1" for Fingerprint (Android, iPhone 5s > iPhone 8), Index "2" for Face ID (iPhone X & newer)
  * @param {number} index This paramter takes in the index of hardware support
@@ -549,12 +561,11 @@ export const CreateUser = () => (dispatch, getState) => {
  * * Document 7.2. Get configuration
  * * https://developers.meethue.com/develop/hue-api/7-configuration-api/#get-configuration 
 */
-export const GetConfig = (dispatch, getState) => {
+export const GetConfig = () => (dispatch, getState) => {
     const i = getState().bridgeIndex;
     const bridgeip = getState().bridgeip[i];
     const username = getState().username[i];
 
-    dispatch(ChangeLoading(true));
     axios({
         url: `http://${bridgeip}/api/${username}/config`,
         method: 'GET'
@@ -563,10 +574,11 @@ export const GetConfig = (dispatch, getState) => {
             type: C.FETCH_CONFIG,
             payload: res.data
         })
+        dispatch(ChangeStatus(true));
     }).catch((error) => {
-        dispatch(ChangeLoading(false));
+        dispatch(ChangeStatus(false))
         console.log(error);
-    }).then(dispatch(ChangeLoading(false)));
+    });
 };
 
 /** 
@@ -612,22 +624,39 @@ export const CreateSchedules = (scheduleData) => (dispatch, getState) => {
 
     dispatch(ChangeLoading(true));
     axios({
+        // url: `https://api.meethue.com/bridge/FBeqf8XG4zmws0hkhJVKnI5UWoSswzKd1H39z-eO/schedules`,
+        // method: "POST",
+        // headers: {
+        //     "Content-Type": "application/json",
+        //     'Authorization': "Bearer hwpfFce4GlLUsf50GKf0rNEtGvoa"
+        // },
         url,
         method: 'POST',
         headers,
-        data: scheduleData
-    }).then(res => {
+        data: JSON.stringify(scheduleData)
+    }).then((res) => {
         if (res.data[0].success) {
+            console.log(res.data[0].success)
             dispatch({
                 type: C.CREATE_SCHEDULE,
                 id: res.data[0].success.id,
-                payload: scheduleData
+                payload: JSON.stringify(scheduleData)
             })
-        } else {
-            throw Error('Can\'t create a schedule');
+            navigation.navigate("PostUpdate", {
+                meta: {
+                    title: "Successfully added!"
+                }
+            })
+        } else if (res.data[0].error) {
+            console.log(res.data[0].error)
+            Alert.alert(
+                'Error',
+                "Please try again",
+                [{ text: "OK", onPress: () => console.log("OK Pressed") }],
+                { cancelable: false }
+            );
         }
     }).catch((error) => {
         dispatch(ChangeLoading(false));
-        console.log(error);
     }).then(dispatch(ChangeLoading(false)));
 };

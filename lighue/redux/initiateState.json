@@ -5,6 +5,7 @@
     "token": "",
     "refresh_token": ""
   },
+  "status" : false,
   "nightmode": true,
   "authentication" : false,
   "hardwareSupport" : 0,
@@ -14,5 +15,6 @@
   "config": {},
   "groups": {},
   "schedules" : {},
+  "scenes" : {},
   "lights": {}
 }

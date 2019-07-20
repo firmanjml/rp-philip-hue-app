@@ -1,12 +1,10 @@
 import React, { Component } from 'react'
-import { Image, StyleSheet, TouchableOpacity, Dimensions, View, Modal, Alert } from 'react-native'
+import { Image, StyleSheet, TouchableOpacity, Dimensions, View, Alert } from 'react-native'
 import { Block, Text, Button } from '../components';
 import { theme } from '../constants';
 import { connect } from 'react-redux';
 import { Updates, BlurView, AuthSession, Constants, WebBrowser } from 'expo';
 import { persistor } from "../redux/store";
-import Swipe from '../components/Swipe';
-import { MaterialIcons, AntDesign } from '@expo/vector-icons';
 const { width } = Dimensions.get('window');
 import { ChangeThemeMode, ChangeCloudToken, ChangeCloudState } from '../redux/actions'
 import ToggleSwitch from '../components/ToggleSwitch';
@@ -35,6 +33,39 @@ class Setting extends Component {
         }, 4000);
     }
 
+    renderBridgeInfo(textcolor) {
+        const { username, bridgeIndex } = this.props;
+        if (username[bridgeIndex]) {
+            return (
+                <View>
+                    <Block flex={false} row space="between" style={styles.row}>
+                        <TouchableOpacity
+                            onPress={() => this.props.navigation.navigate("BridgeInfo")}>
+                            <Text style={[styles.textSetting, textcolor]}>Bridge Info</Text>
+                        </TouchableOpacity>
+                    </Block>
+                    <View style={styles.divider} />
+                </View>
+            )
+        }
+    }
+
+    renderClearButton() {
+        const { username, bridgeIndex } = this.props;
+        if (username[bridgeIndex]) {
+            return (
+                <Block bottom flex={1} style={{ marginBottom: 10 }}>
+                    <Button gradient
+                        startColor='#C40A0A'
+                        endColor='#E86241'
+                        onPress={() => this.clearAppData()}>
+                        <Text center semibold white>Clear app data</Text>
+                    </Button>
+                </Block>
+            )
+        }
+    }
+
     render() {
         const { nightmode, cloud_enable } = this.props;
         const { colors } = theme;
@@ -49,7 +80,7 @@ class Setting extends Component {
                         <ToggleSwitch
                             offColor="#DDDDDD"
                             onColor={theme.colors.secondary}
-                            isOn={this.props.nightmode}
+                            isOn={nightmode}
                             onToggle={nightmode => {
                                 this.props._changeTheme(nightmode);
                             }}
@@ -58,31 +89,18 @@ class Setting extends Component {
                     <View style={styles.divider} />
                     <Block flex={false} row space="between" style={styles.row}>
                         {
-                            this.props.cloud_enable === true ?
-                            <Text style={[styles.textSetting, { color: theme.colors.gray2 }]}>Connected via Cloud</Text>
-                            :
-                            <TouchableOpacity
-                                onPress={() => this._handleoAuth()}>
-                                <Text style={[styles.textSetting, textcolor]}>Setup Remote Control via Cloud</Text>
-                            </TouchableOpacity>
+                            cloud_enable === true ?
+                                <Text style={[styles.textSetting, { color: theme.colors.gray2 }]}>Connected via Cloud</Text>
+                                :
+                                <TouchableOpacity
+                                    onPress={() => this._handleoAuth()}>
+                                    <Text style={[styles.textSetting, textcolor]}>Setup Remote Control via Cloud</Text>
+                                </TouchableOpacity>
                         }
                     </Block>
                     <View style={styles.divider} />
-                    <Block flex={false} row space="between" style={styles.row}>
-                        <TouchableOpacity
-                        onPress={() => this.props.navigation.navigate("TestScreen")}>
-                            <Text style={[styles.textSetting, textcolor]}>TestScreen</Text>
-                        </TouchableOpacity>
-                    </Block>
-                    <View style={styles.divider} />
-                    <Block bottom flex={1} style={{ marginBottom: 10 }}>
-                        <Button gradient
-                            startColor='#C40A0A'
-                            endColor='#E86241'
-                            onPress={() => this.clearAppData() }>
-                            <Text center semibold white>Clear app data</Text>
-                        </Button>
-                    </Block>
+                    {this.renderBridgeInfo(textcolor)}
+                    {this.renderClearButton()}
                 </Block>
             </Block>
         )
@@ -97,7 +115,7 @@ class Setting extends Component {
             appid: 'lighue',
             state: csrf
         });
-    
+
         let result = await AuthSession.startAsync({
             authUrl: `https://api.meethue.com/oauth2/auth${queryParams}`,
         })
@@ -116,9 +134,11 @@ class Setting extends Component {
                 Alert.alert(
                     'Hooray 🥳',
                     'Successfully paired to cloud.',
-                    [{ text: "OK", onPress: () => {
-                        
-                    }}],
+                    [{
+                        text: "OK", onPress: () => {
+
+                        }
+                    }],
                     { cancelable: false }
                 );
             } else {
@@ -142,9 +162,9 @@ class Setting extends Component {
 
 function toQueryString(params) {
     return '?' + Object.entries(params)
-      .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
-      .join('&');
-  }
+        .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+        .join('&');
+}
 
 const mapDispatchToProps = (dispatch) => {
     return {
@@ -160,7 +180,9 @@ const mapDispatchToProps = (dispatch) => {
 const mapStateToProps = (state) => {
     return {
         nightmode: state.nightmode,
-        cloud_enable: state.cloud_enable
+        cloud_enable: state.cloud_enable,
+        bridgeIndex: state.bridgeIndex,
+        username: state.username
     }
 }
 

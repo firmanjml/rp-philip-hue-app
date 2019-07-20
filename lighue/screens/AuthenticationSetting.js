@@ -1,11 +1,11 @@
 import React from 'react';
-import { StyleSheet, Platform, View } from 'react-native';
+import { StyleSheet, Platform, View, Modal, TouchableOpacity } from 'react-native';
+import { BlurView } from 'expo';
 import { Block, Text, Button } from '../components';
 import { connect } from 'react-redux'
-import { Constants } from 'expo';
-import { DangerZone } from 'expo';
-import { theme, constant } from '../constants';
-import { ChangeAuthentication, RefreshCloudToken } from '../redux/actions'
+import { DangerZone, LocalAuthentication } from 'expo';
+import { theme } from '../constants';
+import { ChangeAuthentication } from '../redux/actions'
 import Security from '../assets/lottie/cloud-security.json'
 const { Lottie } = DangerZone;
 
@@ -14,17 +14,11 @@ import ToggleSwitch from '../components/ToggleSwitch'
 class AuthenticationSetting extends React.Component {
     state = {
         type: null,
-        animation: null,
-    }
-
-    componentWillMount() {
-        if (this.props.cloud_enable === true) {
-            this.props._refreshCloudToken();
-        }
-        this._playAnimation();
+        animation1: Security
     }
 
     componentDidMount() {
+        this.animation1.play();
         if (this.props.hardwareSupport == 1) {
             if (Platform.OS == "ios") {
                 this.setState({ type: "Touch ID" })
@@ -37,19 +31,6 @@ class AuthenticationSetting extends React.Component {
             this.setState({ type: "Face ID" })
         }
     }
-
-    _playAnimation = () => {
-        if (!this.state.animation) {
-            this._loadAnimationAsync();
-        } else {
-            this.animation.reset();
-            this.animation.play();
-        }
-    };
-
-    _loadAnimationAsync = async () => {
-        this.setState({ animation: Security }, this._playAnimation);
-      };
 
     render() {
         const { nightmode } = this.props;
@@ -64,19 +45,19 @@ class AuthenticationSetting extends React.Component {
                     <Text h1 bold style={titlecolor}>Authentication Settings</Text>
                     <Text style={[textcolor, { marginTop: 10 }]}>Your device supports authentication with {type}.</Text>
                     <Text style={textcolor}>You can change settings later.</Text>
-                    <Block style={{justifyContent : 'center', alignItems : 'center', marginTop : 30}}>
-                        {this.state.animation &&
+                    <Block style={{ justifyContent: 'center', alignItems: 'center', marginTop: 30 }}>
+                        {this.state.animation1 &&
                             <Lottie
-                                ref={animation => {
-                                    this.animation = animation;
+                                ref={animation1 => {
+                                    this.animation1 = animation1;
                                 }}
                                 style={{
                                     width: '100%',
                                     height: '100%',
-                                    alignSelf : 'center'
+                                    alignSelf: 'center'
                                 }}
                                 loop={true}
-                                source={this.state.animation}
+                                source={this.state.animation1}
                             />}
                     </Block>
                     <Block bottom flex={1} style={{ marginBottom: 10 }}>
@@ -90,7 +71,7 @@ class AuthenticationSetting extends React.Component {
                                     onToggle={(boolean) => this.props._UpdateAuthentication(boolean)}
                                 />
                             </View>
-                            <Text style={[textcolor, { marginTop: 15 }]}>Allow your {type} to unlock the Lighue app.</Text>
+                            <Text style={[textcolor, { marginTop: 15 }]}>All the {type} on this device can be used to unlock the Lighue app.</Text>
                         </View>
                         <Button gradient
                             startColor='#0A7CC4'
@@ -109,8 +90,7 @@ const mapStateToProps = (state) => {
     return {
         nightmode: state.nightmode,
         authentication: state.authentication,
-        hardwareSupport: state.hardwareSupport,
-        cloud_enable: state.cloud_enable
+        hardwareSupport: state.hardwareSupport
     }
 }
 
@@ -118,9 +98,6 @@ const mapDispatchToProps = (dispatch) => {
     return {
         _UpdateAuthentication(boolean) {
             return dispatch(ChangeAuthentication(boolean))
-        },
-        _refreshCloudToken() {
-            return dispatch(RefreshCloudToken());
         }
     }
 }
@@ -135,6 +112,10 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center'
+    },
+    divider: {
+        borderBottomWidth: 1,
+        borderColor: "#E1E3E8"
     }
 });
 

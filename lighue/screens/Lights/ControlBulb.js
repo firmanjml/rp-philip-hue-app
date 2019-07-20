@@ -1,7 +1,6 @@
 import React from 'react';
 import { StyleSheet, View, TouchableOpacity, Image } from 'react-native';
-import { ColorPicker } from 'react-native-color-picker'
-
+import { ColorWheel } from 'react-native-color-wheel';
 import { connect } from 'react-redux'
 import { SetLampState } from '../../redux/actions'
 import ToggleSwitch from '../../components/ToggleSwitch'
@@ -54,21 +53,36 @@ class ControlBulb extends React.Component {
         })
     }
 
-    changeColorLightState = (values) => {
+
+    changeColorLightState = values => {
         const { bridgeip, username, bridgeIndex, lights, _changeLampStateByID } = this.props;
         const { id } = this.state;
+
+        let h = Math.sign(values.h) === -1 ? 360 + (values.h) : values.h
+        let s = values.s;
+        let v = values.v;
+
+        let colors = {
+            h,
+            s,
+            v
+        }
 
         if (!lights[id].state.on) {
             _changeLampStateByID(id, {
                 on: true
             });
         }
+
         axios({
-            method: 'PUT',
-            url: `http://${bridgeip[bridgeIndex]}/api/${username[bridgeIndex]}/lights/${id}/state`,
-            data: { xy: ColorConversionToXY(values) }
-        })
-    }
+            method: "PUT",
+            url: `http://${bridgeip[bridgeIndex]}/api/${
+                username[bridgeIndex]
+                }/lights/${this.state.id}/state`,
+            data: { xy: ColorConversionToXY(colors) }
+        });
+    };
+
 
     changeSatLightState = (values) => {
         const { bridgeip, username, bridgeIndex, lights, _changeLampStateByID } = this.props;
@@ -155,18 +169,16 @@ class ControlBulb extends React.Component {
                     />
                     <Text style={[styles.textPer, textcolor]}>{control == "Brightness" ? briPer : satPer}</Text>
                 </View>
-            )))      
+            )))
     }
 
     renderColorPicker() {
         const { dimmableType } = this.state;
         if (!dimmableType) {
             return (
-                <ColorPicker
+                <ColorWheel
                     onColorChange={this.changeColorLightState}
                     style={{ flex: 1 }}
-                    hideSliders={true}
-                    color={dimmableType ? "black" : null}
                 />
             )
         }
