@@ -187,6 +187,10 @@ export const lights = (state = {}, action) => {
             _state = JSON.parse(JSON.stringify(state));
             _state = action.payload;
             return _state;
+        case C.FETCH_LIGHT:
+            _state = JSON.parse(JSON.stringify(state));
+            _state[action.id] = action.payload;
+            return _state;
         case C.CHANGE_LIGHT_STATE:
             _state = JSON.parse(JSON.stringify(state));
             _state[action.id].state = action.payload;

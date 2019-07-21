@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { StyleSheet, TouchableOpacity, Text, Image } from 'react-native';
 import { Block } from '../components';
 import { theme } from '../constants';
-
+import { ConvertXYtoHex } from '../components/ColorConvert';
 import { connect } from 'react-redux'
 
 class LightDemoMode extends Component {
@@ -29,13 +29,16 @@ class LightDemoMode extends Component {
                     key={val}
                     onPress={() => {
                         navigation.navigate('ControlBulb', {
-                            id: val
+                            id: val,
+                            colorHex: ConvertXYtoHex(this.props.lights[val].state.xy[0],
+                                this.props.lights[val].state.xy[1],
+                                this.props.lights[val].state.bri)
                         });
                     }}>
                     <Text style={[{ marginBottom: 20, fontSize: 20 }, textcolor]}>{lights[val].name}</Text>
                 </TouchableOpacity>
             )))
-    }  
+    }
 
     render() {
         const { nightmode } = this.props;

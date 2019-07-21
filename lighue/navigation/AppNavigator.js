@@ -1,5 +1,5 @@
 import { createAppContainer, createStackNavigator } from 'react-navigation';
-import ControlBulbScreen from '../screens/Lights/ControlBulb';
+import ControlBulbScreen from '../screens/Lights/NewControlBulb';
 import AddRoomScreen from '../screens/Rooms/AddRoomScreen';
 import EditRoomScreen from '../screens/Rooms/EditRoomScreen';
 import DefaultScreen from '../screens/Rooms/DefaultScreen';

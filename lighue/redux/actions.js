@@ -214,6 +214,40 @@ export const GetAllLights = () => (dispatch, getState) => {
 };
 
 /** 
+ * GetLightsAttributes&States
+ * * Document 2.3. Get group attributes
+ * * https://developers.meethue.com/develop/hue-api/groupds-api/#get-group-attr
+ * @param {number} lampID This paramter takes in the group ID.
+*/
+export const GetLightAtrributes = (lampID) => (dispatch, getState) => {
+    const i = getState().bridgeIndex;
+    const bridgeip = getState().bridgeip[i];
+    const username = getState().username[i];
+    const url = getState().cloud_enable === false ? `http://${bridgeip}/api/${username}/lights/${lampID}` : `https://api.meethue.com/bridge/${username}/lights/${lampID}`;
+    const headers = getState().cloud_enable === true ? {"Authorization": `Bearer ${getState().cloud.token}`, "Content-Type": "application/json"} : {"Content-Type": "application/json"};
+
+    dispatch(ChangeLoading(true));
+    axios({
+        url,
+        method: 'GET',
+        headers
+    }).then(res => {
+        if (res.data) {
+            dispatch({
+                type: C.FETCH_LIGHT,
+                id: lampID,
+                payload : res.data
+            })
+        } else {
+            throw Error('An error has occur');
+        }
+    }).catch((error) => {
+        dispatch(ChangeLoading(false));
+        console.log(error);
+    }).then(dispatch(ChangeLoading(false)));
+};
+
+/** 
  * SearchForNewLights
  * * Document 1.3 Search For New Light
  * * https://developers.meethue.com/develop/hue-api/lights-api/#search-for-new-lights
