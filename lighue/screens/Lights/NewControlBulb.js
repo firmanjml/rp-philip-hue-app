@@ -31,10 +31,10 @@ class NewControlBulb extends Component {
 
     componentWillMount() {
         this.setState({
-            id: this.props.navigation.getParam('id', 0),
+            id: this.props.navigation.getParam('id', '1'),
             colorHex: this.props.navigation.getParam('colorHex', '#ffffff')
         })
-        this.props._FetchLampStateByID(this.props.navigation.getParam('id', 0));
+        this.props._FetchLampStateByID(this.props.navigation.getParam('id', '1'));
     }
 
     componentDidMount() {
