@@ -12,6 +12,8 @@ import LocationScreen from '../screens/Schedules/LocationList';
 import AddSceneScreen from '../screens/Scenes/AddScenes';
 import PostUpdateScreen from '../screens/Miscellaneous/PostUpdateScreen';
 import ControlRoomScreen from '../screens/Rooms/ControlRoomScreen';
+import LightInfo from '../screens/Lights/BulbInfo';
+import EditBulbScreen from '../screens/Lights/EditBulb';
 import { theme } from '../constants';
 import {fromRight} from 'react-navigation-transitions';
 const SetupNavigatorApp = createStackNavigator(
@@ -54,8 +56,14 @@ const SetupNavigatorApp = createStackNavigator(
     },
     ControlRoom : {
       screen : ControlRoomScreen
-    }
-  },
+    },
+    BulbInfo : {
+      screen : LightInfo
+    },
+    EditBulb : {
+      screen : EditBulbScreen
+  }
+},
   {
     initialRouteName: "ListRoom",
     transitionConfig: () => fromRight(),

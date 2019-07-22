@@ -3,7 +3,9 @@ import { Dimensions, Image, StyleSheet, ScrollView, TouchableOpacity, View, Refr
 import { Card, Badge, Block, Text } from '../../components';
 import { theme, constant } from '../../constants';
 import Icon from 'react-native-vector-icons';
+import ToggleSwitch from "../../components/ToggleSwitch";
 import { connect } from 'react-redux';
+import { SetLampState } from '../../redux/actions'
 import { GetAllGroups, GetAllLights, GetSchedules } from '../../redux/actions';
 
 import {
@@ -126,7 +128,7 @@ class DefaultScreen extends Component {
     }
 
     displayLayout() {
-        const { navigation, groups, nightmode } = this.props;
+        const { navigation, groups, nightmode, lights } = this.props;
         const { colors } = theme;
         const refreshtextcolor = nightmode ? colors.white : colors.black
         const textcolor = { color: nightmode ? colors.white : colors.black }
@@ -161,7 +163,7 @@ class DefaultScreen extends Component {
                                         onPress={() => {
                                             navigation.navigate('AddRoom');
                                         }}>
-                                        <Text h2 style={{ marginTop : 5, color: '#20D29B' }}>Add Rooms</Text>
+                                        <Text h2 style={{ marginTop: 5, color: '#20D29B' }}>Add Rooms</Text>
                                     </TouchableOpacity>
                                 </Block>
                                 :
@@ -171,7 +173,7 @@ class DefaultScreen extends Component {
                                         onPress={() => {
                                             navigation.navigate('ControlRoom', {
                                                 id: val,
-                                                class : groups[val].class > -1 ? groups[val].class : "Other"
+                                                class: groups[val].class > -1 ? groups[val].class : "Other"
                                             });
                                         }}>
                                         <Card center middle shadow style={styles.category}>
@@ -179,9 +181,9 @@ class DefaultScreen extends Component {
                                                 {
                                                     constant.room_class.indexOf(groups[val].class) > -1
                                                         ?
-                                                        <Image style={{width: constant.class_base64[groups[val].class].width, height: constant.class_base64[groups[val].class].height}} source={{uri: constant.class_base64[groups[val].class].uri}}/>
+                                                        <Image style={{ width: constant.class_base64[groups[val].class].width, height: constant.class_base64[groups[val].class].height }} source={{ uri: constant.class_base64[groups[val].class].uri }} />
                                                         :
-                                                        <Image style={{width: constant.class_base64["Other"].width, height: constant.class_base64["Other"].height}} source={{uri: constant.class_base64["Other"].uri}}/>
+                                                        <Image style={{ width: constant.class_base64["Other"].width, height: constant.class_base64["Other"].height }} source={{ uri: constant.class_base64["Other"].uri }} />
                                                 }
                                             </Badge>
                                             <Text medium height={30} style={styles.roomText}>{groups[val].name.length > 12 ? groups[val].name.substring(0, 12) + "..." : groups[val].name}</Text>
@@ -195,13 +197,36 @@ class DefaultScreen extends Component {
             )
         } else if (this.state.active === "Lights") {
             return (
-                <Block style={{ paddingHorizontal: theme.sizes.base * 2 }}>
-                    <Text center h3 style={[textcolor, marginTop]}>
-                        Lights won't be available at all.
-                    </Text>
-                    <Text paragraph style={textcolor} center>Please don't try again later</Text>
-                    <Text paragraph style={textcolor} center>Call 9126920 for more information</Text>
-                </Block>
+                Object.entries(lights).length === 0 && lights.constructor === Object ?
+                    <Block style={{ paddingHorizontal: theme.sizes.base * 2, alignItems: 'center', justifyContent: 'center' }}>
+                        <Text h1 bold style={[textcolor]}>No light is found.</Text>
+                        <TouchableOpacity
+                            onPress={() => console.log("Search for new bulb")}>
+                            <Text h2 style={{ marginTop: 5, color: '#20D29B' }}>Search for new lights</Text>
+                        </TouchableOpacity>
+                    </Block>
+                    :
+                    Object.keys(lights).map(val => (
+                        <Block flex={false} row space="between" style={styles.row}>
+                            <TouchableOpacity
+                                key={val}
+                                onPress={() => {
+                                    navigation.navigate('BulbInfo', {
+                                        id: val
+                                    });
+                                }}>
+                                 <View style={styles.lampRow}>
+                                <Text style={{color: 'white', marginHorizontal: 30, marginBottom: 10, fontSize: 14}}>{lights[val].name}</Text>
+                                </View>
+                            </TouchableOpacity>
+                            <ToggleSwitch
+                                offColor="#DDDDDD"
+                                onColor={theme.colors.secondary}
+                                isOn={lights[val].state.on}
+                                onToggle={(toggleState) => this.props._changeLightState(val, { on: toggleState })}
+                            />
+                        </Block>
+                    ))
             )
         } else if (this.state.active === "Schedules") {
             return (
@@ -213,13 +238,13 @@ class DefaultScreen extends Component {
                         onPress={() => {
                             navigation.navigate('AddSchedules');
                         }}>
-                        <Text h2 style={{ marginTop : 5, color: '#20D29B' }}>Add schedules</Text>
+                        <Text h2 style={{ marginTop: 5, color: '#20D29B' }}>Add schedules</Text>
                     </TouchableOpacity>
                 </Block>
             )
         } else {
             return (
-                <Block style={{ paddingHorizontal: theme.sizes.base * 2, alignItems : 'center', justifyContent : 'center' }}>
+                <Block style={{ paddingHorizontal: theme.sizes.base * 2, alignItems: 'center', justifyContent: 'center' }}>
                     <Text h1 bold style={textcolor}>
                         No scenes created.
                     </Text>
@@ -227,7 +252,7 @@ class DefaultScreen extends Component {
                         onPress={() => {
                             navigation.navigate('AddScenes');
                         }}>
-                        <Text h2 style={{ marginTop : 5, color: '#20D29B' }}>Add scenes</Text>
+                        <Text h2 style={{ marginTop: 5, color: '#20D29B' }}>Add scenes</Text>
                     </TouchableOpacity>
                 </Block>
             )
@@ -284,16 +309,16 @@ class DefaultScreen extends Component {
         const backgroundcolor = { backgroundColor: nightmode ? colors.background : colors.backgroundLight }
         const textcolor = { color: nightmode ? colors.white : colors.black }
         return (
-                <Block style={backgroundcolor}>
-                    <Block flex={false} center row space="between" style={styles.header}>
-                        <Text h1 style={[textcolor, { fontWeight: 'bold' }]}>Explore</Text>
-                        {this.renderMenu(this.state.active)}
-                    </Block>
-                    <Block flex={false} row style={[styles.tabs, backgroundcolor]}>
-                        {tabs.map(tab => this.renderTab(tab))}
-                    </Block>
-                    {this.displayLayout()}
+            <Block style={backgroundcolor}>
+                <Block flex={false} center row space="between" style={styles.header}>
+                    <Text h1 style={[textcolor, { fontWeight: 'bold' }]}>Explore</Text>
+                    {this.renderMenu(this.state.active)}
                 </Block>
+                <Block flex={false} row style={[styles.tabs, backgroundcolor]}>
+                    {tabs.map(tab => this.renderTab(tab))}
+                </Block>
+                {this.displayLayout()}
+            </Block>
         )
     }
 }
@@ -302,7 +327,10 @@ const mapDispatchToProps = (dispatch) => {
     return {
         _fetchAllGroups: () => dispatch(GetAllGroups()),
         _fetchAllLights: () => dispatch(GetAllLights()),
-        _fetchAllSchedules: () => dispatch(GetSchedules())
+        _fetchAllSchedules: () => dispatch(GetSchedules()),
+        _changeLightState(id, data) {
+            return dispatch(SetLampState(id, data));
+        }
     }
 }
 
@@ -315,7 +343,12 @@ const mapStateToProps = (state) => {
     }
 }
 
+
+
 const styles = StyleSheet.create({
+    container: {
+        backgroundColor: theme.colors.background
+      },
     header: {
         marginTop: 50,
         paddingHorizontal: theme.sizes.base * 2,
@@ -358,6 +391,15 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderColor: '#ccc',
     },
+    lampRow: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        marginBottom: 20
+      }
+
+
+
+
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(DefaultScreen);

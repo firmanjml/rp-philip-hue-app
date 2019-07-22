@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Constants } from 'expo';
 import { Alert } from 'react-native';
 
+
 /** 
  * ChangeLoading
  * * Change loading state before rendering the information to screen.
@@ -39,8 +40,8 @@ export const ChangeThemeMode = (boolean) => (dispatch) => {
 */
 export const ChangeAuthentication = (boolean) => (dispatch) => {
     dispatch({
-        type : C.CHANGE_AUTHENTICATION_STATE,
-        payload : boolean
+        type: C.CHANGE_AUTHENTICATION_STATE,
+        payload: boolean
     })
 }
 
@@ -51,8 +52,8 @@ export const ChangeAuthentication = (boolean) => (dispatch) => {
 */
 export const ChangeHardwareSupport = (index = 0) => (dispatch) => {
     dispatch({
-        type : C.CHANGE_HARDWARE_SUPPORT,
-        payload : index
+        type: C.CHANGE_HARDWARE_SUPPORT,
+        payload: index
     })
 }
 
@@ -94,8 +95,7 @@ export const GetBridgeIP = (navigation, isManual = false, bridgeip = '') => asyn
         });
     } else {
         await axios({
-            // url: 'https://discovery.meethue.com',
-            url: 'https://api.myjson.com/bins/1eqhrc',
+            url: 'https://discovery.meethue.com',
             method: 'GET'
         }).then((res) => {
             dispatch({
@@ -224,7 +224,7 @@ export const SetLampState = (lampID, lampData) => (dispatch, getState) => {
  * * https://developers.meethue.com/develop/hue-api/lights-api/#del-lights
  * @param {number} lampID This paramter takes in the light ID.
 */
-export const DeleteLight = (lampID) => (dispatch, getState) => {
+export const DeleteLight = (lampID, navigation) => (dispatch, getState) => {
     const i = getState().bridgeIndex;
     const bridgeip = getState().bridgeip[i];
     const username = getState().username[i];
@@ -238,8 +238,14 @@ export const DeleteLight = (lampID) => (dispatch, getState) => {
                 type: C.DELETE_LIGHT,
                 payload: lampID
             })
-        } else {
-            throw Error('An error has occur')
+            navigation.navigate("ListRoom");
+        } else if (res.data[0].error) {
+            Alert.alert(
+                'Error',
+                "Please try again",
+                [{ text: "OK", onPress: () => console.log("OK Pressed") }],
+                { cancelable: false }
+            );
         }
     }).catch((error) => {
         dispatch(ChangeLoading(false));
@@ -461,6 +467,49 @@ export const GetConfig = async (dispatch, getState) => {
         console.log(error);
     }).then(dispatch(ChangeLoading(false)));
 };
+
+/** 
+ * SetLampAttributes
+ * * Document 1.5 Set Light Attributes
+ * * https://developers.meethue.com/develop/hue-api/lights-api/#set-light-state
+ * @param {number} lampID This paramter takes in the light ID.
+ * @param {object} lampData This paramter takes in the body argument of the request.
+*/
+export const SetLampAttributes = (lampID, lampData) => (dispatch, getState) => {
+    const i = getState().bridgeIndex;
+    const bridgeip = getState().bridgeip[i];
+    const username = getState().username[i];
+    const url = getState().cloud_enable === false ? `http://${bridgeip}/api/${username}/lights/${lampID}` : `https://api.meethue.com/bridge/${username}/lights/${lampID}`;
+    const headers = getState().cloud_enable === true ? {"Authorization": `Bearer ${getState().cloud.token}`, "Content-Type": "application/json"} : {"Content-Type": "application/json"};
+
+    dispatch(ChangeLoading(true));
+    axios({
+        url,
+        method: 'PUT',
+        headers,
+        data: lampData
+    }).then(res => {
+        var payload = {};
+        res.data.map((data) => {
+            let key = Object.keys(data.success)[0].substring(Object.keys(data.success)[0].lastIndexOf('/') + 1);
+            let value = Object.values(data.success)[0];
+            payload[key] = value;
+        })
+        if (payload) {
+            dispatch({
+                type: C.CHANGE_LIGHT_ATTR,
+                id: lampID,
+                payload: payload
+            })
+        } else {
+            throw Error('An error has occur');
+        }
+    }).catch((error) => {
+        dispatch(ChangeLoading(false));
+        // console.log(error);
+    }).then(dispatch(ChangeLoading(false)));
+};
+
 
 /** 
  * GetSchedules

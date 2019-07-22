@@ -11,6 +11,9 @@ import validator from "validator";
 import { Button, Block, Text, Input } from "../../components";
 import { theme } from "../../constants";
 import { GetAllGroups } from "../../redux/actions";
+import { SetGroupState } from "../../redux/actions";
+import { GetAllLights } from "../../redux/actions";
+
 
 class EditRoomScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -181,3 +184,4 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps
 )(EditRoomScreen);
+
