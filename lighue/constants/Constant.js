@@ -46,7 +46,7 @@ export const step_slider = [
 ]
 
 export const room_class = [
-  "Living Room", 
+  "Living room", 
   "Kitchen", 
   "Dining", 
   "Bedroom", 
@@ -66,8 +66,13 @@ export const room_class = [
   "Carport", 
   "Other"];
 
+
+export const secret = {
+  "basicToken": "U0ZMNVNUdnFJRlpiMjE5TlVBZmx3ZzhVSWVRbTdLbUQ6M2dmNUtrdE9GaUhaa3BScw=="
+}
+
 export const class_base64 = {
-  "Living Room": {
+  "Living room": {
     uri: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAA7DAAAOwwHHb6hkAAABmklEQVRIx+2VS0sCURTH52vUxwjqE/g12tU+yBEJUoiofOBCzRcpM45No1j5DAx8TNIUKSRkq1yIi5B2thTzdM+tKaXEcHQjXfjB5Z5zf/87lxmGYf7HX8eBgVuxstytjeW7BJiQLnVshpaH5Bb2aJEUO05TtCceyqAF53a0hy7HhrDwFWDV8+t4gkKiAcrlsybyxIEuO8utDQYYcVGrXAVd6JyTAAsrLNkN4TYBjt1FUHIa5GQvOtBFQtroZuwG/sFljvZFT54mpyO1iQNwLzrQ5TJJfXQzNj3/lgwr8FTv0OKJpzxxQMyvUAe6MuIdoJvBhVT4BhqPr58BMm2WM01ICvcguksQ2EuB2xwHhzFCwXlgP02uo0R75GxzKABdWalK5z8CvDtn4N1NqPdIhSFbBiRfAc65awrOg9Y0qQkf7zzpxT0+wtgAbEbhhVSBqtyij4u138Ba5apFezFQPdTIgFy8BvXqy0jhOHAvOkYGTJOhgJi/SK9jmpwGy98Bs4RxGVdBhXzeumkw6GQ8WzpQmdbPaxbOOR7vAki73sas4kQAAAAASUVORK5CYII=",
     width: 24,
     height: 24

@@ -1,16 +1,15 @@
 import React, { Component } from 'react';
-import { View, Image, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { Block, Text } from '../components';
 import { theme, constant } from '../constants';
 
 import { connect } from 'react-redux'
 import Layout from '../constants/Layout';
 import AppIntroSlider from 'react-native-app-intro-slider';
-import Security from '../assets/lottie/cloud-security.json'
 import { LocalAuthentication, DangerZone } from 'expo';
 const { Lottie } = DangerZone;
 
-import { GetAllLights, GetAllGroups, GetSchedules, ChangeHardwareSupport } from '../redux/actions'
+import { GetAllLights, GetAllGroups, GetSchedules, ChangeHardwareSupport, GetConfig } from '../redux/actions'
 
 var interval;
 class Splash extends Component {
@@ -26,10 +25,12 @@ class Splash extends Component {
         this.props._fetchAllLights();
         this.props._fetchAllGroups();
         this.props._fetchAllSchedules();
+        this.props._fetchAllConfig();
         interval = setInterval(() => {
             this.props._fetchAllLights();
             this.props._fetchAllGroups();
             this.props._fetchAllSchedules();
+            this.props._fetchAllConfig();
         }, 3000)
     }
 
@@ -95,7 +96,7 @@ class Splash extends Component {
                     {constant.splash_slider[2].lottie &&
                         <Lottie
                             ref={animation3 => {
-                                this.animation3 = animation3; 
+                                this.animation3 = animation3;
                             }}
                             speed={2}
                             source={constant.splash_slider[2].lottie}
@@ -113,11 +114,11 @@ class Splash extends Component {
         const textcolor = { color: nightmode ? colors.white : colors.gray3 }
         return (
             <Block style={backgroundcolor}>
-                {this.renderLottie(item)}
-                <Block marginTop={20} margin={[0, theme.sizes.base * 3]}>
-                    <Text style={[styles.title, titlecolor]}>{item.title}</Text>
-                    <Text medium style={[styles.text, textcolor]}>{item.text}</Text>
-                </Block>
+                    {this.renderLottie(item)}
+                    <Block marginTop={20} style={{ marginHorizontal: theme.sizes.base * 3 }}>
+                        <Text style={[styles.title, titlecolor]}>{item.title}</Text>
+                        <Text medium style={[styles.text, textcolor]}>{item.text}</Text>
+                    </Block>
             </Block>
         );
     }
@@ -147,6 +148,7 @@ const mapDispatchToProps = (dispatch) => {
         _fetchAllGroups: () => dispatch(GetAllGroups()),
         _fetchAllLights: () => dispatch(GetAllLights()),
         _fetchAllSchedules: () => dispatch(GetSchedules()),
+        _fetchAllConfig: () => dispatch(GetConfig()),
         _UpdateHardwareSupport(index) {
             return dispatch(ChangeHardwareSupport(index))
         },

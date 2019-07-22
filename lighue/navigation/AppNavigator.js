@@ -1,5 +1,5 @@
 import { createAppContainer, createStackNavigator } from 'react-navigation';
-import ControlBulbScreen from '../screens/Lights/ControlBulb';
+import ControlBulbScreen from '../screens/Lights/NewControlBulb';
 import AddRoomScreen from '../screens/Rooms/AddRoomScreen';
 import EditRoomScreen from '../screens/Rooms/EditRoomScreen';
 import DefaultScreen from '../screens/Rooms/DefaultScreen';
@@ -12,8 +12,15 @@ import LocationScreen from '../screens/Schedules/LocationList';
 import AddSceneScreen from '../screens/Scenes/AddScenes';
 import PostUpdateScreen from '../screens/Miscellaneous/PostUpdateScreen';
 import ControlRoomScreen from '../screens/Rooms/ControlRoomScreen';
+<<<<<<< HEAD
 import LightInfo from '../screens/Lights/BulbInfo';
 import EditBulbScreen from '../screens/Lights/EditBulb';
+=======
+import SearchScreen from '../screens/Lights/SearchBulb';
+import ScheduleLocationScreen from '../screens/Schedules/LocationList';
+import SceneLocationScreen from '../screens/Scenes/SceneLocationList';
+import BridgeInfoScreen from '../screens/BridgeInfo';
+>>>>>>> d465b9ae7651dfaf37bd41d8613a6a9deeec3a08
 import { theme } from '../constants';
 import {fromRight} from 'react-navigation-transitions';
 const SetupNavigatorApp = createStackNavigator(
@@ -33,6 +40,9 @@ const SetupNavigatorApp = createStackNavigator(
     TestScreen: {
       screen: TestScreen
     },
+    SearchBulbScreen: {
+      screen: SearchScreen
+    },
     LightDemo: {
       screen: LightDemo
     },
@@ -42,6 +52,9 @@ const SetupNavigatorApp = createStackNavigator(
     AddSchedules: {
       screen: AddSchedulesScreen
     },
+    ScheduleLocationListScreen: {
+      screen: ScheduleLocationScreen
+    },
     CategoryListScreen: {
       screen: CategoryScreen
     },
@@ -50,6 +63,12 @@ const SetupNavigatorApp = createStackNavigator(
     },
     AddScenes: {
       screen: AddSceneScreen
+    },
+    SceneLocationListScreen : {
+      screen : SceneLocationScreen
+    },
+    BridgeInfo : {
+      screen : BridgeInfoScreen
     },
     PostUpdate: {
       screen: PostUpdateScreen

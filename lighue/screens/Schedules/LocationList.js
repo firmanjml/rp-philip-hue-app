@@ -1,11 +1,11 @@
 import React, { Component } from 'react'
-import { Image, StyleSheet, TouchableOpacity, Modal, ScrollView, Dimensions, Platform } from 'react-native'
+import { Image, StyleSheet, TouchableOpacity, View, ScrollView, Dimensions, Platform } from 'react-native'
 import { Block, Text, Card, Badge } from '../../components';
 import { theme, constant } from '../../constants';
 import { connect } from 'react-redux';
-import { BlurView } from 'expo';
+import Icon from 'react-native-vector-icons';
 
-const { height, width } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 class LocationList extends Component {
     static navigationOptions = ({ navigation }) => {
@@ -22,37 +22,7 @@ class LocationList extends Component {
     }
 
     state = {
-        location: ["Home", "Room", "Individual Bulb"],
-        roomModal: false,
-        bulbModal: false
-    }
-
-    redirection(value) {
-        const { navigation } = this.props;
-        if (this.state.location[value] == "Home") {
-            navigation.state.params.returnData(this.state.location[value])
-            navigation.goBack()
-        }
-        else if (this.state.location[value] == "Room") {
-            this.setState({ roomModal: true })
-        }
-        else {
-            this.setState({ bulbModal: true })
-        }
-    }
-
-    renderList() {
-        const { nightmode } = this.props;
-        const { colors } = theme;
-        const textcolor = { color: nightmode ? colors.gray2 : colors.black }
-        return (
-            Object.keys(this.state.location).map(val => (
-                <TouchableOpacity
-                    key={val}
-                    onPress={() => this.redirection(val)}>
-                    <Text bold style={[styles.text, textcolor]}>{this.state.location[val]}</Text>
-                </TouchableOpacity>
-            )));
+        selected: "Home"
     }
 
     renderListRoom() {
@@ -73,7 +43,7 @@ class LocationList extends Component {
                                     No Rooms created
                                     </Text>
                                 <TouchableOpacity
-                                    onPress={() => this.setState({roomModal : false})}>
+                                    onPress={() => this.setState({ roomModal: false })}>
                                     <Text h3 style={{ marginTop: 5, color: '#20D29B' }}>Go Back</Text>
                                 </TouchableOpacity>
                             </Block>
@@ -103,34 +73,6 @@ class LocationList extends Component {
         )
     }
 
-    redirectionRoom = (val) => {
-        const { navigation } = this.props;
-        navigation.state.params.returnData("room", val)
-        this.setState({ roomModal: false })
-        navigation.goBack()
-    }
-
-    renderModalRoom() {
-        const { nightmode } = this.props;
-        const { colors } = theme;
-        const backgroundcolor = { backgroundColor: nightmode ? colors.background : colors.backgroundLight }
-        const titlecolor = { color: nightmode ? colors.white : colors.black }
-        return (
-            <Modal animationType={"fade"}
-                transparent={false}
-                visible={this.state.roomModal}>
-                <BlurView tint="dark" intensity={100} style={StyleSheet.absoluteFill}>
-                    <Block container>
-                        <Text h1 style={[titlecolor, { fontWeight: 'bold' }]}>Choose room</Text>
-                        <Block flex={false} row style={[styles.tabs]}>
-                            {this.renderListRoom()}
-                        </Block>
-                    </Block>
-                </BlurView>
-            </Modal>
-        )
-    }
-
     renderListBulb() {
         const { lights, nightmode } = this.props;
         const { colors } = theme;
@@ -152,7 +94,7 @@ class LocationList extends Component {
                                 <TouchableOpacity
                                     key={val}
                                     onPress={() => this.redirectionBulb(val)}>
-                                    <Block flex={false} row space="between" style={{ marginTop: 30, marginBottom: 30 }}>
+                                    <Block flex={false} row space="between" style={{ marginTop: 30, marginBottom: 10 }}>
                                         <Text h2 style={[styles.textControl, textcolor]}>{lights[val].name}</Text>
                                         <Text h2 style={[styles.textControl, textcolor]}>></Text>
                                     </Block>
@@ -164,33 +106,113 @@ class LocationList extends Component {
         )
     }
 
-    redirectionBulb = (val) => {
+    locationList = {
+        Home: {
+            selected: true
+        },
+        Room: {
+            selected: false
+        },
+        Bulb: {
+            selected: false
+        }
+    };
+
+    updateLocation = (val) => {
+        this.setState({ selected: val })
+        if (val == "Home") {
+            this.locationList["Home"].selected = true
+            this.locationList["Room"].selected = false
+            this.locationList["Bulb"].selected = false
+        }
+        else if (val == "Room") {
+            this.locationList["Home"].selected = false
+            this.locationList["Room"].selected = true
+            this.locationList["Bulb"].selected = false
+        }
+        else {
+            this.locationList["Home"].selected = false
+            this.locationList["Room"].selected = false
+            this.locationList["Bulb"].selected = true
+        }
+        this.forceUpdate()
+    }
+
+    renderLocationList() {
+        const { locationList } = this;
+        const { nightmode } = this.props;
+        const { colors } = theme;
+        const textcolor = { color: nightmode ? colors.white : colors.black }
+        return (
+            Object.keys(locationList).map(val => (
+                <TouchableOpacity
+                    key={val}
+                    style={[styles.roundLocation, {
+                        borderColor: locationList[val].selected ? colors.secondary : 'white',
+                        backgroundColor: locationList[val].selected ? colors.secondary : null
+                    }]}
+                    onPress={() => this.updateLocation(val)}>
+                    <Text style={[textcolor, { alignSelf: 'center' }]}>{val}</Text>
+                </TouchableOpacity>
+            )))
+    }
+
+
+    renderListOrText(titlecolor) {
+        const { selected } = this.state;
+        if (selected == "Home") {
+            return (
+                <Text style={[titlecolor, { fontSize: 40, marginTop: 15 }]} bold>Have your own home being scheduled.</Text>
+            )
+        }
+        else if (selected == "Room") {
+            return (
+                <View style={{ marginTop: 10 }}>
+                    {this.renderListRoom()}
+                </View>
+            )
+        }
+        else if (selected == "Bulb") {
+            return (
+                <View>
+                    {this.renderListBulb()}
+                </View>
+            )
+        }
+    }
+
+    renderSaveButton(textcolor) {
+        if (this.state.selected == "Home") {
+            return (
+                <Block bottom style={{ marginBottom: 20, justifyContent: 'flex-end', alignItems: 'flex-end' }}>
+                    <TouchableOpacity
+                        style={styles.saveRound}
+                        onPress={() => this.redirectHome()}>
+                        <View style={{justifyContent : 'space-between', flexDirection : 'row'}}>
+                            <Text style={[{alignSelf : 'center'},textcolor]}>Save  </Text>
+                            <Icon.Ionicons name="ios-arrow-forward" style={{alignSelf : 'center'}} size={25} color={theme.colors.gray} />
+                        </View>
+                    </TouchableOpacity>
+                </Block>
+            )
+        }
+    }
+
+    redirectHome() {
+        this.props.navigation.state.params.returnData("Home")
+        this.props.navigation.goBack()
+    }
+
+    redirectionRoom = (val) => {
         const { navigation } = this.props;
-        navigation.state.params.returnData("bulb", val)
-        this.setState({ bulbModal: false })
+        navigation.state.params.returnData("room", val)
         navigation.goBack()
     }
 
-    renderModalBulb() {
-        const { nightmode } = this.props;
-        const { colors } = theme;
-        const backgroundcolor = { backgroundColor: nightmode ? colors.background : colors.backgroundLight }
-        const titlecolor = { color: nightmode ? colors.white : colors.black }
-        return (
-            <Modal animationType={"fade"}
-                transparent={false}
-                visible={this.state.bulbModal}
-                onRequestClose={() => this.setState({ bulbModal: !this.state.bulbModal })}>
-                <BlurView tint="dark" intensity={100} style={StyleSheet.absoluteFill}>
-                    <Block container>
-                        <Text h1 style={[titlecolor, { fontWeight: 'bold' }]}>Choose bulb</Text>
-                        <Block flex={false} row style={styles.tabs}>
-                            {this.renderListBulb()}
-                        </Block>
-                    </Block>
-                </BlurView>
-            </Modal>
-        )
+    redirectionBulb = (val) => {
+        const { navigation } = this.props;
+        navigation.state.params.returnData("bulb", val)
+        navigation.goBack()
     }
 
     render() {
@@ -198,15 +220,15 @@ class LocationList extends Component {
         const { colors } = theme;
         const backgroundcolor = { backgroundColor: nightmode ? colors.background : colors.backgroundLight }
         const titlecolor = { color: nightmode ? colors.white : colors.black }
+        const textcolor = { color: nightmode ? colors.gray2 : colors.black }
         return (
             <Block style={backgroundcolor}>
                 <Block container>
-                    {this.renderModalRoom()}
-                    {this.renderModalBulb()}
-                    <Text h1 bold style={[titlecolor, { marginTop: 10 }]}>Where to control?</Text>
-                    <Block flex={1} column style={{ justifyContent: 'space-between', marginBottom: 50, marginTop: 50 }}>
-                        {this.renderList()}
-                    </Block>
+                    <View style={styles.rowLocation}>
+                        {this.renderLocationList()}
+                    </View>
+                    {this.renderListOrText(titlecolor)}
+                    {this.renderSaveButton(textcolor)}
                 </Block>
             </Block>
         )
@@ -230,6 +252,25 @@ export default connect(
 const styles = StyleSheet.create({
     row: {
         marginTop: 20,
+    },
+    rowLocation: {
+        flexDirection: 'row'
+    },
+    roundLocation: {
+        flex: 1,
+        borderWidth: 2,
+        borderRadius: 5,
+        justifyContent: 'center',
+        alignSelf: 'stretch',
+        height: 100
+    },
+    saveRound: {
+        borderWidth: 1,
+        borderRadius: 20,
+        width: 65,
+        height: 40,
+        justifyContent: 'center',
+        alignItems: 'center'
     },
     text: {
         fontSize: 30,

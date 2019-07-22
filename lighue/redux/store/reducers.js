@@ -26,6 +26,25 @@ export const nightmode = (state = false, action) => {
     }
 }
 
+export const cloud_enable = (state = false, action) => {
+    if (action.type === C.CHANGE_CLOUD) {
+        return action.payload
+    } else {
+        return state;
+    }
+}
+
+export const cloud = (state = {
+    "token": "",
+    "refresh_token": ""
+}, action) => {
+    if (action.type === C.CHANGE_CLOUD_TOKEN) {
+        return action.payload
+    } else {
+        return state;
+    }
+}
+
 /** 
  * authentication
  * * Redux reducer stores authentication data to Redux state.
@@ -34,7 +53,20 @@ export const authentication = (state = false, action) => {
     if (action.type === C.CHANGE_AUTHENTICATION_STATE) {
         return action.payload;
     }
-    else { 
+    else {
+        return state
+    }
+}
+
+/** 
+ * status
+ * * Redux reducer stores connection status data to Redux state.
+*/
+export const status = (state = false, action) => {
+    if (action.type === C.CHANGE_STATUS) {
+        return action.payload;
+    }
+    else {
         return state
     }
 }
@@ -155,9 +187,17 @@ export const lights = (state = {}, action) => {
             _state = JSON.parse(JSON.stringify(state));
             _state = action.payload;
             return _state;
+        case C.FETCH_LIGHT:
+            _state = JSON.parse(JSON.stringify(state));
+            _state[action.id] = action.payload;
+            return _state;
         case C.CHANGE_LIGHT_STATE:
             _state = JSON.parse(JSON.stringify(state));
             _state[action.id].state = action.payload;
+            return _state;
+        case C.CHANGE_LIGHT_ATTR:
+            _state = JSON.parse(JSON.stringify(state));
+            _state[action.id] = action.payload;
             return _state;
         case C.DELETE_LIGHT:
             _state = JSON.parse(JSON.stringify(state));
@@ -187,16 +227,47 @@ export const schedules = (state = {}, action) => {
     }
 }
 
+/** 
+ * scenes
+ * * Redux reducer stores scene data it recevied from the API to Redux state
+*/
+export const scenes = (state = {}, action) => {
+    switch (action.type) {
+        case C.FETCH_ALL_SCENES:
+            _state = JSON.parse(JSON.stringify(state));
+            _state = action.payload;
+            return _state;
+        case C.CREATE_SCENE:
+            _state = JSON.parse(JSON.stringify(state))
+            _state[action.id] = action.payload;
+            return _state;
+        case C.CHANGE_SCENES_STATE:
+            _state = JSON.parse(JSON.stringify(state));
+            _state[action.id].state = action.payload;
+            return _state;
+        case C.DELETE_SCENE:
+            _state = JSON.parse(JSON.stringify(state));
+            delete _state[payload]
+            return _state;
+        default:
+            return state;
+    }
+}
+
 export default combineReducers({
     bridgeIndex,
     bridgeip,
     config,
+    cloud_enable,
+    cloud,
     groups,
     authentication,
     hardwareSupport,
     lights,
     schedules,
     loading,
+    scenes,
+    status,
     username,
     nightmode
 });

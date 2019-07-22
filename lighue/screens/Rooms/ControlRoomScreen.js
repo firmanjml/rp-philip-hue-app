@@ -37,13 +37,15 @@ class ControlRoomScreen extends React.Component {
     bri: null,
     satPer: null,
     briPer: null,
-    type: null
+    type: null,
+    active: "Main"
   };
 
   componentWillMount() {
-    this.setState({ 
+    this.setState({
       id: this.props.navigation.getParam("id", "NO-ID"),
-      type : this.props.navigation.getParam("class", "Other") });
+      type: this.props.navigation.getParam("class", "Other")
+    });
   }
 
   componentDidMount() {
@@ -69,7 +71,7 @@ class ControlRoomScreen extends React.Component {
     const bordercolor = {
       borderColor: nightmode ? colors.white : colors.gray2
     };
-    const {type} = this.state;
+    const { type } = this.state;
     return (
       <View>
         <Text style={[styles.textControl, textcolor]}>Room Type</Text>
@@ -106,9 +108,7 @@ class ControlRoomScreen extends React.Component {
           />
         </MenuTrigger>
         <MenuOptions style={{ padding: 15 }}>
-          <MenuOption value={1}>
-            <Text h3>Show More Info</Text>
-          </MenuOption>
+          {this.renderMenuOption()}
           <View style={styles.divider} />
           <MenuOption value={2}>
             <Text h3>Edit Room</Text>
@@ -117,6 +117,23 @@ class ControlRoomScreen extends React.Component {
         </MenuOptions>
       </Menu>
     )
+  }
+
+  renderMenuOption() {
+    if (this.state.active == "Main") {
+      return (
+        <MenuOption value={1}>
+          <Text h3>Show More Info</Text>
+        </MenuOption>
+      )
+    }
+    else if (this.state.active == "ShowMoreInfo") {
+      return (
+        <MenuOption value={1}>
+          <Text h3>Show Color Picker</Text>
+        </MenuOption>
+      )
+    }
   }
 
   changeColorGroupState = values => {
@@ -251,16 +268,23 @@ class ControlRoomScreen extends React.Component {
     );
   }
 
-  renderColorPicker() {
-    return (
-      <ColorPicker
-        onColorChange={this.changeColorGroupState}
-        style={{ flex: 1 }}
-        hideSliders={true}
-      // color={ConvertXYtoHex(this.props.lights[this.state.id].state.xy[0], this.props.lights[this.state.id].state.xy[1], 254)}
-      // color={this.state.color}
-      />
-    );
+  renderView() {
+    if (this.state.active == "Main") {
+      return (
+        <ColorPicker
+          onColorChange={this.changeColorGroupState}
+          style={{ flex: 1 }}
+          hideSliders={true}
+        // color={ConvertXYtoHex(this.props.lights[this.state.id].state.xy[0], this.props.lights[this.state.id].state.xy[1], 254)}
+        // color={this.state.color}
+        />
+      );
+    }
+    else if (this.state.active == "ShowMoreInfo") {
+      return (
+        <Text>Show more info</Text>
+      )
+    }
   }
 
   renderToggleButton() {
@@ -278,9 +302,23 @@ class ControlRoomScreen extends React.Component {
     console.log("ControlRoomScreen", "press menu " + value);
     if (value == 1) {
       // show more Room Info
-      this.props.navigation.navigate("MoreRoomInfo");
+      if (this.state.active == "Main") {
+        this.setState({
+          active: "ShowMoreInfo"
+        })
+      }
+      else if (this.state.active == "ShowMoreInfo") {
+        this.setState({
+          active : "Main"
+        })
+      }
     } else if (value == 2) {
       this.props.navigation.navigate("EditRoom");
+    }
+    else if (Value == 3) {
+      this.setState({
+        active: "Main"
+      })
     }
   }
 
@@ -320,7 +358,7 @@ class ControlRoomScreen extends React.Component {
           <Text style={[styles.textPer, textcolor]}>
             {this.state.satPer}%
             </Text>
-          {this.renderColorPicker()}
+          {this.renderView()}
         </Block>
       </Block>
     );

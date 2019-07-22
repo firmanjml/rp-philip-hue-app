@@ -1,28 +1,42 @@
 import React from 'react';
-import { StyleSheet, Platform, View, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { StyleSheet, Platform, View, Modal, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { theme } from '../constants';
-import { Text } from '../components';
+import { Text, Block } from '../components';
 
+import Fingerprint from '../assets/lottie/fingerprint.json'
 import { connect } from 'react-redux'
-import { LocalAuthentication } from 'expo';
+import { DangerZone, LocalAuthentication, BlurView } from 'expo';
 
+const { Lottie } = DangerZone;
 class Authentication extends React.Component {
 
     state = {
-        authenticate: null
+        authenticate: null,
+        androidModal: false,
+        animation: Fingerprint,
+        status: false,
+        retry: 0,
+        retryText: ""
+    }
+
+    componentWillMount() {
+        this.authentication()
     }
 
     componentDidMount() {
-        this.authentication();
+        if (Platform.OS == "android") {
+            this.animation.play(38, 38);
+        }
     }
 
     authentication = async () => {
         this.setState({
-            authenticate: "loading"
+            authenticate: true
         })
 
         if (Platform.OS == "ios") {
             let result = await LocalAuthentication.authenticateAsync("Authenticate with your finger");
+
             if (result.success) {
                 this.props.navigation.navigate("ListRoom")
             }
@@ -32,32 +46,93 @@ class Authentication extends React.Component {
         }
         else {
             // android work in progress
-            // this.setState({ status: "Waiting for authentication" })
-            // let result = await LocalAuthentication.authenticateAsync("Authenticate for Lighue");
-            // if (result.success) {
-            //     this.setState({
-            //         authenticate: result.success,
-            //         status: ""
-            //     })
-            // } else {
-            //     this.setState({ authenticate: result.success })
-            // }
+            // this.animation.play(38, 38);
+            this.setState({
+                androidModal: true
+            })
+
+            let result = await LocalAuthentication.authenticateAsync("Authenticate for Lighue");
+
+            if (result.success) {
+                this.setState({
+                    status: true
+                });
+                this.animation.play(37, 154)
+                setTimeout(() => { this.props.navigation.navigate("ListRoom") }, 600);
+            }
+            else {
+                this.setState({
+                    authenticate: false,
+                    androidModal: false
+                })
+            }
         }
     }
 
-    renderView() {
-        const { authenticate } = this.state;
+    cancelAuthentication() {
+        LocalAuthentication.cancelAuthenticate();
+        this.setState({
+            androidModal: false,
+            authenticate: false
+        })
+    }
+
+    renderAndroidFingerprint() {
+        const status = this.state.status ? "Fingerprint recognised" : "Confirm your fingerprint now";
+        const textcolor = this.state.status ? '#20D29B' : 'black';
+        return (
+            <Modal animationType={"none"}
+                transparent={true}
+                onRequestClose={() => this.cancelAuthentication()}
+                visible={this.state.androidModal}>
+                <BlurView tint="dark" intensity={100} style={StyleSheet.absoluteFill}>
+                    <View style={{ backgroundColor: 'white', marginHorizontal: theme.sizes.base * 2, marginVertical: 270 }}>
+                        {this.state.animation &&
+                            <Lottie
+                                ref={animation => {
+                                    this.animation = animation;
+                                }}
+                                style={{
+                                    width: '100%',
+                                    height: '100%'
+                                }}
+                                loop={false}
+                                speed={5.0}
+                                source={this.state.animation}
+                            />}
+                        <View style={{ backgroundColor: 'white' }}>
+                            <Text center>Fingerprint for Lighue</Text>
+                            <Text center light style={{ color: textcolor }}>{status}</Text>
+                            <View style={[styles.divider, { marginTop: 25, marginBottom: 15 }]} />
+                            <TouchableOpacity
+                                style={{ alignItems: 'center' }}
+                                onPress={() => this.cancelAuthentication()}>
+                                <Text light style={{ marginBottom: 15, color: '#20D29B' }}>Cancel</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </BlurView>
+            </Modal>
+        )
+    }
+
+    render() {
         const { nightmode } = this.props;
+        const { authenticate } = this.state;
         const { colors } = theme;
         const textcolor = { color: nightmode ? colors.white : colors.black }
-        if (authenticate == 'loading') {
+        const backgroundcolor = { backgroundColor: nightmode ? colors.background : colors.backgroundLight };
+        if (authenticate) {
             return (
-                <ActivityIndicator />
+                <View style={[backgroundcolor, styles.container]}>
+                    {this.renderAndroidFingerprint()}
+                </View>
             )
         }
         else if (authenticate == false) {
             return (
-                <View style={{ justifyContent: 'center' }}>
+                <View style={[backgroundcolor, styles.container]}>
+                    {this.renderAndroidFingerprint()}
                     <Text h2 bold style={[{ textAlign: 'center' }, textcolor]}>You are not authenticated.</Text>
                     <Text h3 style={[{ textAlign: 'center' }, textcolor]}>Please try again</Text>
                     <TouchableOpacity
@@ -67,17 +142,6 @@ class Authentication extends React.Component {
                 </View>
             )
         }
-    }
-
-    render() {
-        const { nightmode } = this.props;
-        const { colors } = theme;
-        const backgroundcolor = { backgroundColor: nightmode ? colors.background : colors.backgroundLight };
-        return (
-            <View style={[styles.container, backgroundcolor]}>
-                {this.renderView()}
-            </View>
-        );
     }
 }
 
@@ -96,7 +160,8 @@ export default connect(
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center'
+        justifyContent: 'center',
+        alignItems: 'center'
     }
 })
 

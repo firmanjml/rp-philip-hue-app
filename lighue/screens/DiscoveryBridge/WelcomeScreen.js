@@ -29,7 +29,7 @@ class WelcomeScreen extends Component {
 
         await this.props._GetBridgeIP();
         if (this.props.bridgeip) {
-            SnackBar.show('New Hue Bridge Found!', { duration: 4000 });
+            SnackBar.show('New Hue Bridge Found!', { duration: 2000 });
             this.setState({ pairBtn: 'Pair now' });
         }
     }

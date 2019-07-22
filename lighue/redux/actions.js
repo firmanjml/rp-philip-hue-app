@@ -1,7 +1,9 @@
 import C from './constants';
+import qs from 'qs';
 import axios from 'axios';
 import { Constants } from 'expo';
 import { Alert } from 'react-native';
+import { constant } from '../constants';
 
 
 /** 
@@ -13,6 +15,58 @@ export const ChangeLoading = (visibility) => ({
     type: C.CHANGE_LOADING,
     payload: visibility
 });
+
+export const ChangeCloudState = (boolean) => ({
+    type: C.CHANGE_CLOUD,
+    payload: boolean
+});
+
+export const ChangeCloudToken = (code = '') => (dispatch) => {
+    let b64 = constant.secret.basicToken;
+    axios({
+        url: `https://api.meethue.com/oauth2/token?code=${code}&grant_type=authorization_code`,
+        method: "POST",
+        headers : {
+            'Authorization': `Basic ${b64}`
+        }
+    }).then((res) => {
+        dispatch({
+            type: C.CHANGE_CLOUD_TOKEN,
+            payload: {
+                token: res.data.access_token,
+                refresh_token: res.data.refresh_token
+            }
+        });
+        dispatch(ChangeCloudState(true));
+    }).catch((error) => {
+        // unauthroize 401, 400
+        console.log(error);
+    })
+};
+
+export const RefreshCloudToken = () => (dispatch, getState) => {
+    let b64 = constant.secret.basicToken;
+    axios({
+        url: "https://api.meethue.com/oauth2/refresh?grant_type=refresh_token",
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "Authorization": `Basic ${b64}`
+        },
+        data: qs.stringify({ 'refresh_token': getState().cloud.refresh_token })
+    }).then((res) => {
+        dispatch({
+            type: C.CHANGE_CLOUD_TOKEN,
+            payload: {
+                token: res.data.access_token,
+                refresh_token: res.data.refresh_token
+            }
+        });
+    }).catch((error) => {
+        // unauthroize 401, 400
+        console.log(error);
+    })
+}
 
 /** 
  * SwitchBridge
@@ -42,6 +96,18 @@ export const ChangeAuthentication = (boolean) => (dispatch) => {
     dispatch({
         type: C.CHANGE_AUTHENTICATION_STATE,
         payload: boolean
+    })
+}
+
+/** 
+ * Status
+ * * Change status regards to connection of the Bridge
+ * @param {number} boolean This parameter takes in the boolean
+*/
+export const ChangeStatus = (boolean) => (dispatch) => {
+    dispatch({
+        type : C.CHANGE_STATUS,
+        payload : boolean
     })
 }
 
@@ -98,10 +164,12 @@ export const GetBridgeIP = (navigation, isManual = false, bridgeip = '') => asyn
             url: 'https://discovery.meethue.com',
             method: 'GET'
         }).then((res) => {
-            dispatch({
-                type: C.FETCH_BRIDGE_IP,
-                payload: res.data[0].internalipaddress
-            })
+            if (res.data.length > 0) {
+                dispatch({
+                    type: C.FETCH_BRIDGE_IP,
+                    payload: res.data[0].internalipaddress
+                })
+            }
         }).catch((error) => {
             dispatch(ChangeLoading(false));
             console.log(error)
@@ -123,15 +191,18 @@ export const AddBridge = (bridgeip = "") => (dispatch) => {
  * * Document 1.1 Get All Light
  * * https://developers.meethue.com/develop/hue-api/lights-api/#get-all-lights
 */
-export const GetAllLights = () => async (dispatch, getState) => {
+export const GetAllLights = () => (dispatch, getState) => {
     const i = getState().bridgeIndex;
     const bridgeip = getState().bridgeip[i];
     const username = getState().username[i];
+    const url = getState().cloud_enable === false ? `http://${bridgeip}/api/${username}/lights` : `https://api.meethue.com/bridge/${username}/lights`;
+    const headers = getState().cloud_enable === true ? {"Authorization": `Bearer ${getState().cloud.token}`, "Content-Type": "application/json"} : {"Content-Type": "application/json"};
 
     dispatch(ChangeLoading(true));
-    await axios({
-        url: `http://${bridgeip}/api/${username}/lights`,
-        method: 'GET'
+    axios({
+        url,
+        method: 'GET',
+        headers
     }).then((res) => {
         dispatch({
             type: C.FETCH_ALL_LIGHTS,
@@ -144,21 +215,39 @@ export const GetAllLights = () => async (dispatch, getState) => {
 };
 
 /** 
- * GetNewLights
- * * Document 1.2 Get New Lights
- * * https://developers.meethue.com/develop/hue-api/lights-api/#get-new-lights
+ * GetLightsAttributes&States
+ * * Document 1.4. Get lamp attributes
+ * * https://developers.meethue.com/develop/hue-api/lights-api/#get-attr-and-state
+ * @param {number} lampID This paramter takes in the lamp ID.
 */
-export const GetNewLights = () => (dispatch, getState) => {
+export const GetLightAtrributes = (lampID) => (dispatch, getState) => {
     const i = getState().bridgeIndex;
     const bridgeip = getState().bridgeip[i];
     const username = getState().username[i];
+    const url = getState().cloud_enable === false ? `http://${bridgeip}/api/${username}/lights/${lampID}` : `https://api.meethue.com/bridge/${username}/lights/${lampID}`;
+    const headers = getState().cloud_enable === true ? {"Authorization": `Bearer ${getState().cloud.token}`, "Content-Type": "application/json"} : {"Content-Type": "application/json"};
+
+    dispatch(ChangeLoading(true));
     axios({
-        url: `http://${bridgeip}/api/${username}/lights/new`,
-        method: 'GET'
+        url,
+        method: 'GET',
+        headers
+    }).then(res => {
+        if (res.data) {
+            dispatch({
+                type: C.FETCH_LIGHT,
+                id: lampID,
+                payload : res.data
+            })
+        } else {
+            throw Error('An error has occur');
+        }
     }).catch((error) => {
+        dispatch(ChangeLoading(false));
         console.log(error);
-    })
+    }).then(dispatch(ChangeLoading(false)));
 };
+
 
 /** 
  * SearchForNewLights
@@ -169,14 +258,58 @@ export const SearchForNewLights = () => (dispatch, getState) => {
     const i = getState().bridgeIndex;
     const bridgeip = getState().bridgeip[i];
     const username = getState().username[i];
+    const url = getState().cloud_enable === false ? `http://${bridgeip}/api/${username}/lights` : `https://api.meethue.com/bridge/${username}/lights`;
+    const headers = getState().cloud_enable === true ? {"Authorization": `Bearer ${getState().cloud.token}`, "Content-Type": "application/json"} : {"Content-Type": "application/json"};
+
     axios({
-        url: `http://${bridgeip}/api/${username}/lights`,
-        method: 'POST'
-    }).then(() => {
-        dispatch(GetNewLights());
+        url,
+        method: 'POST',
+        headers
     }).catch((error) => {
         console.log(error);
     })
+};
+
+/** 
+ * SetLampAttributes
+ * * Document 1.5 Set Light Attributes
+ * * https://developers.meethue.com/develop/hue-api/lights-api/#set-light-attr-rename
+ * @param {number} lampID This paramter takes in the light ID.
+ * @param {object} lampData This paramter takes in the body argument of the request.
+*/
+export const SetLampAttributes = (lampID, lampData) => (dispatch, getState) => {
+    const i = getState().bridgeIndex;
+    const bridgeip = getState().bridgeip[i];
+    const username = getState().username[i];
+    const url = getState().cloud_enable === false ? `http://${bridgeip}/api/${username}/lights/${lampID}` : `https://api.meethue.com/bridge/${username}/lights/${lampID}`;
+    const headers = getState().cloud_enable === true ? {"Authorization": `Bearer ${getState().cloud.token}`, "Content-Type": "application/json"} : {"Content-Type": "application/json"};
+
+    dispatch(ChangeLoading(true));
+    axios({
+        url,
+        method: 'PUT',
+        headers,
+        data: lampData
+    }).then(res => {
+        var payload = {};
+        res.data.map((data) => {
+            let key = Object.keys(data.success)[0].substring(Object.keys(data.success)[0].lastIndexOf('/') + 1);
+            let value = Object.values(data.success)[0];
+            payload[key] = value;
+        })
+        if (payload) {
+            dispatch({
+                type: C.CHANGE_LIGHT_ATTR,
+                id: lampID,
+                payload: payload
+            })
+        } else {
+            throw Error('An error has occur');
+        }
+    }).catch((error) => {
+        dispatch(ChangeLoading(false));
+        // console.log(error);
+    }).then(dispatch(ChangeLoading(false)));
 };
 
 /** 
@@ -190,11 +323,14 @@ export const SetLampState = (lampID, lampData) => (dispatch, getState) => {
     const i = getState().bridgeIndex;
     const bridgeip = getState().bridgeip[i];
     const username = getState().username[i];
+    const url = getState().cloud_enable === false ? `http://${bridgeip}/api/${username}/lights/${lampID}/state` : `https://api.meethue.com/bridge/${username}/lights/${lampID}/state`;
+    const headers = getState().cloud_enable === true ? {"Authorization": `Bearer ${getState().cloud.token}`, "Content-Type": "application/json"} : {"Content-Type": "application/json"};
 
     dispatch(ChangeLoading(true));
     axios({
-        url: `http://${bridgeip}/api/${username}/lights/${lampID}/state`,
+        url,
         method: 'PUT',
+        headers,
         data: lampData
     }).then(res => {
         var payload = {};
@@ -228,10 +364,14 @@ export const DeleteLight = (lampID, navigation) => (dispatch, getState) => {
     const i = getState().bridgeIndex;
     const bridgeip = getState().bridgeip[i];
     const username = getState().username[i];
+    const url = getState().cloud_enable === false ? `http://${bridgeip}/api/${username}/lights/${lampID}` : `https://api.meethue.com/bridge/${username}/lights/${lampID}`;
+    const headers = getState().cloud_enable === true ? {"Authorization": `Bearer ${getState().cloud.token}`, "Content-Type": "application/json"} : {"Content-Type": "application/json"};
+
     dispatch(ChangeLoading(true));
     axios({
-        url: `http://${bridgeip}/api/${username}/lights/${lampID}`,
-        method: 'DELETE'
+        url,
+        method: 'DELETE',
+        headers
     }).then((res) => {
         if (res.data[0].success) {
             dispatch({
@@ -262,10 +402,14 @@ export const GetAllGroups = () => (dispatch, getState) => {
     const i = getState().bridgeIndex;
     const bridgeip = getState().bridgeip[i];
     const username = getState().username[i];
+    const url = getState().cloud_enable === false ? `http://${bridgeip}/api/${username}/groups` : `https://api.meethue.com/bridge/${username}/groups`;
+    const headers = getState().cloud_enable === true ? {"Authorization": `Bearer ${getState().cloud.token}`, "Content-Type": "application/json"} : {"Content-Type": "application/json"};
+
     dispatch(ChangeLoading(true));
     axios({
-        url: `http://${bridgeip}/api/${username}/groups`,
-        method: 'GET'
+        url,
+        method: 'GET',
+        headers
     }).then((res) => {
         dispatch({
             type: C.FETCH_ALL_GROUPS,
@@ -287,11 +431,14 @@ export const CreateGroup = (groupData) => (dispatch, getState) => {
     const i = getState().bridgeIndex;
     const bridgeip = getState().bridgeip[i];
     const username = getState().username[i];
+    const url = getState().cloud_enable === false ? `http://${bridgeip}/api/${username}/groups` : `https://api.meethue.com/bridge/${username}/groups`;
+    const headers = getState().cloud_enable === true ? {"Authorization": `Bearer ${getState().cloud.token}`, "Content-Type": "application/json"} : {"Content-Type": "application/json"};
 
     dispatch(ChangeLoading(true));
     axios({
-        url: `http://${bridgeip}/api/${username}/groups`,
+        url,
         method: 'POST',
+        headers,
         data: groupData
     }).then(res => {
         if (res.data[0].success) {
@@ -324,10 +471,12 @@ export const GetGroupAtrributes = (groupID) => (dispatch, getState) => {
     const i = getState().bridgeIndex;
     const bridgeip = getState().bridgeip[i];
     const username = getState().username[i];
+    const url = getState().cloud_enable === false ? `http://${bridgeip}/api/${username}/groups/${groupID}` : `https://api.meethue.com/bridge/${username}/groups/${groupID}`;
+    const headers = getState().cloud_enable === true ? {"Authorization": `Bearer ${getState().cloud.token}`, "Content-Type": "application/json"} : {"Content-Type": "application/json"};
 
     dispatch(ChangeLoading(true));
     axios({
-        url: `http://${bridgeip}/api/${username}/groups/${groupID}`,
+        url,
         method: 'GET',
     }).then(res => {
         if (res.data) {
@@ -346,6 +495,47 @@ export const GetGroupAtrributes = (groupID) => (dispatch, getState) => {
 };
 
 /** 
+ * SetGroupAttributes
+ * * Document 2.5 Set Light Attributes
+ * * https://developers.meethue.com/develop/hue-api/groupds-api/#set-group-attr
+ * @param {number} groupId This paramter takes in the light ID.
+ * @param {object} groupData This paramter takes in the body argument of the request.
+*/
+export const SetGroupAttributes = (groupId, groupData) => (dispatch, getState) => {
+    const i = getState().bridgeIndex;
+    const bridgeip = getState().bridgeip[i];
+    const username = getState().username[i];
+    const url = getState().cloud_enable === false ? `http://${bridgeip}/api/${username}/groups/${groupId}` : `https://api.meethue.com/bridge/${username}/groups/${groupId}`;
+    const headers = getState().cloud_enable === true ? {"Authorization": `Bearer ${getState().cloud.token}`, "Content-Type": "application/json"} : {"Content-Type": "application/json"};
+
+    dispatch(ChangeLoading(true));
+    axios({
+        url,
+        method: 'PUT',
+        headers,
+        data: groupData
+    }).then(res => {
+        var payload = {};
+        res.data.map((data) => {
+            let key = Object.keys(data.success)[0].substring(Object.keys(data.success)[0].lastIndexOf('/') + 1);
+            let value = Object.values(data.success)[0];
+            payload[key] = value;
+        })
+        if (payload) {
+            dispatch({
+                type: C.CHANGE_LIGHT_ATTR,
+                id: groupId,
+                payload: payload
+            })
+        } else {
+            throw Error('An error has occur');
+        }
+    }).catch((error) => {
+        dispatch(ChangeLoading(false));
+    }).then(dispatch(ChangeLoading(false)));
+};
+
+/** 
  * SetGroupState
  * * Document 2.5. Set group state
  * * https://developers.meethue.com/develop/hue-api/groupds-api/#set-gr-state
@@ -356,11 +546,14 @@ export const SetGroupState = (groupID, groupData) => (dispatch, getState) => {
     const i = getState().bridgeIndex;
     const bridgeip = getState().bridgeip[i];
     const username = getState().username[i];
+    const url = getState().cloud_enable === false ? `http://${bridgeip}/api/${username}/groups/${groupID}/action` : `https://api.meethue.com/bridge/${username}/groups/${groupID}/action`;
+    const headers = getState().cloud_enable === true ? {"Authorization": `Bearer ${getState().cloud.token}`, "Content-Type": "application/json"} : {"Content-Type": "application/json"};
 
     dispatch(ChangeLoading(true));
     axios({
-        url: `http://${bridgeip}/api/${username}/groups/${groupID}/action`,
+        url,
         method: 'PUT',
+        headers,
         data: groupData
     }).then(res => {
         var payload = {};
@@ -394,11 +587,14 @@ export const DeleteGroup = (groupID) => (dispatch, getState) => {
     const i = getState().bridgeIndex;
     const bridgeip = getState().bridgeip[i];
     const username = getState().username[i];
+    const url = getState().cloud_enable === false ? `http://${bridgeip}/api/${username}/groups/${groupID}` : `https://api.meethue.com/bridge/${username}/groups/${groupID}`;
+    const headers = getState().cloud_enable === true ? {"Authorization": `Bearer ${getState().cloud.token}`, "Content-Type": "application/json"} : {"Content-Type": "application/json"};
 
     dispatch(ChangeLoading(true));
     axios({
-        url: `http://${bridgeip}/api/${username}/groups/${groupID}`,
-        method: 'DELETE'
+        url,
+        method: 'DELETE',
+        headers
     }).then((res) => {
         if (res.data[0].success) {
             dispatch({
@@ -448,13 +644,12 @@ export const CreateUser = () => (dispatch, getState) => {
  * * Document 7.2. Get configuration
  * * https://developers.meethue.com/develop/hue-api/7-configuration-api/#get-configuration 
 */
-export const GetConfig = async (dispatch, getState) => {
+export const GetConfig = () => (dispatch, getState) => {
     const i = getState().bridgeIndex;
     const bridgeip = getState().bridgeip[i];
     const username = getState().username[i];
 
-    dispatch(ChangeLoading(true));
-    await axios({
+    axios({
         url: `http://${bridgeip}/api/${username}/config`,
         method: 'GET'
     }).then((res) => {
@@ -462,10 +657,11 @@ export const GetConfig = async (dispatch, getState) => {
             type: C.FETCH_CONFIG,
             payload: res.data
         })
+        dispatch(ChangeStatus(true));
     }).catch((error) => {
-        dispatch(ChangeLoading(false));
+        dispatch(ChangeStatus(false))
         console.log(error);
-    }).then(dispatch(ChangeLoading(false)));
+    });
 };
 
 /** 
@@ -520,11 +716,14 @@ export const GetSchedules = () => (dispatch, getState) => {
     const i = getState().bridgeIndex;
     const bridgeip = getState().bridgeip[i];
     const username = getState().username[i];
-
+    const url = getState().cloud_enable === false ? `http://${bridgeip}/api/${username}/schedules` : `https://api.meethue.com/bridge/${username}/schedules`;
+    const headers = getState().cloud_enable === true ? {"Authorization": `Bearer ${getState().cloud.token}`, "Content-Type": "application/json"} : {"Content-Type": "application/json"};
+    
     dispatch(ChangeLoading(true));
     axios({
-        url: `http://${bridgeip}/api/${username}/schedules`,
-        method: 'GET'
+        url,
+        method: 'GET',
+        headers
     }).then((res) => {
         dispatch({
             type: C.FETCH_ALL_SCHEDULES,
@@ -546,24 +745,44 @@ export const CreateSchedules = (scheduleData) => (dispatch, getState) => {
     const i = getState().bridgeIndex;
     const bridgeip = getState().bridgeip[i];
     const username = getState().username[i];
+    const url = getState().cloud_enable === false ? `http://${bridgeip}/api/${username}/schedules` : `https://api.meethue.com/bridge/${username}/schedules`;
+    const headers = getState().cloud_enable === true ? {"Authorization": `Bearer ${getState().cloud.token}`, "Content-Type": "application/json"} : {"Content-Type": "application/json"};
 
     dispatch(ChangeLoading(true));
     axios({
-        url: `http://${bridgeip}/api/${username}/schedules`,
+        // url: `https://api.meethue.com/bridge/FBeqf8XG4zmws0hkhJVKnI5UWoSswzKd1H39z-eO/schedules`,
+        // method: "POST",
+        // headers: {
+        //     "Content-Type": "application/json",
+        //     'Authorization': "Bearer hwpfFce4GlLUsf50GKf0rNEtGvoa"
+        // },
+        url,
         method: 'POST',
-        data: scheduleData
-    }).then(res => {
+        headers,
+        data: JSON.stringify(scheduleData)
+    }).then((res) => {
         if (res.data[0].success) {
+            console.log(res.data[0].success)
             dispatch({
                 type: C.CREATE_SCHEDULE,
                 id: res.data[0].success.id,
-                payload: scheduleData
+                payload: JSON.stringify(scheduleData)
             })
-        } else {
-            throw Error('Can\'t create a schedule');
+            navigation.navigate("PostUpdate", {
+                meta: {
+                    title: "Successfully added!"
+                }
+            })
+        } else if (res.data[0].error) {
+            console.log(res.data[0].error)
+            Alert.alert(
+                'Error',
+                "Please try again",
+                [{ text: "OK", onPress: () => console.log("OK Pressed") }],
+                { cancelable: false }
+            );
         }
     }).catch((error) => {
         dispatch(ChangeLoading(false));
-        console.log(error);
     }).then(dispatch(ChangeLoading(false)));
 };

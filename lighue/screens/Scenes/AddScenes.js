@@ -1,63 +1,133 @@
 import React, { Component } from 'react'
-import { Image, StyleSheet, TouchableOpacity, Button, Modal } from 'react-native'
-import { Block, Text, Input } from '../../components';
-import { theme } from '../../constants';
+import { Image, StyleSheet, TouchableOpacity, View, ActivityIndicator, Modal } from 'react-native'
+import { Block, Text, Input, Button } from '../../components';
+import { theme, constant } from '../../constants';
 import { connect } from 'react-redux';
-import { ImagePicker, Permissions, Constants } from 'expo';
-import CameraScreen from './Camera'
+import { ColorWheel } from 'react-native-color-wheel';
+import { CreateScenes, SetLampState } from '../../redux/actions';
+import { ColorConversionToXY } from '../../components/ColorConvert';
+import axios from 'axios';
 
 class AddScenes extends Component {
-    static navigationOptions = ({ navigation }) => {
-        return {
-            headerLeft:
-                <TouchableOpacity>
-                    <TouchableOpacity
-                        onPress={() => navigation.goBack()}
-                        style={{ height: 40, width: 80, justifyContent: 'center' }}>
-                        <Image source={require('../../assets/icons/back.png')} />
-                    </TouchableOpacity>
-                </TouchableOpacity>
-        }
+    static navigationOptions = {
+        header: null
     }
 
     state = {
         name: null,
-        image: null,
-        hasCameraPermission: null,
-        cameraModal: false
+        newStateBulbColor: null,
+        oldStateBulb: null,
+        locationType: null,
+        locationID: null,
+        mode: "ColorPicker",
     };
+
+    componentWillMount() {
+        const { locationType, locationID } = this.props.navigation.state.params;
+        this.setState({
+            locationType: locationType,
+            locationID: locationID
+        })
+    }
 
     componentDidMount() {
-        this.getPermissionAsync();
-    }
-
-    getPermissionAsync = async () => {
-        if (Constants.platform.ios) {
-            const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
-            const { statusCamera } = await Permissions.askAsync(Permissions.CAMERA);
-            if (status !== 'granted' && statusCamera !== 'granted') {
-                alert('Sorry, we need camera roll permissions to make this work!');
-            }
+        if (this.state.locationType == "Bulb") {
+            this.setState({
+                oldStateBulb: this.props.lights[this.state.locationID].state
+            })
         }
-        this.setState({ hasCameraPermission: statusCamera === 'granted' });
     }
 
-    _pickImage = async () => {
-        let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            allowsEditing: true,
-            aspect: [4, 3],
+    componentWillUnmount() {
+        const { bridgeIndex, bridgeip, username } = this.props;
+        const { locationID } = this.state;
+        axios({
+            method: "PUT",
+            url: `http://${bridgeip[bridgeIndex]}/api/${username[bridgeIndex]}/lights/${locationID}/state`,
+            data: this.state.oldStateBulb
         });
+    }
 
-        console.log(result);
+    changeColorSceneState = values => {
+        const { bridgeip, username, bridgeIndex, lights, _changeLampStateByID } = this.props;
+        const { locationID } = this.state;
 
-        if (!result.cancelled) {
-            this.setState({ image: result.uri });
+        let h = Math.sign(values.h) === -1 ? 360 + (values.h) : values.h
+        let s = values.s;
+        let v = values.v;
+
+        let colors = {
+            h,
+            s,
+            v
         }
+
+        if (!lights[locationID].state.on) {
+            _changeLampStateByID(locationID, {
+                on: true
+            });
+        }
+
+        axios({
+            method: "PUT",
+            url: `http://${bridgeip[bridgeIndex]}/api/${username[bridgeIndex]}/lights/${locationID}/state`,
+            data: { xy: ColorConversionToXY(colors) }
+        });
+        this.setState({ newStateBulbColor: ColorConversionToXY(colors) })
     };
+
+    renderBackButton() {
+        const { navigation } = this.props;
+        return (
+            <TouchableOpacity
+                onPress={() => navigation.goBack()}
+                style={{ height: 40, width: 80, justifyContent: "center" }}
+            >
+                <Image source={require("../../assets/icons/back.png")} />
+            </TouchableOpacity>
+        )
+    }
+
+    renderSave() {
+        const { nightmode } = this.props;
+        const { colors } = theme;
+        const textcolor = { color: nightmode ? colors.white : colors.black }
+        if (this.state.name != null) {
+            return (
+                <TouchableOpacity
+                    onPress={this.confirmAddScene}>
+                    <Text style={[textcolor, { justifyContent: 'center' }]}>Save</Text>
+                </TouchableOpacity>
+            )
+        }
+    }
 
     changeNameText = (value) => {
         this.setState({ name: value })
+        console.log(this.state.name)
+    }
+
+    onRequestCloseModal() {
+        this.setState({ locationModal: false })
+        this.props.navigation.goBack();
+    }
+
+    renderLoadingModal() {
+        return (
+            <Modal
+                transparent={true}
+                animationType={'none'}
+                visible={this.props.loading}
+                onRequestClose={() => { console.log('close modal') }}>
+                <View style={styles.modalBackground}>
+                    <View style={styles.activityIndicatorWrapper}>
+                        <ActivityIndicator
+                            animating={this.props.loading}
+                            color="#00ff00" />
+                    </View>
+                </View>
+            </Modal>
+        )
     }
 
     renderInput() {
@@ -67,7 +137,7 @@ class AddScenes extends Component {
         const textcolor = { color: nightmode ? colors.gray2 : colors.black }
         const titlecolor = { color: nightmode ? colors.white : colors.black }
         return (
-            <Block>
+            <View>
                 <Text bold h3 style={[styles.textControl, titlecolor, styles.row]}>Name</Text>
                 <Input
                     style={[styles.textInput, textcolor, bordercolor]}
@@ -76,39 +146,69 @@ class AddScenes extends Component {
                     placeholderTextColor={nightmode ? colors.gray2 : colors.black}
                     onChangeText={this.changeNameText}
                 />
-            </Block>
+            </View>
         )
     }
 
-    renderCamera() {
-        return (
-            <Modal
-                animationType={"slide"}
-                transparent={false}
-                style={{position: 'absolute'}}
-                visible={this.state.cameraModal}>
-                <CameraScreen/>
-            </Modal>
-        )
+    renderListBulb() {
+        const { nightmode } = this.props;
+        const { colors } = theme;
+        const titlecolor = { color: nightmode ? colors.white : colors.black }
+        if (this.state.locationType == "Bulb") {
+            return (
+                <View>
+                    <Text style={titlecolor}>Lights included in the scene</Text>
+                    <View>
+                        <Text style={{ color: '#20D29B', marginTop: 10 }}>{this.props.lights[this.state.locationID].name}</Text>
+                    </View>
+                </View>
+            )
+        }
+        else if (this.state.locationType == "Room") {
+            return (
+                <View>
+                    <Text style={titlecolor}>Lights included in the scene</Text>
+                    <Text>Coming soon...</Text>
+                </View>
+            )
+        }
+    }
+
+    confirmAddScene() {
+        if (this.state.locationType == "Bulb") {
+            const lightstate = {
+                
+            }
+            const scenesData =
+            {
+                "name": this.state.name,
+                "lights": `[${this.state.bulb}]`,
+                "lightstates": lightstate
+            }
+            this.props._CreateScenes(scenesData);
+        }
     }
 
     render() {
-        let { image } = this.state;
         const { nightmode } = this.props;
         const { colors } = theme;
         const backgroundcolor = { backgroundColor: nightmode ? colors.background : colors.backgroundLight }
         const titlecolor = { color: nightmode ? colors.white : colors.black }
         return (
             <Block style={backgroundcolor}>
-                <Block container>
+                {this.renderLoadingModal()}
+                <View style={styles.header}>
+                    {this.renderBackButton()}
+                    {this.renderSave()}
+                </View>
+                <Block containerNoHeader>
                     <Text h1 bold style={[titlecolor, { marginTop: 10 }]}>Add Scenes</Text>
                     {this.renderInput()}
-                    <Button
-                        title="Pick an image from camera roll"
-                        onPress={this._pickImage}
+                    {this.renderListBulb()}
+                    <ColorWheel
+                        onColorChange={this.changeColorSceneState}
+                        style={{ flex: 1 }}
                     />
-                    {image &&
-                        <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />}
                 </Block>
             </Block>
         )
@@ -116,21 +216,60 @@ class AddScenes extends Component {
 
 }
 
-
 const mapStateToProps = (state) => {
     return {
         nightmode: state.nightmode,
+        groups: state.groups,
+        lights: state.lights,
+        loading: state.loading,
+        bridgeip: state.bridgeip,
+        bridgeIndex: state.bridgeIndex,
+        username: state.username
+    }
+}
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        _CreateScenes(data, navigation) {
+            return dispatch(CreateScenes(data, navigation));
+        },
+        _changeLampStateByID(id, data) {
+            return dispatch(SetLampState(id, data));
+        }
     }
 }
 
 export default connect(
     mapStateToProps,
-    null
+    mapDispatchToProps
 )(AddScenes)
 
 const styles = StyleSheet.create({
     row: {
         marginTop: 20,
+    },
+    modalBackground: {
+        flex: 1,
+        alignItems: 'center',
+        flexDirection: 'column',
+        justifyContent: 'space-around',
+        backgroundColor: '#00000040'
+    },
+    activityIndicatorWrapper: {
+        backgroundColor: '#FFFFFF',
+        height: 100,
+        width: 100,
+        borderRadius: 10,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-around'
+    },
+    header: {
+        marginTop: 30,
+        paddingHorizontal: theme.sizes.base * 2,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center'
     },
     textSetting: {
         fontSize: 24,

@@ -1,5 +1,11 @@
 {
   "loading": false,
+  "cloud_enable": false,
+  "cloud": {
+    "token": "",
+    "refresh_token": ""
+  },
+  "status" : false,
   "nightmode": true,
   "authentication" : false,
   "hardwareSupport" : 0,
@@ -9,17 +15,6 @@
   "config": {},
   "groups": {},
   "schedules" : {},
-  "lights": {
-    "1": {
-      "state": {
-        "on": false
-      },
-      "type": "",
-      "name": "",
-      "modelid": "",
-      "manufacturername": "",
-      "uniqueid": "",
-      "swversion": ""
-    }
-  }
+  "scenes" : {},
+  "lights": {}
 }

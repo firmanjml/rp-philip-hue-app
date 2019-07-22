@@ -1,31 +1,22 @@
 import React, { Component } from 'react'
-import { Image, StyleSheet, TouchableOpacity, Dimensions, View, Modal } from 'react-native'
+import { Image, StyleSheet, TouchableOpacity, Dimensions, View, Alert } from 'react-native'
 import { Block, Text, Button } from '../components';
 import { theme } from '../constants';
 import { connect } from 'react-redux';
-import { Updates } from 'expo';
+import { Updates, BlurView, AuthSession, Constants, WebBrowser } from 'expo';
 import { persistor } from "../redux/store";
-import { BlurView } from 'expo';
-import Swipe from '../components/Swipe';
-import { MaterialIcons, AntDesign } from '@expo/vector-icons';
-
 const { width } = Dimensions.get('window');
-
-import { ChangeThemeMode } from '../redux/actions'
-
-import ToggleSwitch from '../components/ToggleSwitch'
-
+import { ChangeThemeMode, ChangeCloudToken, ChangeCloudState } from '../redux/actions'
+import ToggleSwitch from '../components/ToggleSwitch';
 
 class Setting extends Component {
     static navigationOptions = ({ navigation }) => {
         return {
             headerLeft:
-                <TouchableOpacity>
-                    <TouchableOpacity
-                        onPress={() => navigation.goBack()}
-                        style={{ height: 40, width: 80, justifyContent: 'center' }}>
-                        <Image source={require('../assets/icons/back.png')} />
-                    </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={() => navigation.goBack()}
+                    style={{ height: 40, width: 80, justifyContent: 'center' }}>
+                    <Image source={require('../assets/icons/back.png')} />
                 </TouchableOpacity>
         }
     }
@@ -37,48 +28,46 @@ class Setting extends Component {
         persistor.flush();
         persistor.purge();
         setTimeout(() => {
-            // Updates.reload()
+            Updates.reload()
             this.props.navigation.navigate("DiscoveryNavigator")
         }, 4000);
     }
 
-    renderClearData() {
-        return (
-            <Modal
-                animationType={"fade"}
-                transparent={true}
-                visible={this.state.clearDataModal}>
-                <BlurView tint="dark" intensity={100} style={StyleSheet.absoluteFill}>
-                    <View style={{ marginTop: 90, paddingLeft: 30, paddingRight: 30, height : 60 }}>
-                        <Swipe
-                            width={width - 50}
-                            buttonSize={70}
-                            buttonColor="white"
-                            backgroundColor="rgb(176,176,176)"
-                            textColor="#37474F"
-                            borderRadius={40}
-                            borderColor="transparent"
-                            okButton={{ visible: true, duration: 400 }}
-                            icon={<AntDesign name="arrowright" size={30} color='red' />}
-                            onVerified={() => this.clearAppData()}>
-                            <Text bold>               slide to clear data</Text>
-                        </Swipe>
-                    </View>
-                    <Block bottom flex={1} style={{ marginBottom: 40 }}>
-                        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                            <TouchableOpacity onPress={() => this.setState({ clearDataModal: false })}>
-                                <MaterialIcons name="cancel" size={80} color='white' />
-                            </TouchableOpacity>
-                            <Text center white>Cancel</Text>
-                        </View>
+    renderBridgeInfo(textcolor) {
+        const { username, bridgeIndex } = this.props;
+        if (username[bridgeIndex]) {
+            return (
+                <View>
+                    <Block flex={false} row space="between" style={styles.row}>
+                        <TouchableOpacity
+                            onPress={() => this.props.navigation.navigate("BridgeInfo")}>
+                            <Text style={[styles.textSetting, textcolor]}>Bridge Info</Text>
+                        </TouchableOpacity>
                     </Block>
-                </BlurView>
-            </Modal>
-        )
+                    <View style={styles.divider} />
+                </View>
+            )
+        }
+    }
+
+    renderClearButton() {
+        const { username, bridgeIndex } = this.props;
+        if (username[bridgeIndex]) {
+            return (
+                <Block bottom flex={1} style={{ marginBottom: 10 }}>
+                    <Button gradient
+                        startColor='#C40A0A'
+                        endColor='#E86241'
+                        onPress={() => this.clearAppData()}>
+                        <Text center semibold white>Clear app data</Text>
+                    </Button>
+                </Block>
+            )
+        }
     }
 
     render() {
-        const { nightmode } = this.props;
+        const { nightmode, cloud_enable } = this.props;
         const { colors } = theme;
         const backgroundcolor = { backgroundColor: nightmode ? colors.background : colors.backgroundLight }
         const textcolor = { color: nightmode ? colors.white : colors.black }
@@ -91,33 +80,99 @@ class Setting extends Component {
                         <ToggleSwitch
                             offColor="#DDDDDD"
                             onColor={theme.colors.secondary}
-                            isOn={this.props.nightmode}
+                            isOn={nightmode}
                             onToggle={nightmode => {
                                 this.props._changeTheme(nightmode);
                             }}
                         />
                     </Block>
                     <View style={styles.divider} />
-                    {this.renderClearData()}
-                    <Block bottom flex={1} style={{ marginBottom: 10 }}>
-                        <Button gradient
-                            startColor='#C40A0A'
-                            endColor='#E86241'
-                            onPress={() => this.setState({ clearDataModal: true })}>
-                            <Text center semibold white>Clear app data</Text>
-                        </Button>
+                    <Block flex={false} row space="between" style={styles.row}>
+                        {
+                            cloud_enable === true ?
+                                <Text style={[styles.textSetting, { color: theme.colors.gray2 }]}>Connected via Cloud</Text>
+                                :
+                                <TouchableOpacity
+                                    onPress={() => this._handleoAuth()}>
+                                    <Text style={[styles.textSetting, textcolor]}>Setup Remote Control via Cloud</Text>
+                                </TouchableOpacity>
+                        }
                     </Block>
+                    <View style={styles.divider} />
+                    {this.renderBridgeInfo(textcolor)}
+                    {this.renderClearButton()}
                 </Block>
             </Block>
         )
     }
+    _handleoAuth = async () => {
+        const redirectUrl = AuthSession.getRedirectUrl();
+        const csrf = 'lighue' + Constants.installationId + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 
+        const queryParams = toQueryString({
+            clientid: 'SFL5STvqIFZb219NUAflwg8UIeQm7KmD',
+            deviceid: Constants.installationId,
+            appid: 'lighue',
+            state: csrf
+        });
+
+        let result = await AuthSession.startAsync({
+            authUrl: `https://api.meethue.com/oauth2/auth${queryParams}`,
+        })
+        console.log(csrf);
+
+        if (result.params.status === "error") {
+            Alert.alert(
+                "Please try again.",
+                'There\'s something wrong with the authentication right now.',
+                [{ text: "OK" }],
+                { cancelable: false }
+            );
+        } else if (result.params.status === "success") {
+            if (result.params.state === csrf) {
+                this.props._changeCloudToken(result.params.code);
+                Alert.alert(
+                    'Hooray 🥳',
+                    'Successfully paired to cloud.',
+                    [{
+                        text: "OK", onPress: () => {
+
+                        }
+                    }],
+                    { cancelable: false }
+                );
+            } else {
+                Alert.alert(
+                    "Validation Error",
+                    'Fail to validate data.',
+                    [{ text: "OK" }],
+                    { cancelable: false }
+                );
+            }
+        } else {
+            Alert.alert(
+                'Please try again. 😉',
+                'Hacking attempt an invalid request.',
+                [{ text: "OK" }],
+                { cancelable: false }
+            );
+        }
+    }
+}
+
+function toQueryString(params) {
+    return '?' + Object.entries(params)
+        .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+        .join('&');
 }
 
 const mapDispatchToProps = (dispatch) => {
     return {
         _changeTheme: (boolean) => {
             return dispatch(ChangeThemeMode(boolean));
+        },
+        _changeCloudToken: (code) => {
+            return dispatch(ChangeCloudToken(code));
         }
     }
 }
@@ -125,6 +180,9 @@ const mapDispatchToProps = (dispatch) => {
 const mapStateToProps = (state) => {
     return {
         nightmode: state.nightmode,
+        cloud_enable: state.cloud_enable,
+        bridgeIndex: state.bridgeIndex,
+        username: state.username
     }
 }
 
@@ -147,6 +205,6 @@ const styles = StyleSheet.create({
         marginVertical: 5,
         marginHorizontal: 2,
         borderBottomWidth: 1,
-        borderColor: "#E1E3E8"
+        borderColor: "#747880"
     },
 });

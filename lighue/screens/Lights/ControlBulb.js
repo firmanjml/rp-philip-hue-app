@@ -1,12 +1,12 @@
 import React from 'react';
 import { StyleSheet, View, TouchableOpacity, Image } from 'react-native';
-import { ColorPicker } from 'react-native-color-picker'
-
+import { ColorWheel } from 'react-native-color-wheel';
 import { connect } from 'react-redux'
 import { SetLampState } from '../../redux/actions'
 import ToggleSwitch from '../../components/ToggleSwitch'
+import _ from 'lodash'
 
-import { ColorConversionToXY, ConvertXYtoHex } from '../../components/ColorConvert';
+import { ColorConversionToXY } from '../../components/ColorConvert';
 import { theme } from '../../constants';
 
 import { Block, Input, Text } from '../../components';
@@ -34,6 +34,7 @@ class ControlBulb extends React.Component {
         id: null,
         sat: null,
         bri: null,
+        on : null,
         dimmableType: null,
         satPer: null,
         briPer: null,
@@ -45,64 +46,74 @@ class ControlBulb extends React.Component {
     }
 
     componentDidMount() {
-        this.calculatePercentage("bri", this.props.lights[this.state.id].state.bri)
-        this.calculatePercentage("sat", this.props.lights[this.state.id].state.sat)
+        const { lights } = this.props;
+        const { id } = this.state;
+        this.calculatePercentage("bri", lights[id].state.bri)
+        this.calculatePercentage("sat", lights[id].state.sat)
         this.setState({
-            sat: this.props.lights[this.state.id].state.sat,
-            dimmableType: this.props.lights[this.state.id].type != "Dimmable light" ? false : true,
-            bri: this.props.lights[this.state.id].state.bri
+            sat: lights[id].state.sat,
+            dimmableType: lights[id].type != "Dimmable light" ? false : true,
+            bri: lights[id].state.bri,
+            on : lights[id].state.on
         })
     }
 
-    changeColorLightState = (values) => {
+    changeColorLightState = _.throttle((values) => {
         const { bridgeip, username, bridgeIndex, lights, _changeLampStateByID } = this.props;
-        const { id } = this.state;
+        const { id, on} = this.state;
 
-        if (!lights[id].state.on) {
-            _changeLampStateByID(id, {
-                on: true
-            });
+        let h = Math.sign(values.h) === -1 ? 360 + (values.h) : values.h
+        let s = values.s;
+        let v = values.v;
+
+        let colors = {
+            h,
+            s,
+            v
+        }
+        if (!on) {
+            this.turnOnOffBulb(true)
         }
         axios({
-            method: 'PUT',
-            url: `http://${bridgeip[bridgeIndex]}/api/${username[bridgeIndex]}/lights/${id}/state`,
-            data: { xy: ColorConversionToXY(values) }
+            method: "PUT",
+            url: `http://${bridgeip[bridgeIndex]}/api/${
+                username[bridgeIndex]
+                }/lights/${id}/state`,
+            data: { xy: ColorConversionToXY(colors) }
         })
-    }
+    }, 600);
 
-    changeSatLightState = (values) => {
-        const { bridgeip, username, bridgeIndex, lights, _changeLampStateByID } = this.props;
-        const { id } = this.state;
 
-        if (!lights[id].state.on) {
-            _changeLampStateByID(id, {
-                on: true
-            });
+    changeSatLightState = _.throttle((values) => {
+        const { _changeLampStateByID } = this.props;
+        const { id,on } = this.state;
+
+        if (!on) {
+            this.turnOnOffBulb(true)
         }
-        axios({
-            method: 'PUT',
-            url: `http://${bridgeip[bridgeIndex]}/api/${username[bridgeIndex]}/lights/${id}/state`,
-            data: { sat: values }
+        _changeLampStateByID(id, {
+            sat: values
+        });
+        this.setState({
+            sat : values
         })
         this.calculatePercentage("sat", values);
-    }
+    },100);
 
-    changeBriLightState = (values) => {
-        const { bridgeip, username, bridgeIndex, lights, _changeLampStateByID } = this.props;
-        const { id } = this.state;
-
-        if (!lights[this.state.id].state.on) {
-            _changeLampStateByID(this.state.id, {
-                on: true
-            });
+    changeBriLightState = _.throttle((values) => {
+        const { _changeLampStateByID } = this.props;
+        const { id, on } = this.state;
+        if (!on) {
+            this.turnOnOffBulb(true)
         }
-        axios({
-            method: 'PUT',
-            url: `http://${bridgeip[bridgeIndex]}/api/${username[bridgeIndex]}/lights/${id}/state`,
-            data: { bri: values }
+        _changeLampStateByID(id, {
+            bri: values
+        });
+        this.setState({
+            bri : values
         })
         this.calculatePercentage("bri", values);
-    }
+    },100);
 
     calculatePercentage = (arg, values) => {
         const result = Math.round((values * 100) / 254);
@@ -124,16 +135,9 @@ class ControlBulb extends React.Component {
         }
     }
 
-    onLights = (boolean) => {
-        const { id } = this.state;
-        this.props._changeLampStateByID(id, {
-            on: boolean
-        })
-    }
-
     renderControl() {
-        const { nightmode } = this.props;
-        const { dimmableType, bri, sat, briPer, satPer } = this.state;
+        const { nightmode, lights } = this.props;
+        const { dimmableType, bri, sat, briPer, satPer, id } = this.state;
         const { colors } = theme;
         const trackTintColor = nightmode ? "rgba(157, 163, 180, 0.10)" : "#DDDDDD"
         const textcolor = { color: nightmode ? colors.white : colors.gray3 }
@@ -155,32 +159,38 @@ class ControlBulb extends React.Component {
                     />
                     <Text style={[styles.textPer, textcolor]}>{control == "Brightness" ? briPer : satPer}</Text>
                 </View>
-            )))      
+            )))
     }
 
     renderColorPicker() {
         const { dimmableType } = this.state;
         if (!dimmableType) {
             return (
-                <ColorPicker
+                <ColorWheel
                     onColorChange={this.changeColorLightState}
-                    style={{ flex: 1 }}
-                    hideSliders={true}
-                    color={dimmableType ? "black" : null}
                 />
             )
         }
     }
 
+    turnOnOffBulb = (bool) => {
+        const { _changeLampStateByID } = this.props;
+        _changeLampStateByID(this.state.id, {
+            on: bool
+        })
+        this.setState({
+            on : bool
+        })
+    }
+
     renderToggleButton() {
-        const { id } = this.state
-        const { lights } = this.props;
+        const { on } = this.state
         return (
             <ToggleSwitch
                 offColor="#DDDDDD"
                 onColor={theme.colors.secondary}
-                isOn={lights[id].state.on}
-                onToggle={this.onLights}
+                isOn={on}
+                onToggle={this.turnOnOffBulb}
             />
         )
     }

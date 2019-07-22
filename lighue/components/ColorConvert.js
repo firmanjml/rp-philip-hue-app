@@ -3,14 +3,9 @@ import { fromHsv } from 'react-native-color-picker'
 export const ColorConversionToXY = (color) => {
     var hexcolor = fromHsv({ h: color.h, s: color.s, v: color.v })
     var colourHex = hexcolor;
-
     var colourR = parseInt(colourHex.slice(1, 3), 16);
     var colourG = parseInt(colourHex.slice(3, 5), 16);
     var colourB = parseInt(colourHex.slice(5), 16);
-
-    // console.log("HEX " + colourHex);
-    // console.log("RGB " + colourR.toString() + "," + colourG.toString() + "," + colourB.toString());
-
     var red = colourR;
     var green = colourG;
     var blue = colourB;
@@ -22,7 +17,6 @@ export const ColorConversionToXY = (color) => {
     // var X = red * 0.664511 + green * 0.154324 + blue * 0.162028;
     // var Y = red * 0.283881 + green * 0.668433 + blue * 0.047685;
     // var Z = red * 0.000088 + green * 0.072310 + blue * 0.986039;
-
     var X = red * 0.649926 + green * 0.103455 + blue * 0.197109;
     var Y = red * 0.234327 + green * 0.743075 + blue * 0.022598;
     var Z = red * 0.0000000 + green * 0.053077 + blue * 1.035763;
@@ -35,7 +29,6 @@ export const ColorConversionToXY = (color) => {
     if (isNaN(y)) {
         y = 0;
     }
-    
     return [parseFloat(x),parseFloat(y)]
 }
 
