@@ -4,137 +4,155 @@ import {
   Image,
   Alert,
   TouchableOpacity,
-  Picker
+  BackHandler,
+  View
 } from "react-native";
 import { connect } from "react-redux";
-import validator from "validator";
 import { Button, Block, Text, Input } from "../../components";
 import { theme } from "../../constants";
-import { GetAllGroups } from "../../redux/actions";
-import { SetGroupState } from "../../redux/actions";
-import { GetAllLights } from "../../redux/actions";
-
+import { SetGroupAttributes, DeleteGroup } from "../../redux/actions";
 
 class EditRoomScreen extends React.Component {
+
   static navigationOptions = ({ navigation }) => {
     return {
       headerLeft: (
-        <TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={{ height: 40, width: 80, justifyContent: "center" }}
-          >
-            <Image source={require("../../assets/icons/back.png")} />
-          </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={{ height: 40, width: 80, justifyContent: "center" }}
+        >
+          <Image source={require("../../assets/icons/back.png")} />
         </TouchableOpacity>
       )
     };
   };
 
+
+
   state = {
-    id: null,
-    roomNameOld: null,
-    roomNameNew: null,
-    roomType: null,
+    id: 0,
+    roomName: "",
+    roomType: "",
     checked: false
   };
 
   componentWillMount() {
-    this.setState({ id: this.props.navigation.getParam("id", "1") });
-  }
-
-  componentDidMount() {
     this.setState({
-      roomNameOld: this.props.groups[this.state.id].name
+      id: this.props.navigation.getParam("id", "1"),
+      roomName: this.props.navigation.getParam("roomName", ""),
+      roomClass: this.props.navigation.getParam("roomClass", "Other")
     });
   }
 
-  handleName = text => {
-    this.setState({ roomNameNew: text });
+  // The 3 parts below handles hardware Back Button on Android
+  componentDidMount() {
+    this.BackHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      this.handleBackPress
+    );
+  }
+
+  componentWillUnmount() {
+    BackHandler.removeEventListener("hardwareBackPress", this.handleBackPress);
+  }
+
+  handleBackPress = () => {
+    Alert.alert(
+      "You are still editing!",
+      "Are you sure you want to exit room editing? This will not save current input.",
+      [
+        { text: "Keep Editing", onPress: () => { }, style: "cancel" },
+        { text: "Exit Anyways", onPress: () => this.props.navigation.goBack() }
+      ],
+      { cancelable: false }
+    );
+    return true;
   };
 
-  updateRoom = room => {
-    this.setState({ roomType: room });
+  handleName = text => {
+    this.setState({ roomName: text });
   };
+
+
+  confirmEditRoom() {
+    this.props._changeGroupAttribute(this.state.id, {
+      name: this.state.name
+      // class: this.state.roomClass
+    });
+  }
+
+  returnClassData = (val) => {
+    this.setState({
+      roomClass: val
+    })
+  }
+
+  renderRoomType(textcolor) {
+    return (
+      <Block flex={false} row space="between">
+        <Text style={[textcolor]}>{this.state.roomClass}</Text>
+        <TouchableOpacity
+          onPress={() => {
+            this.props.navigation.navigate('RoomType', { returnData: this.returnClassData.bind(this) });
+          }}>
+          <Text style={{ color: '#20D29B' }}>Edit</Text>
+        </TouchableOpacity>
+      </Block>
+    )
+  }
+
+  confirmDeleteRoom() {
+    Alert.alert(
+      "Are you sure?",
+      "This will remove this group from the bridge",
+      [
+        { text: "No", onPress: () => { }, style: "cancel" },
+        { text: "Yes", onPress: () => this.props._deleteGroup(this.state.id) }
+      ],
+      { cancelable: false }
+    );
+  }
 
   render() {
+    const { nightmode } = this.props;
+    const { colors } = theme;
+    const backgroundcolor = { backgroundColor: nightmode ? colors.background : colors.backgroundLight };
+    const titlecolor = { color: nightmode ? colors.white : colors.black };
+    const textcolor = { color: nightmode ? colors.white : colors.gray3 };
     return (
-      <Block style={styles.container}>
+      <Block style={backgroundcolor}>
         <Block container>
-          <Text h1 center bold color={"white"} style={{ textAlign: "left" }}>
-            {this.props.groups[this.state.id].name}
-          </Text>
+          <Text h1 center bold color={"white"} style={{ textAlign: "left" }}>Edit Room Info</Text>
           <Block marginTop={30}>
             <Text semibold paragraph white>
               Room Name
             </Text>
             <Input
               style={styles.textInput}
+              value={this.state.roomName}
               onChangeText={this.handleName}
-              placeholder={this.state.roomNameOld}
               placeholderTextColor={theme.colors.gray2}
             />
-
-            <Text semibold paragraph white>
-              Room Type
-            </Text>
-            <Picker
-              selectedValue={this.state.room}
-              onValueChange={this.updateRoom}
-              style={{ color: "white" }}
-            >
-              <Picker.Item label="Living Room" value="living_room" />
-              <Picker.Item label="Recreation" value="recreation" />
-              <Picker.Item label="Terrace" value="terrace" />
-              <Picker.Item label="Kitchen" value="kitchen" />
-              <Picker.Item label="Office" value="office" />
-              <Picker.Item label="Garden" value="garden" />
-              <Picker.Item label="Dining" value="dining" />
-              <Picker.Item label="Gym" value="gym" />
-              <Picker.Item label="Driveway" value="driveway" />
-              <Picker.Item label="Bedroom" value="bedroom" />
-              <Picker.Item label="Hallway" value="hallway" />
-              <Picker.Item label="Carport" value="carport" />
-              <Picker.Item label="Kids Bedroom" value="kids_room" />
-              <Picker.Item label="Toilet" value="toilet" />
-              <Picker.Item label="Other" value="other" />
-              <Picker.Item label="Bathroom" value="bathroom" />
-              <Picker.Item label="Front Door" value="front_door" />
-              <Picker.Item label="Nursery" value="nursery" />
-              <Picker.Item label="Garage" value="garage" />
-            </Picker>
-
-            <Text semibold paragraph white>
-              Class
-            </Text>
-
-            <Text semibold paragraph white>
-              Number of Light(s)
-            </Text>
+            <Block flex={false} column style={styles.row}>
+              <Text bold style={[titlecolor]}>Room Type</Text>
+              <View style={{ marginTop: 20 }}>
+                {this.renderRoomType(textcolor)}
+              </View>
+              <View style={[styles.divider, { marginTop: 5 }]} />
+            </Block>
           </Block>
-
-          <Block bottom flex={1} style={{ marginBottom: 10 }}>
+          <Block bottom flex={1} style={{ marginBottom: 20 }}>
             <Button
               gradient
               startColor="#0A7CC4"
               endColor="#2BDACD"
-              onPress={() => {
-                if (validator.isAlphanumeric(this.handleName)) {
-                  this.props._CreateGroup(this.props.groupData);
-                } else {
-                  Alert.alert(
-                    "Invalid Name Format",
-                    "Please re-enter the empty fields",
-                    [{ text: "OK", onPress: () => console.log("OK Pressed") }],
-                    { cancelable: false }
-                  );
-                }
-              }}
-            >
-              <Text center semibold white>
-                Save
-              </Text>
+              onPress={() => this.confirmEditRoom()}>
+              <Text center semibold white>Save</Text>
             </Button>
+            <TouchableOpacity
+              onPress={() => this.confirmDeleteRoom()}>
+              <Text center semibold white style={{alignSelf : 'center'}}>Delete Room</Text>
+            </TouchableOpacity>
           </Block>
         </Block>
       </Block>
@@ -146,37 +164,39 @@ const mapStateToProps = state => {
   return {
     loading: state.loading,
     groups: state.groups,
-    lights: state.lights
+    lights: state.lights,
+    nightmode: state.nightmode
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
-    _GetAllGroups() {
-      return dispatch(GetAllGroups());
-    },
-    _fetchAllLights() {
-      return dispatch(GetAllLights());
-    },
     _changeGroupStateByID(id, data) {
       return dispatch(SetGroupState(id, data));
+    },
+    _changeGroupAttribute(id, data) {
+      return dispatch(SetGroupAttributes(id, data));
+    },
+    _deleteGroup(id) {
+      return dispatch(DeleteGroup(id))
     }
   };
 };
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: theme.colors.background
-  },
   textInput: {
     height: 25,
     borderBottomWidth: 0.5,
     borderRadius: 0,
     borderWidth: 0,
-    color: "white",
+    color: theme.colors.gray2,
     borderColor: "white",
     textAlign: "left",
     paddingBottom: 10
+  },
+  divider: {
+    borderBottomWidth: 0.5,
+    borderColor: "#E1E3E8"
   }
 });
 
@@ -184,4 +204,3 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps
 )(EditRoomScreen);
-

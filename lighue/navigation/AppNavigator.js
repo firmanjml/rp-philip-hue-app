@@ -8,19 +8,17 @@ import LightDemo from '../screens/LightDemoMode';
 import SettingsScreen from '../screens/Setting';
 import AddSchedulesScreen from '../screens/Schedules/AddSchedules';
 import CategoryScreen from '../screens/Schedules/CategoryList';
-import LocationScreen from '../screens/Schedules/LocationList';
+import ScheduleLocationScreen from '../screens/Schedules/LocationList';
 import AddSceneScreen from '../screens/Scenes/AddScenes';
 import PostUpdateScreen from '../screens/Miscellaneous/PostUpdateScreen';
+import SceneLocationScreen from '../screens/Scenes/SceneLocationList';
 import ControlRoomScreen from '../screens/Rooms/ControlRoomScreen';
-<<<<<<< HEAD
+import BridgeInfoScreen from '../screens/BridgeInfo';
 import LightInfo from '../screens/Lights/BulbInfo';
 import EditBulbScreen from '../screens/Lights/EditBulb';
-=======
+import RoomTypeList from '../screens/Rooms/RoomTypeList';
 import SearchScreen from '../screens/Lights/SearchBulb';
-import ScheduleLocationScreen from '../screens/Schedules/LocationList';
-import SceneLocationScreen from '../screens/Scenes/SceneLocationList';
-import BridgeInfoScreen from '../screens/BridgeInfo';
->>>>>>> d465b9ae7651dfaf37bd41d8613a6a9deeec3a08
+import ControlLightAdvanced from '../screens/Lights/ControlBulbAdvanced';
 import { theme } from '../constants';
 import {fromRight} from 'react-navigation-transitions';
 const SetupNavigatorApp = createStackNavigator(
@@ -52,14 +50,17 @@ const SetupNavigatorApp = createStackNavigator(
     AddSchedules: {
       screen: AddSchedulesScreen
     },
+    ControlBulbAdvanced : {
+      screen : ControlLightAdvanced
+    },
     ScheduleLocationListScreen: {
       screen: ScheduleLocationScreen
     },
     CategoryListScreen: {
       screen: CategoryScreen
     },
-    LocationListScreen: {
-      screen: LocationScreen
+    RoomType : {
+      screen : RoomTypeList
     },
     AddScenes: {
       screen: AddSceneScreen
@@ -99,7 +100,7 @@ const SetupNavigatorApp = createStackNavigator(
         alignItems: 'center',
         marginLeft: theme.sizes.base * 2,
       },
-      gesturesEnabled: true,
+      gesturesEnabled: false,
     },
   }
 );

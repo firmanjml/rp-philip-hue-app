@@ -4,13 +4,14 @@ import {
   Image,
   Alert,
   TouchableOpacity,
-  View
+  View,
+  ScrollView
 } from "react-native";
 import { connect } from "react-redux";
 import { Button, Block, Text } from "../../components";
 import { theme } from "../../constants";
 import Icon from 'react-native-vector-icons';
-import { DeleteLight } from "../../redux/actions";
+import { DeleteLight, GetAllLights } from "../../redux/actions";
 import {
   Menu,
   MenuOptions,
@@ -18,30 +19,46 @@ import {
   MenuTrigger,
 } from "react-native-popup-menu";
 
-class bulbInfoScreen extends React.Component {
+class BulbInfo extends React.Component {
 
   static navigationOptions = ({ navigation }) => {
     return {
       headerLeft:
-        <TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={{ height: 40, width: 80, justifyContent: 'center' }}>
-            <Image source={require('../../assets/icons/back.png')} />
-          </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={{ height: 40, width: 80, justifyContent: 'center' }}>
+          <Image source={require('../../assets/icons/back.png')} />
         </TouchableOpacity>
     }
   }
 
   state = {
-    id: null
+    id: 0,
+    name: "",
+    type: "",
+    manufacturername: "",
+    modelid: "",
+    uniqueid: "",
+    swversion: ""
+
   };
 
   // retrieve id from navigation props
   componentWillMount() {
     this.setState({
-      id: this.props.navigation.getParam("id", "NO-ID")
+      id: this.props.navigation.getParam("id", "1")
     });
+  }
+
+  componentDidMount() {
+    this.setState({
+      name: this.props.lights[this.state.id].name,
+      type: this.props.lights[this.state.id].type,
+      manufacturername: this.props.lights[this.state.id].manufacturername,
+      modelid: this.props.lights[this.state.id].modelid,
+      uniqueid: this.props.lights[this.state.id].uniqueid,
+      swversion: this.props.lights[this.state.id].swversion
+    })
   }
 
   alertUserDeletion() {
@@ -55,7 +72,7 @@ class bulbInfoScreen extends React.Component {
       }, {
         text: "OK",
         onPress: () => {
-          this.props._deleteLight(this.state.id, this.props.navigation)
+          this.props._DeleteLight(this.state.id, this.props.navigation)
         }
       }],
       { cancelable: false }
@@ -74,10 +91,9 @@ class bulbInfoScreen extends React.Component {
         </MenuTrigger>
         <MenuOptions style={{ padding: 15 }}>
           <MenuOption value={1}>
-            <Text h3>Edit Lamp</Text>
+            <Text h3>Edit Bulb Name</Text>
           </MenuOption>
-          <View style={styles.divider} />
-          </MenuOptions>
+        </MenuOptions>
       </Menu>
     )
   }
@@ -87,50 +103,67 @@ class bulbInfoScreen extends React.Component {
     console.log("BulbInfo", "press menu " + value);
     if (value == 1) {
       // edit lamp
-      this.props.navigation.navigate("EditBulb");
-    } 
+      this.props.navigation.navigate('EditBulb', {
+        id: this.state.id,
+        name: this.props.lights[this.state.id].name
+      })
+    }
   }
 
   render() {
     const { id } = this.state;
     const { lights, nightmode } = this.props;
     const { colors } = theme;
+    const textcolor = { color: nightmode ? colors.white : colors.gray3 }
     const backgroundcolor = { backgroundColor: nightmode ? colors.background : colors.backgroundLight }
     return (
       <Block style={backgroundcolor}>
-      <Block container>
-      {this.renderMenu()}
-          <Text h1 bold color={"white"} style={{ textAlign: "left" }}>Bulb Info</Text>
-          <Block style={{ marginTop: 10 }}>
-
-            <Text semibold paragraph white style={{ marginTop: 20 }}>Name</Text>
-            <Text style={{ color: 'white', fontSize: 14 }}>{lights[id].name}</Text>
-            <View style={styles.line} />
-            <Text semibold paragraph white style={{ marginTop: 10 }}>Type</Text>
-            <Text style={{ color: 'white', fontSize: 14 }}>{lights[id].type}</Text>
-            <View style={styles.line} />
-            <Text semibold paragraph white style={{ marginTop: 10 }}>Manufacturer</Text>
-            <Text style={{ color: 'white', fontSize: 14 }}>{lights[id].manufacturername}</Text>
-            <View style={styles.line} />
-            <Text semibold paragraph white style={{ marginTop: 10 }}>Model Id</Text>
-            <Text style={{ color: 'white', fontSize: 14 }}>{lights[id].modelid}</Text>
-            <View style={styles.line} />
-            <Text semibold paragraph white style={{ marginTop: 10 }}>Mac Address</Text>
-            <Text style={{ color: 'white', fontSize: 14 }}>{lights[id].uniqueid}</Text>
-            <View style={styles.line} />
-            <Text semibold paragraph white style={{ marginTop: 10 }}>Software Version</Text>
-            <Text style={{ color: 'white', fontSize: 14 }}>{lights[id].swversion}</Text>
-            <View style={styles.line} />
+        <Block container style={{ marginBottom: 20 }}>
+          <Block flex={false} row space="between">
+            <Text h1 bold style={[textcolor, { marginTop: 10 }]}>Bulb Info</Text>
+            {this.renderMenu()}
           </Block>
-
-          <Button
-            gradient
-            startColor="#C40A0A"
-            endColor="#E86241"
-            onPress={this.alertUserDeletion}>
-            <Text center semibold white>Delete Bulb</Text>
-          </Button>
-
+          <ScrollView>
+            <Block flex={false} column style={styles.row}>
+              <Text bold style={textcolor}>Name</Text>
+              <Text style={[styles.text, textcolor]}>{this.state.name}</Text>
+              <View style={styles.divider} />
+            </Block>
+            <Block flex={false} column style={styles.row}>
+              <Text bold style={textcolor}>Type</Text>
+              <Text style={[styles.text, textcolor]}>{this.state.type}</Text>
+              <View style={styles.divider} />
+            </Block>
+            <Block flex={false} column style={styles.row}>
+              <Text bold style={textcolor}>Manufacturer</Text>
+              <Text style={[styles.text, textcolor]}>{this.state.manufacturername}</Text>
+              <View style={styles.divider} />
+            </Block>
+            <Block flex={false} column style={styles.row}>
+              <Text bold style={textcolor}>Model Id</Text>
+              <Text style={[styles.text, textcolor]}>{this.state.modelid}</Text>
+              <View style={styles.divider} />
+            </Block>
+            <Block flex={false} column style={styles.row}>
+              <Text bold style={textcolor}>Mac Address</Text>
+              <Text style={[styles.text, textcolor]}>{this.state.uniqueid}</Text>
+              <View style={styles.divider} />
+            </Block>
+            <Block flex={false} column style={styles.row}>
+              <Text bold style={textcolor}>Software Version</Text>
+              <Text style={[styles.text, textcolor]}>{this.state.swversion}</Text>
+              <View style={styles.divider} />
+            </Block>
+            <Block bottom flex={1}>
+              <Button
+                gradient
+                startColor="#C40A0A"
+                endColor="#E86241"
+                onPress={() => this.alertUserDeletion()}>
+                <Text center semibold white>Delete Bulb</Text>
+              </Button>
+            </Block>
+          </ScrollView>
         </Block>
       </Block>
     );
@@ -138,9 +171,10 @@ class bulbInfoScreen extends React.Component {
 }
 const mapDispatchToProps = (dispatch) => {
   return {
-    _deleteLight(id, navigation) {
+    _DeleteLight(id, navigation) {
       return dispatch(DeleteLight(id, navigation))
-    }
+    },
+    _fetchAllLights: () => dispatch(GetAllLights()),
   }
 }
 const mapStateToProps = (state) => {
@@ -150,20 +184,22 @@ const mapStateToProps = (state) => {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(bulbInfoScreen);
+export default connect(mapStateToProps, mapDispatchToProps)(BulbInfo);
 
 const styles = StyleSheet.create({
-  lampRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 30
+  row: {
+    marginTop: 20,
   },
-  line: {
+  text: {
+    marginTop: 10
+  },
+  divider: {
     marginTop: 10,
     marginVertical: 5,
     marginHorizontal: 2,
     borderBottomWidth: 1,
     borderColor: "#E1E3E8"
-}
+  },
+
 });
 

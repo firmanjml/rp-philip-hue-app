@@ -164,6 +164,10 @@ export const groups = (state = {}, action) => {
             _state = JSON.parse(JSON.stringify(state));
             _.merge(_state[action.id].action, action.payload);
             return _state;
+        case C.CHANGE_GROUP_ATTR:
+            _state = JSON.parse(JSON.stringify(state));
+            _.merge(_state[action.id].action, action.payload);
+            return _state;
         case C.CREATE_GROUP:
             _state = JSON.parse(JSON.stringify(state));
             _state[action.id] = action.payload;
@@ -201,7 +205,7 @@ export const lights = (state = {}, action) => {
             return _state;
         case C.DELETE_LIGHT:
             _state = JSON.parse(JSON.stringify(state));
-            delete _state[payload]
+            delete _state[action.payload]
             return _state;
         default:
             return state;

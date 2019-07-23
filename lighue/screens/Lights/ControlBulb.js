@@ -42,7 +42,7 @@ class ControlBulb extends React.Component {
     };
 
     componentWillMount() {
-        this.setState({ id: this.props.navigation.getParam('id', 1) })
+        this.setState({ id: this.props.navigation.getParam('id', "1") })
     }
 
     componentDidMount() {

@@ -5,12 +5,9 @@ import { theme, constant } from '../../constants';
 import Icon from 'react-native-vector-icons';
 import ToggleSwitch from "../../components/ToggleSwitch";
 import { connect } from 'react-redux';
-<<<<<<< HEAD
-import { SetLampState } from '../../redux/actions'
-import { GetAllGroups, GetAllLights, GetSchedules } from '../../redux/actions';
-=======
-import { GetAllGroups, GetAllLights, GetSchedules, SearchForNewLights, GetConfig } from '../../redux/actions';
->>>>>>> d465b9ae7651dfaf37bd41d8613a6a9deeec3a08
+import { SetLampState } from '../../redux/actions';
+import { ConvertXYtoHex } from '../../components/ColorConvert';
+import { GetAllGroups, GetAllLights, GetSchedules, GetConfig } from '../../redux/actions';
 
 import {
     Menu,
@@ -19,7 +16,7 @@ import {
     MenuTrigger,
 } from 'react-native-popup-menu';
 
-const { height, width } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 var interval;
 class DefaultScreen extends Component {
@@ -38,12 +35,12 @@ class DefaultScreen extends Component {
         this.props._fetchAllGroups();
         this.props._fetchAllSchedules();
         this.props._fetchAllConfig();
-        interval = setInterval(() => {
+        setInterval(() => {
             this.props._fetchAllLights();
             this.props._fetchAllGroups();
             this.props._fetchAllSchedules();
             this.props._fetchAllConfig();
-        }, 5000)
+        }, 2000)
     }
 
     renderTab(tab, backgroundcolor) {
@@ -129,16 +126,11 @@ class DefaultScreen extends Component {
         }
     }
 
-<<<<<<< HEAD
     displayLayout() {
-        const { navigation, groups, nightmode, lights } = this.props;
+        const { navigation, groups, nightmode, lights, _changeLightState } = this.props;
         const { colors } = theme;
         const refreshtextcolor = nightmode ? colors.white : colors.black
         const textcolor = { color: nightmode ? colors.white : colors.black }
-=======
-    displayLayout(textcolor, refreshtextcolor) {
-        const { navigation, groups } = this.props;
->>>>>>> d465b9ae7651dfaf37bd41d8613a6a9deeec3a08
         const marginTop = { marginTop: Platform.OS == "android" ? 20 : 0 }
 
         if (this.state.active === 'Rooms') {
@@ -178,10 +170,13 @@ class DefaultScreen extends Component {
                                     <TouchableOpacity
                                         key={val}
                                         onPress={() => {
-                                            navigation.navigate('ControlRoom', {
-                                                id: val,
-                                                class: groups[val].class > -1 ? groups[val].class : "Other"
-                                            });
+                                            this.props._fetchAllGroups(),
+                                                setTimeout(() => {
+                                                    navigation.navigate('ControlRoom', {
+                                                        id: val,
+                                                        class: groups[val].class > -1 ? groups[val].class : "Other"
+                                                    });
+                                                }, 700);
                                         }}>
                                         <Card center middle shadow style={styles.category}>
                                             <Badge margin={[0, 0, 15]} size={50} color="rgba(41,216,143,0.20)">
@@ -204,48 +199,54 @@ class DefaultScreen extends Component {
             )
         } else if (this.state.active === "Lights") {
             return (
-<<<<<<< HEAD
                 Object.entries(lights).length === 0 && lights.constructor === Object ?
                     <Block style={{ paddingHorizontal: theme.sizes.base * 2, alignItems: 'center', justifyContent: 'center' }}>
                         <Text h1 bold style={[textcolor]}>No light is found.</Text>
                         <TouchableOpacity
-                            onPress={() => console.log("Search for new bulb")}>
+                            onPress={() => this.props.navigation.navigate('SearchBulbScreen')}>
                             <Text h2 style={{ marginTop: 5, color: '#20D29B' }}>Search for new lights</Text>
                         </TouchableOpacity>
                     </Block>
                     :
                     Object.keys(lights).map(val => (
-                        <Block flex={false} row space="between" style={styles.row}>
-                            <TouchableOpacity
-                                key={val}
-                                onPress={() => {
-                                    navigation.navigate('BulbInfo', {
-                                        id: val
-                                    });
-                                }}>
-                                 <View style={styles.lampRow}>
-                                <Text style={{color: 'white', marginHorizontal: 30, marginBottom: 10, fontSize: 14}}>{lights[val].name}</Text>
+                        <View style={{ paddingHorizontal: theme.sizes.base * 2 }}>
+                            <View style={styles.bulbRow}>
+                                <View style={{ flexDirection: 'row' }}>
+                                    <TouchableOpacity
+                                        key={val}
+                                        onPress={() => {
+                                            this.props._fetchAllLights();
+                                            setTimeout(() => {
+                                                navigation.navigate('ControlBulb', {
+                                                    id: val
+                                                });
+                                            }, 700);
+                                        }}>
+                                        <Text style={{ color: 'white', fontSize: 21, alignSelf: 'center' }}>{lights[val].name.length > 15 ? lights[val].name.substring(0, 15) + "..." : lights[val].name}</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        key={val}
+                                        onPress={() => {
+                                            navigation.navigate('BulbInfo', {
+                                                id: val
+                                            });
+                                        }}>
+                                        <Icon.Ionicons name="ios-information-circle-outline" size={22} style={{ marginLeft: 10, alignSelf: 'center' }} color={theme.colors.gray} />
+                                    </TouchableOpacity>
                                 </View>
-                            </TouchableOpacity>
-                            <ToggleSwitch
-                                offColor="#DDDDDD"
-                                onColor={theme.colors.secondary}
-                                isOn={lights[val].state.on}
-                                onToggle={(toggleState) => this.props._changeLightState(val, { on: toggleState })}
-                            />
-                        </Block>
+                                <ToggleSwitch
+                                    offColor="#DDDDDD"
+                                    onColor={theme.colors.secondary}
+                                    isOn={this.props.lights[val].state.on}
+                                    onToggle={(value) => {
+                                        _changeLightState(val, {
+                                            "on": value,
+                                        })
+                                    }}
+                                />
+                            </View>
+                        </View>
                     ))
-=======
-                <Block style={{ paddingHorizontal: theme.sizes.base * 2, alignItems: 'center', justifyContent: 'center' }}>
-                    <Text h1 bold style={[textcolor]}>
-                        No lights is found.
-                </Text>
-                    <TouchableOpacity
-                        onPress={() => console.log("Search for new bulb")}>
-                        <Text h2 style={{ marginTop: 5, color: '#20D29B' }}>Search for new lights</Text>
-                    </TouchableOpacity>
-                </Block>
->>>>>>> d465b9ae7651dfaf37bd41d8613a6a9deeec3a08
             )
         } else if (this.state.active === "Schedules") {
             return (
@@ -264,7 +265,6 @@ class DefaultScreen extends Component {
         } else {
             return (
                 <Block style={{ paddingHorizontal: theme.sizes.base * 2, alignItems: 'center', justifyContent: 'center' }}>
-<<<<<<< HEAD
                     <Text h1 bold style={textcolor}>
                         No scenes created.
                     </Text>
@@ -275,30 +275,13 @@ class DefaultScreen extends Component {
                         <Text h2 style={{ marginTop: 5, color: '#20D29B' }}>Add scenes</Text>
                     </TouchableOpacity>
                 </Block>
-=======
-                <Text h1 bold style={textcolor}>
-                    No scenes created.
-                </Text>
-                <TouchableOpacity
-                    onPress={() => {
-                        navigation.navigate('SceneLocationListScreen');
-                    }}>
-                    <Text h2 style={{ marginTop: 5, color: '#20D29B' }}>Add scenes</Text>
-                </TouchableOpacity>
-            </Block>
->>>>>>> d465b9ae7651dfaf37bd41d8613a6a9deeec3a08
             )
         }
     }
 
     onMenuRoomSelect(value) {
         if (value == 1) {
-            this.props.navigation.navigate('PostUpdate', {
-                meta: {
-                    timer: 5000,
-                    nav: "ListRoom"
-                }
-            });
+            this.props.navigation.navigate('AddRoom');
         } else if (value == 2) {
             this.props.navigation.navigate('TestScreen');
         } else if (value == 3) {
@@ -346,15 +329,9 @@ class DefaultScreen extends Component {
                     {this.renderMenu(this.state.active)}
                 </Block>
                 <Block flex={false} row style={[styles.tabs, backgroundcolor]}>
-<<<<<<< HEAD
                     {tabs.map(tab => this.renderTab(tab))}
                 </Block>
                 {this.displayLayout()}
-=======
-                    {tabs.map(tab => this.renderTab(tab, backgroundcolor))}
-                </Block>
-                {this.displayLayout(textcolor, refreshtextcolor)}
->>>>>>> d465b9ae7651dfaf37bd41d8613a6a9deeec3a08
             </Block>
         )
     }
@@ -365,14 +342,10 @@ const mapDispatchToProps = (dispatch) => {
         _fetchAllGroups: () => dispatch(GetAllGroups()),
         _fetchAllLights: () => dispatch(GetAllLights()),
         _fetchAllSchedules: () => dispatch(GetSchedules()),
-<<<<<<< HEAD
+        _fetchAllConfig: () => dispatch(GetConfig()),
         _changeLightState(id, data) {
             return dispatch(SetLampState(id, data));
         }
-=======
-        _searchBulb: () => dispatch(SearchForNewLights()),
-        _fetchAllConfig: () => dispatch(GetConfig())
->>>>>>> d465b9ae7651dfaf37bd41d8613a6a9deeec3a08
     }
 }
 
@@ -390,7 +363,7 @@ const mapStateToProps = (state) => {
 const styles = StyleSheet.create({
     container: {
         backgroundColor: theme.colors.background
-      },
+    },
     header: {
         marginTop: 50,
         paddingHorizontal: theme.sizes.base * 2,
@@ -419,6 +392,12 @@ const styles = StyleSheet.create({
         paddingHorizontal: theme.sizes.base * 2,
         marginBottom: theme.sizes.base * 3.5,
     },
+    bulbRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 20,
+        marginTop: 10
+    },
     category: {
         minWidth: (width - (theme.sizes.padding * 2.4) - theme.sizes.base) / 2,
         maxWidth: (width - (theme.sizes.padding * 2.4) - theme.sizes.base) / 2,
@@ -432,12 +411,7 @@ const styles = StyleSheet.create({
         marginHorizontal: 2,
         borderBottomWidth: 1,
         borderColor: '#ccc',
-    },
-    lampRow: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        marginBottom: 20
-      }
+    }
 
 
 

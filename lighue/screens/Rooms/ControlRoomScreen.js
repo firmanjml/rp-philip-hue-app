@@ -1,65 +1,45 @@
 import React from "react";
-import { StyleSheet, View, TouchableOpacity, Image, Modal } from "react-native";
+import { StyleSheet, View, TouchableOpacity, Image } from "react-native";
 import { ColorPicker } from "react-native-color-picker";
-
 import { connect } from "react-redux";
-import { SetGroupState } from "../../redux/actions";
+import { SetGroupState, SetLampState, GetAllLights } from "../../redux/actions";
 import ToggleSwitch from "../../components/ToggleSwitch";
-import Icon from 'react-native-vector-icons';
-
-import {
-  ColorConversionToXY
-} from "../../components/ColorConvert";
+import Icon from "react-native-vector-icons";
+import { ColorConversionToXY } from "../../components/ColorConvert";
 import { theme } from "../../constants";
-
+import _ from 'lodash';
 import { Block, Input, Text } from "../../components";
+import axios from 'axios';
 
 import Slider from "react-native-slider";
-
-import axios from "axios";
 
 import {
   Menu,
   MenuOptions,
   MenuOption,
-  MenuTrigger,
+  MenuTrigger
 } from "react-native-popup-menu";
 
 // kau tak tukar ControlBulb to ControlRoomScreen
 class ControlRoomScreen extends React.Component {
   static navigationOptions = {
     header: null
-  }
+  };
 
   state = {
-    id: null,
-    sat: null,
-    bri: null,
-    satPer: null,
-    briPer: null,
-    type: null,
+    id: 0,
+    sat: 0,
+    bri: 0,
+    type: "",
     active: "Main"
   };
 
   componentWillMount() {
     this.setState({
       id: this.props.navigation.getParam("id", "NO-ID"),
-      type: this.props.navigation.getParam("class", "Other")
-    });
-  }
-
-  componentDidMount() {
-    this.calculatePercentage(
-      "bri",
-      this.props.groups[this.state.id].action.bri
-    );
-    this.calculatePercentage(
-      "sat",
-      this.props.groups[this.state.id].action.sat
-    );
-    this.setState({
-      sat: this.props.groups[this.state.id].action.sat,
-      bri: this.props.groups[this.state.id].action.bri
+      type: this.props.navigation.getParam("class", "Other"),
+      sat: this.props.groups[this.props.navigation.getParam("id", "NO-ID")].action.sat,
+      bri: this.props.groups[this.props.navigation.getParam("id", "NO-ID")].action.bri
     });
   }
 
@@ -68,9 +48,7 @@ class ControlRoomScreen extends React.Component {
     const { colors } = theme;
     const titlecolor = { color: nightmode ? colors.white : colors.black };
     const textcolor = { color: nightmode ? colors.white : colors.gray3 };
-    const bordercolor = {
-      borderColor: nightmode ? colors.white : colors.gray2
-    };
+    const bordercolor = { borderColor: nightmode ? colors.white : colors.gray2 };
     const { type } = this.state;
     return (
       <View>
@@ -82,7 +60,7 @@ class ControlRoomScreen extends React.Component {
           placeholderTextColor={nightmode ? colors.gray2 : colors.black}
         />
       </View>
-    )
+    );
   }
 
   renderBackButton() {
@@ -94,7 +72,7 @@ class ControlRoomScreen extends React.Component {
       >
         <Image source={require("../../assets/icons/back.png")} />
       </TouchableOpacity>
-    )
+    );
   }
 
   renderMenu() {
@@ -111,179 +89,78 @@ class ControlRoomScreen extends React.Component {
           {this.renderMenuOption()}
           <View style={styles.divider} />
           <MenuOption value={2}>
-            <Text h3>Edit Room</Text>
+            <Text h3>Edit Room Info</Text>
           </MenuOption>
           <View style={styles.divider} />
         </MenuOptions>
       </Menu>
-    )
+    );
   }
 
   renderMenuOption() {
     if (this.state.active == "Main") {
       return (
         <MenuOption value={1}>
-          <Text h3>Show More Info</Text>
+          <Text h3>Show Room Bulbs</Text>
         </MenuOption>
-      )
-    }
-    else if (this.state.active == "ShowMoreInfo") {
+      );
+    } else if (this.state.active == "ShowMoreInfo") {
       return (
         <MenuOption value={1}>
           <Text h3>Show Color Picker</Text>
         </MenuOption>
-      )
+      );
     }
-  }
-
-  changeColorGroupState = values => {
-    const {
-      bridgeip,
-      username,
-      bridgeIndex,
-      groups,
-      _changeGroupStateByID
-    } = this.props;
-
-    if (!groups[this.state.id].action.on) {
-      _changeGroupStateByID(this.state.id, {
-        on: true
-      });
-    }
-    axios({
-      method: "PUT",
-      url: `http://${bridgeip[bridgeIndex]}/api/${
-        username[bridgeIndex]
-        }/groups/${this.state.id}/action`,
-      data: { xy: ColorConversionToXY(values) }
-    });
-  };
-
-  changeSatGroupState = values => {
-    const {
-      bridgeip,
-      username,
-      bridgeIndex,
-      groups,
-      _changeGroupStateByID
-    } = this.props;
-
-    if (!groups[this.state.id].action.on) {
-      _changeGroupStateByID(this.state.id, {
-        on: true
-      });
-    }
-    axios({
-      method: "PUT",
-      url: `http://${bridgeip[bridgeIndex]}/api/${
-        username[bridgeIndex]
-        }/groups/${this.state.id}/action`,
-      data: { sat: values }
-    });
-    this.calculatePercentage("sat", values);
-  };
-
-  changeBriGroupState = (values) => {
-    const {
-      bridgeip,
-      username,
-      bridgeIndex,
-      groups,
-      _changeGroupStateByID
-    } = this.props;
-
-    if (!groups[this.state.id].action.on) {
-      _changeGroupStateByID(this.state.id, {
-        on: true
-      });
-    }
-    axios({
-      method: "PUT",
-      url: `http://${bridgeip[bridgeIndex]}/api/${
-        username[bridgeIndex]
-        }/groups/${this.state.id}/action`,
-      data: { bri: values }
-    });
-    // in axios, state kena tukar to action api, sbb in group api, bri sat and on is 
-    // dalam action punya object
-    this.calculatePercentage("bri", values);
-  };
-
-  calculatePercentage = (arg, values) => {
-    let result = Math.round((values * 100) / 254);
-    if (result == 0) {
-      if (arg == "sat") {
-        this.setState({ satPer: 1 });
-      } else {
-        this.setState({ briPer: 1 });
-      }
-    } else {
-      if (arg == "sat") {
-        this.setState({ satPer: result });
-      } else {
-        this.setState({ briPer: result });
-      }
-    }
-  };
-
-  onGroupLights = boolean => {
-    this.props._changeGroupStateByID(this.state.id, {
-      on: boolean
-    });
-  };
-
-  renderBriSlider() {
-    const { nightmode } = this.props;
-    const trackTintColor = nightmode ? "rgba(157, 163, 180, 0.10)" : "#DDDDDD";
-    return (
-      <Slider
-        minimumValue={1}
-        maximumValue={254}
-        style={{ height: 19 }}
-        thumbStyle={styles.thumb}
-        trackStyle={{ height: 10, borderRadius: 10 }}
-        minimumTrackTintColor={theme.colors.secondary}
-        maximumTrackTintColor={trackTintColor}
-        value={this.state.bri}
-        onValueChange={this.changeBriGroupState}
-      />
-    );
-  }
-
-  renderSatSlider() {
-    const { nightmode } = this.props;
-    const trackTintColor = nightmode ? "rgba(157, 163, 180, 0.10)" : "#DDDDDD";
-    return (
-      <Slider
-        minimumValue={1}
-        maximumValue={254}
-        style={{ height: 19 }}
-        thumbStyle={styles.thumb}
-        trackStyle={{ height: 10, borderRadius: 10 }}
-        minimumTrackTintColor={theme.colors.secondary}
-        maximumTrackTintColor={trackTintColor}
-        value={this.state.sat}
-        onValueChange={this.changeSatGroupState}
-      />
-    );
   }
 
   renderView() {
+    const { lights, groups, navigation } = this.props;
     if (this.state.active == "Main") {
       return (
         <ColorPicker
           onColorChange={this.changeColorGroupState}
           style={{ flex: 1 }}
           hideSliders={true}
-        // color={ConvertXYtoHex(this.props.lights[this.state.id].state.xy[0], this.props.lights[this.state.id].state.xy[1], 254)}
-        // color={this.state.color}
         />
       );
-    }
-    else if (this.state.active == "ShowMoreInfo") {
+    } else if (this.state.active == "ShowMoreInfo") {
       return (
-        <Text>Show more info</Text>
-      )
+        (groups[this.state.id].lights.map(val => (
+          <View style={{ marginTop: 30 }}>
+            <View style={styles.bulbRow}>
+              <View style={{ flexDirection: 'row' }}>
+                <TouchableOpacity
+                  key={val}
+                  onPress={() => {
+                    this.props._fetchAllLights();
+                    setTimeout(() => {
+                        navigation.navigate('ControlBulb', {
+                            id: val
+                        });
+                    }, 700);
+                  }}>
+                  <Text style={{ color: 'white', fontSize: 21, alignSelf: 'center' }}>{lights[val].name.length > 15 ? lights[val].name.substring(0, 15) + "..." : lights[val].name}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  key={val}
+                  onPress={() => {
+                    navigation.navigate('BulbInfo', {
+                      id: val
+                    })
+                  }}>
+                  <Icon.Ionicons name="ios-information-circle-outline" size={22} style={{ marginLeft: 10, alignSelf: 'center' }} color={theme.colors.gray} />
+                </TouchableOpacity>
+              </View>
+              <ToggleSwitch
+                offColor="#DDDDDD"
+                onColor={theme.colors.secondary}
+                isOn={lights[val].state.on}
+                onToggle={(toggleState) => this.props._changeLightState(val, { on: toggleState })}
+              />
+            </View>
+          </View>
+        ))
+        ))
     }
   }
 
@@ -305,31 +182,65 @@ class ControlRoomScreen extends React.Component {
       if (this.state.active == "Main") {
         this.setState({
           active: "ShowMoreInfo"
-        })
-      }
-      else if (this.state.active == "ShowMoreInfo") {
+        });
+      } else if (this.state.active == "ShowMoreInfo") {
         this.setState({
-          active : "Main"
-        })
+          active: "Main"
+        });
       }
     } else if (value == 2) {
-      this.props.navigation.navigate("EditRoom");
-    }
-    else if (Value == 3) {
-      this.setState({
-        active: "Main"
-      })
+      this.props.navigation.navigate("EditRoom", {
+        id: this.state.id,
+        roomName: this.props.groups[this.state.id].name,
+        roomClass: this.props.groups[this.state.id].class
+      });
     }
   }
 
+  changeColorGroupState = _.throttle((values) => {
+    axios({
+      method: "PUT",
+      url: `http://${this.props.bridgeip[this.props.bridgeIndex]}/api/${
+        this.props.username[this.props.bridgeIndex]}/groups/${this.state.id}/action`,
+      data: {
+        on: true,
+        xy: ColorConversionToXY(values)
+      }
+    })
+  }, 50);
+
+  changeBrightnessState = (value) => {
+    console.log("changing")
+    axios({
+      method: "PUT",
+      url: `http://${this.props.bridgeip[this.props.bridgeIndex]}/api/${
+        this.props.username[this.props.bridgeIndex]}/groups/${this.state.id}/action`,
+      data: {
+        on: true,
+        bri: value
+      }
+    })
+  }
+
+  changeSaturationState = (value) => {
+    axios({
+      method: "PUT",
+      url: `http://${this.props.bridgeip[this.props.bridgeIndex]}/api/${
+        this.props.username[this.props.bridgeIndex]}/groups/${this.state.id}/action`,
+      data: {
+        on: true,
+        sat: value
+      }
+    })
+  }
+
   render() {
-    const { nightmode } = this.props;
+    const { nightmode, _changeGroupStateByID } = this.props;
     const { colors } = theme;
-    const backgroundcolor = {
-      backgroundColor: nightmode ? colors.background : colors.backgroundLight
-    };
+    const backgroundcolor = { backgroundColor: nightmode ? colors.background : colors.backgroundLight };
     const titlecolor = { color: nightmode ? colors.white : colors.black };
     const textcolor = { color: nightmode ? colors.white : colors.gray3 };
+    const trackTintColor = nightmode ? "rgba(157, 163, 180, 0.10)" : "#DDDDDD"
     return (
       <Block style={backgroundcolor}>
         <Block flex={false} center row space="between" style={styles.header}>
@@ -341,26 +252,51 @@ class ControlRoomScreen extends React.Component {
             <Text style={[styles.title, titlecolor]}>
               {this.props.groups[this.state.id].name}
             </Text>
-            {this.renderToggleButton()}
+            <ToggleSwitch
+              offColor="#DDDDDD"
+              onColor={theme.colors.secondary}
+              isOn={this.props.groups[this.state.id].action.on}
+              onToggle={(value) => {
+                _changeGroupStateByID(this.state.id, {
+                  "on": value,
+                })
+              }}
+            />
           </View>
           {this.renderType()}
           <Text style={[styles.textControl, textcolor, { marginBottom: 10 }]}>
             Brightness
-            </Text>
-          {this.renderBriSlider()}
-          <Text style={[styles.textPer, textcolor]}>
-            {this.state.briPer}%
-            </Text>
+          </Text>
+          <Slider
+            minimumValue={1}
+            maximumValue={254}
+            step={10}
+            style={{ height: 25 }}
+            thumbStyle={styles.thumb}
+            trackStyle={{ height: 15, borderRadius: 10 }}
+            minimumTrackTintColor={colors.secondary}
+            maximumTrackTintColor={trackTintColor}
+            value={this.state.bri}
+            onValueChange={this.changeBrightnessState}
+          />
           <Text style={[styles.textControl, textcolor, { marginBottom: 10 }]}>
             Saturation
-            </Text>
-          {this.renderSatSlider()}
-          <Text style={[styles.textPer, textcolor]}>
-            {this.state.satPer}%
-            </Text>
+          </Text>
+          <Slider
+            minimumValue={1}
+            maximumValue={254}
+            step={10}
+            style={{ height: 25 }}
+            thumbStyle={styles.thumb}
+            trackStyle={{ height: 15, borderRadius: 10 }}
+            minimumTrackTintColor={colors.secondary}
+            maximumTrackTintColor={trackTintColor}
+            value={this.state.sat}
+            onValueChange={this.changeSaturationState}
+          />
           {this.renderView()}
         </Block>
-      </Block>
+      </Block >
     );
   }
 }
@@ -369,6 +305,12 @@ const mapDispatchToProps = dispatch => {
   return {
     _changeGroupStateByID(id, data) {
       return dispatch(SetGroupState(id, data));
+    },
+    _changeLightState(id, data) {
+      return dispatch(SetLampState(id, data))
+    },
+    _fetchAllLights() {
+      return dispatch(GetAllLights())
     }
   };
 };
@@ -396,6 +338,16 @@ const styles = StyleSheet.create({
   lightPicker: {
     width: 10
   },
+  divider: {
+    borderBottomWidth: 0.5,
+    borderColor: "#E1E3E8"
+  },
+  bulbRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+    marginTop: 10
+  },
   textInput: {
     height: 30,
     borderBottomWidth: 0.5,
@@ -405,16 +357,16 @@ const styles = StyleSheet.create({
     paddingBottom: 10
   },
   header: {
-    marginTop: 30,
-    paddingHorizontal: theme.sizes.base * 2,
+    marginTop: 50,
+    paddingHorizontal: theme.sizes.base * 2
   },
   thumb: {
-    width: theme.sizes.base,
-    height: theme.sizes.base,
-    borderRadius: theme.sizes.base,
-    borderColor: "white",
+    width: 25,
+    height: 25,
+    borderRadius: 25,
+    borderColor: 'white',
     borderWidth: 3,
-    backgroundColor: theme.colors.secondary
+    backgroundColor: theme.colors.secondary,
   },
   textPer: {
     textAlign: "right"
