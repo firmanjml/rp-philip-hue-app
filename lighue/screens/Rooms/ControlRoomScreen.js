@@ -134,9 +134,9 @@ class ControlRoomScreen extends React.Component {
                   onPress={() => {
                     this.props._fetchAllLights();
                     setTimeout(() => {
-                        navigation.navigate('ControlBulb', {
-                            id: val
-                        });
+                      navigation.navigate('ControlBulb', {
+                        id: val
+                      });
                     }, 700);
                   }}>
                   <Text style={{ color: 'white', fontSize: 21, alignSelf: 'center' }}>{lights[val].name.length > 15 ? lights[val].name.substring(0, 15) + "..." : lights[val].name}</Text>
@@ -207,9 +207,9 @@ class ControlRoomScreen extends React.Component {
         xy: ColorConversionToXY(values)
       }
     })
-  }, 50);
+  }, 600);
 
-  changeBrightnessState = (value) => {
+  changeBrightnessState = _.throttle((value) => {
     console.log("changing")
     axios({
       method: "PUT",
@@ -220,9 +220,9 @@ class ControlRoomScreen extends React.Component {
         bri: value
       }
     })
-  }
+  }, 50);
 
-  changeSaturationState = (value) => {
+  changeSaturationState = _.throttle((value) => {
     axios({
       method: "PUT",
       url: `http://${this.props.bridgeip[this.props.bridgeIndex]}/api/${
@@ -232,7 +232,7 @@ class ControlRoomScreen extends React.Component {
         sat: value
       }
     })
-  }
+  }, 50);
 
   render() {
     const { nightmode, _changeGroupStateByID } = this.props;

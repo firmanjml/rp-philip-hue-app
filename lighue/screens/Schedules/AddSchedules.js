@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Image, StyleSheet, TouchableOpacity, View, ScrollView, Alert, Modal, ActivityIndicator } from 'react-native'
+import { Image, StyleSheet, TouchableOpacity, View, ScrollView, Alert } from 'react-native'
 import { Block, Text, Button, Input } from '../../components';
 import { theme } from '../../constants';
 import { CreateSchedules } from '../../redux/actions';
@@ -110,24 +110,6 @@ class AddSchedules extends Component {
             selected: false
         }
     };
-
-    renderLoadingModal() {
-        return (
-            <Modal
-                transparent={true}
-                animationType={'none'}
-                visible={this.props.loading}
-                onRequestClose={() => { console.log('close modal') }}>
-                <View style={styles.modalBackground}>
-                    <View style={styles.activityIndicatorWrapper}>
-                        <ActivityIndicator
-                            animating={this.props.loading}
-                            color="#00ff00" />
-                    </View>
-                </View>
-            </Modal>
-        )
-    }
 
     updateDay = (val) => {
         const newBoolean = !this.dayOpacity[val].selected;
@@ -451,7 +433,7 @@ class AddSchedules extends Component {
                     <TouchableOpacity
                         onPress={() => this.setState({ isDatePickerVisible: true })}>
                         {/* <Text style={{ color: '#20D29B' }}>Edit</Text> */}
-                        <Text style={{color : '#20D29B', alignSelf: 'center' }}>{this.state.date}</Text>
+                        <Text style={{ color: '#20D29B', alignSelf: 'center' }}>{this.state.date}</Text>
                     </TouchableOpacity>
                     {this.renderDatePicker()}
                 </Block>
@@ -521,7 +503,6 @@ class AddSchedules extends Component {
         return (
             <Block style={backgroundcolor}>
                 <Block container style={{ marginBottom: 20 }}>
-                    {this.renderLoadingModal()}
                     <Text h1 bold style={titlecolor}>Add Schedules</Text>
                     <ScrollView
                         showsVerticalScrollIndicator={false}>

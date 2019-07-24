@@ -49,9 +49,9 @@ class NewControlBulb extends Component {
                 xy: ColorConversionToXY(values)
             }
         })
-    }, 50);
+    }, 600);
 
-    changeBrightnessState = (value) => {
+    changeBrightnessState = _.throttle((value) => {
         axios({
             method: "PUT",
             url: `http://${this.props.bridgeip[this.props.bridgeIndex]}/api/${
@@ -61,9 +61,9 @@ class NewControlBulb extends Component {
                 bri: value
             }
         })
-    }
+    }, 50)
 
-    changeSaturationState = (value) => {
+    changeSaturationState = _.throttle((value) => {
         axios({
             method: "PUT",
             url: `http://${this.props.bridgeip[this.props.bridgeIndex]}/api/${
@@ -73,7 +73,7 @@ class NewControlBulb extends Component {
                 sat: value
             }
         })
-    }
+    }, 50);
 
     renderBackButton() {
         const { navigation } = this.props;
