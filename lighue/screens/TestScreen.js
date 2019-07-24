@@ -15,12 +15,10 @@ class TestScreen extends Component {
     static navigationOptions = ({ navigation }) => {
         return {
             headerLeft:
-                <TouchableOpacity>
-                    <TouchableOpacity
-                        onPress={() => navigation.goBack()}
-                        style={{ height: 40, width: 80, justifyContent: 'center' }}>
-                        <Image source={require('../assets/icons/back.png')} />
-                    </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={() => navigation.goBack()}
+                    style={{ height: 40, width: 80, justifyContent: 'center' }}>
+                    <Image source={require('../assets/icons/back.png')} />
                 </TouchableOpacity>
         }
     }
@@ -121,7 +119,7 @@ class TestScreen extends Component {
         // this.props._switchBridge(1);
 
     }
-    
+
     render() {
         // Example 
         return (

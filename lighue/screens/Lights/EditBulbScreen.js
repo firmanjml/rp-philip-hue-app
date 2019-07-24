@@ -11,17 +11,15 @@ import { theme } from "../../constants";
 import { SetLampAttributes } from "../../redux/actions";
 
 
-class EditBulb extends React.Component {
+class EditBulbScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
     return {
       headerLeft: (
-        <TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={{ height: 40, width: 80, justifyContent: "center" }}
-          >
-            <Image source={require("../../assets/icons/back.png")} />
-          </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={{ height: 40, width: 80, justifyContent: "center" }}
+        >
+          <Image source={require("../../assets/icons/back.png")} />
         </TouchableOpacity>
       )
     };
@@ -44,11 +42,11 @@ class EditBulb extends React.Component {
 
   changeName = (value) => {
     this.setState({ bulbName: value })
-}
+  }
 
   saveBulbName() {
-    this.props._changeLampName(this.state.id,{
-      name : this.state.bulbName
+    this.props._changeLampName(this.state.id, {
+      name: this.state.bulbName
     })
   }
 
@@ -132,4 +130,4 @@ const styles = StyleSheet.create({
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(EditBulb);
+)(EditBulbScreen);

@@ -7,16 +7,14 @@ import { SetLampState } from "../../redux/actions";
 import validator from 'validator';
 import { HexColorConversionToXY } from '../../components/ColorConvert';
 
-class ControlBulbAdvanced extends Component {
+class ControlBulbAdvancedScreen extends Component {
     static navigationOptions = ({ navigation }) => {
         return {
             headerLeft:
-                <TouchableOpacity>
-                    <TouchableOpacity
+                <TouchableOpacity
                         onPress={() => navigation.goBack()}
                         style={{ height: 40, width: 80, justifyContent: 'center' }}>
                         <Image source={require('../../assets/icons/back.png')} />
-                    </TouchableOpacity>
                 </TouchableOpacity>
         }
     }
@@ -108,11 +106,6 @@ const mapDispatchToProps = dispatch => {
     };
 };
 
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps
-)(ControlBulbAdvanced)
-
 const styles = StyleSheet.create({
     row: {
         marginTop: 20,
@@ -142,3 +135,8 @@ const styles = StyleSheet.create({
         paddingBottom: 10
     },
 });
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(ControlBulbAdvancedScreen)

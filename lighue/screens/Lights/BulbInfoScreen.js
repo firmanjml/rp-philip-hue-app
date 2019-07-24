@@ -19,7 +19,7 @@ import {
   MenuTrigger,
 } from "react-native-popup-menu";
 
-class BulbInfo extends React.Component {
+class BulbInfoScreen extends React.Component {
 
   static navigationOptions = ({ navigation }) => {
     return {
@@ -184,8 +184,6 @@ const mapStateToProps = (state) => {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(BulbInfo);
-
 const styles = StyleSheet.create({
   row: {
     marginTop: 20,
@@ -200,6 +198,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderColor: "#E1E3E8"
   },
-
 });
 
+export default connect(mapStateToProps, mapDispatchToProps)(BulbInfoScreen);

@@ -68,8 +68,8 @@ class AddRoomScreen extends React.Component {
           <Text h1 style={{ color: "white" }}>No Bulb Found</Text>
         </Block>
         :
-        Object.keys(lightBulbSelected).map(val => (
-          <View style={styles.lampRow}>
+        Object.keys(lightBulbSelected).map((val, index) => (
+          <View key={index} style={styles.lampRow}>
             <TouchableOpacity
               key={val}
               onPress={() => _ChangeLampStateByID(val, {

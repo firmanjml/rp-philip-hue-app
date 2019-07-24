@@ -36,10 +36,10 @@ class ControlRoomScreen extends React.Component {
 
   componentWillMount() {
     this.setState({
-      id: this.props.navigation.getParam("id", "NO-ID"),
+      id: this.props.navigation.getParam("id", "1"),
       type: this.props.navigation.getParam("class", "Other"),
-      sat: this.props.groups[this.props.navigation.getParam("id", "NO-ID")].action.sat,
-      bri: this.props.groups[this.props.navigation.getParam("id", "NO-ID")].action.bri
+      sat: this.props.groups[this.props.navigation.getParam("id", "1")].action.sat,
+      bri: this.props.groups[this.props.navigation.getParam("id", "1")].action.bri
     });
   }
 

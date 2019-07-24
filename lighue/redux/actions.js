@@ -179,10 +179,43 @@ export const GetBridgeIP = (navigation, isManual = false, bridgeip = '') => asyn
     }
 }
 
-export const AddBridge = (bridgeip = "") => (dispatch) => {
+export const AddBridge = (bridgeip = "", navigation) => async (dispatch) => {
+    await axios({
+        url: `http://${bridgeip}/api/nouser/config`,
+        method: 'GET'
+    }).then((res) => {
+        if (res.data.modelid === "BSB001") {
+            dispatch({
+                type: C.ADD_BRIDGE,
+                payload: bridgeip
+            })
+            navigation.navigate('PairNewBridge');
+        } else {
+            throw Error('Invalid IP');
+        }
+    }).catch((error) => {
+        console.log(error);
+        setTimeout(() => {
+            Alert.alert(
+                'IP address you entered cannot be reached',
+                "Please try again",
+                [{ text: "OK", onPress: () => console.log("OK Pressed") }],
+                { cancelable: false }
+            );
+        }, 500);
+    }).then(() => {
+        dispatch(ChangeLoading(false));
+    });
+}
+
+export const DeleteBridge = (bridgeIndex) => (dispatch) => {
     dispatch({
-        type: C.ADD_BRIDGE,
-        payload: bridgeip
+        type: C.DELETE_BRIDGE,
+        payload: bridgeIndex
+    })
+    dispatch({
+        type: C.DELETE_USERNAME,
+        payload: bridgeIndex
     })
 }
 
@@ -473,26 +506,23 @@ export const GetGroupAtrributes = (groupID) => (dispatch, getState) => {
  * SetGroupAttributes
  * * Document 2.5 Set Light Attributes
  * * https://developers.meethue.com/develop/hue-api/groupds-api/#set-group-attr
- * @param {number} groupId This paramter takes in the light ID.
+ * @param {number} groupID This paramter takes in the light ID.
  * @param {object} groupData This paramter takes in the body argument of the request.
 */
-export const SetGroupAttributes = (groupID, groupData) => (dispatch, getState) => {
+export const SetGroupAttributes = (groupID, groupData, navigation) => (dispatch, getState) => {
     const i = getState().bridgeIndex;
     const bridgeip = getState().bridgeip[i];
     const username = getState().username[i];
     const url = getState().cloud_enable === false ? `http://${bridgeip}/api/${username}/groups/${groupID}` : `https://api.meethue.com/bridge/${username}/groups/${groupID}`;
     const headers = getState().cloud_enable === true ? { "Authorization": `Bearer ${getState().cloud.token}`, "Content-Type": "application/json" } : { "Content-Type": "application/json" };
-
+    
     dispatch(ChangeLoading(true));
-    console.log("oi")
     axios({
         url,
         method: 'PUT',
         headers,
         data: groupData
     }).then(res => {
-        console.log("halo")
-        console.log(res.data)
         var payload = {};
         res.data.map((data) => {
             let key = Object.keys(data.success)[0].substring(Object.keys(data.success)[0].lastIndexOf('/') + 1);
@@ -502,10 +532,12 @@ export const SetGroupAttributes = (groupID, groupData) => (dispatch, getState) =
         if (payload) {
             dispatch({
                 type: C.CHANGE_GROUP_ATTR,
-                id: groupId,
+                id: groupID,
                 payload: payload
             })
-            console.log(payload)
+            navigation.navigate('ControlRoom', {
+                id: groupID
+            });
         } else {
             console.log("error else")
             throw Error('An error has occur');
@@ -595,9 +627,9 @@ export const DeleteGroup = (groupID) => (dispatch, getState) => {
  * CreateUser
  * * Document 7.1. Create user
  * * https://developers.meethue.com/develop/hue-api/7-configuration-api/#create-user
+ * @param {number} i This paramter takes in the index of the bridge.
 */
-export const CreateUser = () => (dispatch, getState) => {
-    const i = getState().bridgeIndex;
+export const CreateUser = (i = 0) => (dispatch, getState) => {
     const bridgeip = getState().bridgeip[i];
 
     dispatch(ChangeLoading(true));

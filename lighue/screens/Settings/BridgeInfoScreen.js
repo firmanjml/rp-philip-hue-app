@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Image, StyleSheet, TouchableOpacity, View } from 'react-native'
-import { Block, Text, Button } from '../components';
-import { theme } from '../constants';
+import { Block, Text, Button } from '../../components';
+import { theme } from '../../constants';
 import { connect } from 'react-redux';
 import { ScrollView } from 'react-native-gesture-handler';
 
@@ -10,18 +10,16 @@ class BridgeInfo extends Component {
     static navigationOptions = ({ navigation }) => {
         return {
             headerLeft:
-                <TouchableOpacity>
-                    <TouchableOpacity
-                        onPress={() => navigation.goBack()}
-                        style={{ height: 40, width: 80, justifyContent: 'center' }}>
-                        <Image source={require('../assets/icons/back.png')} />
-                    </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={() => navigation.goBack()}
+                    style={{ height: 40, width: 80, justifyContent: 'center' }}>
+                    <Image source={require('../../assets/icons/back.png')} />
                 </TouchableOpacity>
         }
     }
 
     renderStatus(textcolor) {
-        const {cloud_enable , status} = this.props;
+        const { cloud_enable, status } = this.props;
         if (!cloud_enable) {
             return (
                 <Text style={textcolor}>{status ? "Connected" : "Not Connected"}</Text>
@@ -89,16 +87,22 @@ class BridgeInfo extends Component {
                             <Text style={[styles.textSetting, textcolor]}>{config.modelid}</Text>
                             <View style={styles.divider} />
                         </Block>
-                        <Block flex={false} column style={styles.row}>
-                            <Text bold style={textcolor}>Bridge Date</Text>
-                            <Text style={[styles.textSetting, textcolor]}>{(config.localtime).substring(0,10)}</Text>
-                            <View style={styles.divider} />
-                        </Block>
-                        <Block flex={false} column style={styles.row}>
-                            <Text bold style={textcolor}>Bridge Time</Text>
-                            <Text style={[styles.textSetting, textcolor]}>{(config.localtime).substring(11)}</Text>
-                            <View style={styles.divider} />
-                        </Block>
+                        {
+                            (config.localtime) ?
+                                (<Block>
+                                    <Block flex={false} column style={styles.row}>
+                                        <Text bold style={textcolor}>Bridge Date</Text>
+                                        <Text style={[styles.textSetting, textcolor]}>{(config.localtime).substring(0, 10)}</Text>
+                                        <View style={styles.divider} />
+                                    </Block>
+                                    <Block flex={false} column style={styles.row}>
+                                        <Text bold style={textcolor}>Bridge Time</Text>
+                                        <Text style={[styles.textSetting, textcolor]}>{(config.localtime).substring(11)}</Text>
+                                        <View style={styles.divider} />
+                                    </Block>
+                                </Block>)
+                                : null
+                        }
                         <Block flex={false} column style={styles.row}>
                             <Text bold style={textcolor}>ZigBee Channel</Text>
                             <Text style={[styles.textSetting, textcolor]}>{config.zigbeechannel}</Text>

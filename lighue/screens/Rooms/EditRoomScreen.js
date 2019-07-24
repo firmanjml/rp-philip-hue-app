@@ -76,9 +76,9 @@ class EditRoomScreen extends React.Component {
 
   confirmEditRoom() {
     this.props._changeGroupAttribute(this.state.id, {
-      name: this.state.name
-      // class: this.state.roomClass
-    });
+      "name": this.state.roomName
+    }, 
+    this.props.navigation);
   }
 
   returnClassData = (val) => {
@@ -174,8 +174,8 @@ const mapDispatchToProps = dispatch => {
     _changeGroupStateByID(id, data) {
       return dispatch(SetGroupState(id, data));
     },
-    _changeGroupAttribute(id, data) {
-      return dispatch(SetGroupAttributes(id, data));
+    _changeGroupAttribute(id, data, navigate) {
+      return dispatch(SetGroupAttributes(id, data, navigate));
     },
     _deleteGroup(id) {
       return dispatch(DeleteGroup(id))

@@ -4,17 +4,15 @@ import { Block, Text, Button } from '../../components';
 import { theme } from '../../constants';
 import { connect } from 'react-redux';
 import { persistor } from "../../redux/store";
-
 import axios from 'axios';
-
 import Swipe from '../../components/Swipe';
 import { MaterialIcons, AntDesign } from '@expo/vector-icons';
 const { width } = Dimensions.get('window');
 import SnackBar from 'rn-snackbar';
-
 import { SearchForNewLights } from '../../redux/actions'
 var interval;
-class Setting extends Component {
+
+class SearchBulbScreen extends Component {
     static navigationOptions = ({ navigation }) => {
         return {
             headerLeft:
@@ -100,7 +98,7 @@ const mapStateToProps = (state) => {
 export default connect(
     mapStateToProps,
     mapDispatchToProps
-)(Setting)
+)(SearchBulbScreen)
 
 const styles = StyleSheet.create({
     row: {

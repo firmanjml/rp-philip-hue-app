@@ -19,7 +19,7 @@ import {
     MenuTrigger
 } from "react-native-popup-menu";
 
-class NewControlBulb extends Component {
+class NewControlBulbScreen extends Component {
     static navigationOptions = {
         header: null
     }
@@ -217,11 +217,6 @@ const mapStateToProps = (state) => {
     }
 }
 
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps
-)(NewControlBulb)
-
 const styles = StyleSheet.create({
     titleRow: {
         flexDirection: 'row',
@@ -269,3 +264,8 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     }
 });
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(NewControlBulbScreen)

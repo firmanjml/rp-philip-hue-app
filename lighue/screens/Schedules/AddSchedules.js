@@ -12,12 +12,10 @@ class AddSchedules extends Component {
     static navigationOptions = ({ navigation }) => {
         return {
             headerLeft:
-                <TouchableOpacity>
-                    <TouchableOpacity
+                <TouchableOpacity
                         onPress={() => navigation.goBack()}
                         style={{ height: 40, width: 80, justifyContent: 'center' }}>
                         <Image source={require('../../assets/icons/back.png')} />
-                    </TouchableOpacity>
                 </TouchableOpacity>
         }
     }

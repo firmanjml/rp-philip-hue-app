@@ -1,27 +1,24 @@
 import React, { Component } from 'react'
 import { Image, StyleSheet, TouchableOpacity, Dimensions, View, Alert } from 'react-native'
-import { Block, Text, Button } from '../components';
-import { theme } from '../constants';
+import { Block, Text, Button } from '../../components';
+import { theme } from '../../constants';
 import { connect } from 'react-redux';
 import { Updates, BlurView, AuthSession, Constants, WebBrowser } from 'expo';
-import { persistor } from "../redux/store";
+import { persistor } from "../../redux/store";
 const { width } = Dimensions.get('window');
-import { ChangeThemeMode, ChangeCloudToken, ChangeCloudState } from '../redux/actions'
-import ToggleSwitch from '../components/ToggleSwitch';
+import { ChangeThemeMode, ChangeCloudToken, ChangeCloudState } from '../../redux/actions'
+import ToggleSwitch from '../../components/ToggleSwitch';
 
-class Setting extends Component {
+class SettingScreen extends Component {
     static navigationOptions = ({ navigation }) => {
         return {
             headerLeft:
                 <TouchableOpacity
                     onPress={() => navigation.goBack()}
                     style={{ height: 40, width: 80, justifyContent: 'center' }}>
-                    <Image source={require('../assets/icons/back.png')} />
+                    <Image source={require('../../assets/icons/back.png')} />
                 </TouchableOpacity>
         }
-    }
-    state = {
-        clearDataModal: false
     }
 
     clearAppData() {
@@ -67,7 +64,7 @@ class Setting extends Component {
     }
 
     render() {
-        const { nightmode, cloud_enable } = this.props;
+        const { nightmode, cloud_enable, bridgeip } = this.props;
         const { colors } = theme;
         const backgroundcolor = { backgroundColor: nightmode ? colors.background : colors.backgroundLight }
         const textcolor = { color: nightmode ? colors.white : colors.black }
@@ -97,6 +94,14 @@ class Setting extends Component {
                                     <Text style={[styles.textSetting, textcolor]}>Setup Remote Control via Cloud</Text>
                                 </TouchableOpacity>
                         }
+                    </Block>
+                    <View style={styles.divider} />
+                    <Block flex={false} row space="between" style={styles.row}>
+                        <TouchableOpacity
+                            onPress={() => this.props.navigation.navigate("ListBridge")}>
+                            <Text style={[styles.textSetting, textcolor]}>{(bridgeip.length > 1) ? "Switch Bridge" : "Add new Bridge"}</Text>
+                        </TouchableOpacity>
+
                     </Block>
                     <View style={styles.divider} />
                     {this.renderBridgeInfo(textcolor)}
@@ -182,14 +187,10 @@ const mapStateToProps = (state) => {
         nightmode: state.nightmode,
         cloud_enable: state.cloud_enable,
         bridgeIndex: state.bridgeIndex,
+        bridgeip: state.bridgeip,
         username: state.username
     }
 }
-
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps
-)(Setting)
 
 const styles = StyleSheet.create({
     row: {
@@ -208,3 +209,8 @@ const styles = StyleSheet.create({
         borderColor: "#747880"
     },
 });
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(SettingScreen)

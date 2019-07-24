@@ -110,20 +110,6 @@ class DefaultScreen extends Component {
                 </Menu>
             )
         }
-        else if (this.state.active === "Scenes") {
-            return (
-                <Menu onSelect={value => this.onMenuSceneSelect(value)}>
-                    <MenuTrigger>
-                        <Icon.Entypo name="dots-three-horizontal" size={25} color={theme.colors.gray} />
-                    </MenuTrigger>
-                    <MenuOptions style={{ padding: 15 }} >
-                        <MenuOption value={1}><Text h3>Add Scenes</Text></MenuOption>
-                        <View style={styles.divider} />
-                        <MenuOption value={2}><Text h3>Settings</Text></MenuOption>
-                    </MenuOptions>
-                </Menu>
-            )
-        }
     }
 
     displayLayout() {
@@ -208,12 +194,11 @@ class DefaultScreen extends Component {
                         </TouchableOpacity>
                     </Block>
                     :
-                    Object.keys(lights).map(val => (
-                        <View style={{ paddingHorizontal: theme.sizes.base * 2 }}>
+                    Object.keys(lights).map((val, index) => (
+                        <View key={index} style={{ paddingHorizontal: theme.sizes.base * 2 }}>
                             <View style={styles.bulbRow}>
                                 <View style={{ flexDirection: 'row' }}>
                                     <TouchableOpacity
-                                        key={val}
                                         onPress={() => {
                                             this.props._fetchAllLights();
                                             setTimeout(() => {
@@ -262,20 +247,6 @@ class DefaultScreen extends Component {
                     </TouchableOpacity>
                 </Block>
             )
-        } else {
-            return (
-                <Block style={{ paddingHorizontal: theme.sizes.base * 2, alignItems: 'center', justifyContent: 'center' }}>
-                    <Text h1 bold style={textcolor}>
-                        No scenes created.
-                    </Text>
-                    <TouchableOpacity
-                        onPress={() => {
-                            navigation.navigate('AddScenes');
-                        }}>
-                        <Text h2 style={{ marginTop: 5, color: '#20D29B' }}>Add scenes</Text>
-                    </TouchableOpacity>
-                </Block>
-            )
         }
     }
 
@@ -316,7 +287,7 @@ class DefaultScreen extends Component {
     }
 
     render() {
-        const tabs = ['Rooms', 'Lights', 'Schedules', 'Scenes'];
+        const tabs = ['Rooms', 'Lights', 'Schedules'];
         const { nightmode } = this.props;
         const { colors } = theme;
         const backgroundcolor = { backgroundColor: nightmode ? colors.background : colors.backgroundLight }
@@ -374,7 +345,7 @@ const styles = StyleSheet.create({
     },
     tabs: {
         marginTop: 30,
-        justifyContent: 'space-between',
+        justifyContent: 'space-around',
         borderBottomColor: theme.colors.gray2,
         borderBottomWidth: StyleSheet.hairlineWidth,
         marginVertical: theme.sizes.base,

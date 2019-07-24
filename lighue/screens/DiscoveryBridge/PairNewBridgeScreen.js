@@ -1,34 +1,35 @@
 import React, { Component } from 'react'
 import {
-    StyleSheet,
     TouchableOpacity,
     Image,
     Alert
 } from 'react-native';
 import { connect } from 'react-redux';
-import { CreateUser } from '../../redux/actions';
+import { CreateUser, SwitchBridge } from '../../redux/actions';
 import { theme } from '../../constants';
 import { Block, Text } from '../../components';
 import Countdown from 'react-countdown-now';
 
-class LinkButtonScreen extends Component {
+class PairNewBridgeScreen extends Component {
     static navigationOptions = ({ navigation }) => {
         return {
             headerLeft:
                 <TouchableOpacity
-                        onPress={() => navigation.goBack()}
-                        style={{ height: 40, width: 80, justifyContent: 'center' }}>
-                        <Image source={require('../../assets/icons/back.png')} />
+                    onPress={() => navigation.goBack()}
+                    style={{ height: 40, width: 80, justifyContent: 'center' }}>
+                    <Image source={require('../../assets/icons/back.png')} />
                 </TouchableOpacity>
         }
     }
 
     createUsername = () => {
-        const { username } = this.props;
-        if (!username[0]) {
-            this.props._CreateUser(0);
+        const { username, bridgeip } = this.props;
+        const bridgeLength = bridgeip.length - 1;
+        if (!username[bridgeLength]) {
+            this.props._CreateUser(bridgeLength);
         } else {
-            this.props.navigation.navigate("SplashNavigator")
+            this.props._SwitchBridge(bridgeLength);
+            this.props.navigation.navigate("ListRoom");
         }
     }
 
@@ -37,9 +38,9 @@ class LinkButtonScreen extends Component {
         const { colors } = theme;
         const textcolor = { color: nightmode ? colors.white : colors.black }
         if (!completed) {
-            return <Text center h1 style={[this.props.style, { fontFamily: 'space-mono' },textcolor]}>{seconds} seconds</Text>;
+            return <Text center h1 style={[this.props.style, { fontFamily: 'space-mono' }, textcolor]}>{seconds} seconds</Text>;
         } else {
-            return <Text center h1 style={[this.props.style, { fontFamily: 'space-mono' },textcolor]}>No device link.</Text>;
+            return <Text center h1 style={[this.props.style, { fontFamily: 'space-mono' }, textcolor]}>No device link.</Text>;
         }
     };
 
@@ -48,14 +49,14 @@ class LinkButtonScreen extends Component {
         const { colors } = theme;
         const backgroundcolor = { backgroundColor: nightmode ? colors.background : colors.backgroundLight };
         const titlecolor = { color: nightmode ? colors.white : colors.black }
-        const textcolor = { color: nightmode ? colors.white : colors.gray3}
+        const textcolor = { color: nightmode ? colors.white : colors.gray3 }
         return (
             <Block style={backgroundcolor} >
                 <Block container>
-                    <Text h1 center bold style={[{ textAlign: 'left' },titlecolor]}>
+                    <Text h1 center bold style={[{ textAlign: 'left' }, titlecolor]}>
                         Link to Philips Hue
                     </Text>
-                    <Text paragraph style={[{ marginTop: 20 },textcolor]}>
+                    <Text paragraph style={[{ marginTop: 20 }, textcolor]}>
                         To link this device with the Bridge, press the push-link button of the Hue bridge you want to connect to.
                     </Text>
                     <Block marginTop={30} justifyContent={'center'} alignItems={'center'}>
@@ -100,6 +101,7 @@ class LinkButtonScreen extends Component {
 
 const mapStateToProps = (state) => {
     return {
+        bridgeip: state.bridgeip,
         username: state.username,
         nightmode: state.nightmode
     }
@@ -109,24 +111,14 @@ const mapDispatchToProps = (dispatch) => {
     return {
         _CreateUser(i) {
             return dispatch(CreateUser(i));
+        },
+        _SwitchBridge(i) {
+            return dispatch(SwitchBridge(i));
         }
     }
 }
 
-const styles = StyleSheet.create({
-    textInput: {
-        height: 25,
-        borderBottomWidth: .5,
-        borderRadius: 0,
-        borderWidth: 0,
-        color: 'white',
-        borderColor: 'white',
-        textAlign: 'left',
-        paddingBottom: 10
-    }
-});
-
 export default connect(
     mapStateToProps,
     mapDispatchToProps
-)(LinkButtonScreen);
+)(PairNewBridgeScreen);

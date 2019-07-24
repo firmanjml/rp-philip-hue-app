@@ -15,17 +15,15 @@ import Slider from 'react-native-slider';
 
 import axios from 'axios';
 
-class ControlBulb extends React.Component {
+class ControlBulbScreen extends React.Component {
 
     static navigationOptions = ({ navigation }) => {
         return {
             headerLeft:
-                <TouchableOpacity>
-                    <TouchableOpacity
+                <TouchableOpacity
                         onPress={() => navigation.goBack()}
                         style={{ height: 40, width: 80, justifyContent: 'center' }}>
                         <Image source={require('../../assets/icons/back.png')} />
-                    </TouchableOpacity>
                 </TouchableOpacity>
         }
     }
@@ -243,11 +241,6 @@ const mapStateToProps = (state) => {
     }
 }
 
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps
-)(ControlBulb)
-
 const styles = StyleSheet.create({
     lightPicker: {
         width: 10,
@@ -283,4 +276,9 @@ const styles = StyleSheet.create({
     textControl: {
         textAlign: 'left'
     }
-})
+});
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(ControlBulbScreen)

@@ -111,6 +111,10 @@ export const bridgeip = (state = [], action) => {
             _state = JSON.parse(JSON.stringify(state))
             _state.push(action.payload);
             return _state;
+        case C.DELETE_BRIDGE:
+            _state = JSON.parse(JSON.stringify(state))
+            _state.splice(action.payload, 1);
+            return _state;
         default:
             return state;
     }
@@ -125,6 +129,10 @@ export const username = (state = [], action) => {
         case C.FETCH_USERNAME:
             _state = JSON.parse(JSON.stringify(state))
             _state.push(action.payload)
+            return _state;
+        case C.DELETE_USERNAME:
+            _state = JSON.parse(JSON.stringify(state))
+            _state.splice(action.payload, 1);
             return _state;
         default:
             return state;
@@ -174,7 +182,7 @@ export const groups = (state = {}, action) => {
             return _state;
         case C.DELETE_GROUP:
             _state = JSON.parse(JSON.stringify(state));
-            delete _state[payload]
+            delete _state[action.payload]
             return _state;
         default:
             return state;
