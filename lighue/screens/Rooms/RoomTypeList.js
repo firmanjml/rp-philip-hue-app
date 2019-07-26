@@ -48,7 +48,7 @@ class RoomTypeList extends Component {
         return (
             <Block style={backgroundcolor}>
                 <View style={styles.header}>
-                    <Text h1 bold style={[titlecolor, { marginTop: 10 }]}>Choose room type</Text>
+                    <Text h1 bold style={[titlecolor, { marginTop: 25, marginBottom : 10 }]}>Choose room type</Text>
                 </View>
                 <ScrollView>
                     <Block flex={false} row space="between" style={[styles.categories, { marginTop: 20 }]}>

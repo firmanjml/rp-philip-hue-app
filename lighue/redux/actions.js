@@ -361,12 +361,14 @@ export const DeleteLight = (lampID) => (dispatch, getState) => {
     const url = getState().cloud_enable === false ? `http://${bridgeip}/api/${username}/lights/${lampID}` : `https://api.meethue.com/bridge/${username}/lights/${lampID}`;
     const headers = getState().cloud_enable === true ? { "Authorization": `Bearer ${getState().cloud.token}`, "Content-Type": "application/json" } : { "Content-Type": "application/json" };
 
+    dispatch(ChangeSaving(true))
     axios({
         url,
         method: 'DELETE',
         headers
     }).then((res) => {
         if (res.data[0].success) {
+            dispatch(ChangeSaving(false))
             dispatch({
                 type: C.DELETE_LIGHT,
                 payload: lampID
@@ -377,16 +379,29 @@ export const DeleteLight = (lampID) => (dispatch, getState) => {
                 }
             })
         } else if (res.data[0].error) {
-            console.log(res.data[0].error)
+            dispatch(ChangeSaving(true))
+            setTimeout(() => {
+                Alert.alert(
+                    'Error',
+                    "Please try again",
+                    [{ text: "OK", onPress: () => console.log("OK Pressed") }],
+                    { cancelable: false }
+                );
+            }, 1000);
+        }
+    }).catch((error) => {
+        dispatch(ChangeSaving(false))
+        setTimeout(() => {
             Alert.alert(
                 'Error',
                 "Please try again",
                 [{ text: "OK", onPress: () => console.log("OK Pressed") }],
                 { cancelable: false }
             );
-        }
-    }).catch((error) => {
-    }).then();
+        }, 1000);
+    }).then(
+
+    )
 };
 
 /** 
@@ -619,12 +634,8 @@ export const SetGroupState = (groupID, groupData) => (dispatch, getState) => {
                 id: groupID,
                 payload: payload
             })
-        } else {
-            throw Error('An error has occur');
         }
-    }).catch((error) => {
-
-    }).then();
+    })
 };
 
 /** 
@@ -633,29 +644,42 @@ export const SetGroupState = (groupID, groupData) => (dispatch, getState) => {
  * * https://developers.meethue.com/develop/hue-api/groupds-api/#del-group
  * @param {number} groupID This paramter takes in the group ID.
 */
-export const DeleteGroup = (groupID) => (dispatch, getState) => {
+export const DeleteGroup = (groupID, navigation) => (dispatch, getState) => {
     const i = getState().bridgeIndex;
     const bridgeip = getState().bridgeip[i];
     const username = getState().username[i];
     const url = getState().cloud_enable === false ? `http://${bridgeip}/api/${username}/groups/${groupID}` : `https://api.meethue.com/bridge/${username}/groups/${groupID}`;
     const headers = getState().cloud_enable === true ? { "Authorization": `Bearer ${getState().cloud.token}`, "Content-Type": "application/json" } : { "Content-Type": "application/json" };
 
+    dispatch(ChangeSaving(true))
     axios({
         url,
         method: 'DELETE',
         headers
     }).then((res) => {
         if (res.data[0].success) {
+            dispatch(ChangeSaving(false))
+            navigation.navigate("PostUpdate", {
+                meta: {
+                    title: "Successfully deleted!"
+                }
+             })
             dispatch({
                 type: C.DELETE_GROUP,
                 payload: groupID
             })
-        } else {
-            throw Error('An error has occur')
         }
     }).catch((error) => {
-
-    }).then();
+        dispatch(ChangeSaving(false))
+        setTimeout(() => {
+            Alert.alert(
+                'Error',
+                "Please try again",
+                [{ text: "OK", onPress: () => console.log("OK Pressed") }],
+                { cancelable: false }
+            );
+        }, 1000);
+    })
 };
 
 /** 

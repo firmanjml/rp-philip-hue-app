@@ -30,16 +30,21 @@ class ControlRoomScreen extends React.Component {
     id: 0,
     sat: 0,
     bri: 0,
+    on: false,
     type: "",
-    active: "Main"
+    active: "Main",
+    roomName: ""
   };
 
   componentWillMount() {
     this.setState({
+      roomName: this.props.groups[this.props.navigation.getParam("id", "1")].name,
       id: this.props.navigation.getParam("id", "1"),
       type: this.props.navigation.getParam("class", "Other"),
       sat: this.props.groups[this.props.navigation.getParam("id", "1")].action.sat,
-      bri: this.props.groups[this.props.navigation.getParam("id", "1")].action.bri
+      bri: this.props.groups[this.props.navigation.getParam("id", "1")].action.bri,
+      on: this.props.groups[this.props.navigation.getParam("id", "1")].action.on
+
     });
   }
 
@@ -165,16 +170,6 @@ class ControlRoomScreen extends React.Component {
     }
   }
 
-  renderToggleButton() {
-    return (
-      <ToggleSwitch
-        offColor="#DDDDDD"
-        onColor={theme.colors.secondary}
-        isOn={this.props.groups[this.state.id].action.on}
-        onToggle={this.onGroupLights}
-      />
-    );
-  }
 
   onMenuRoomSelect(value) {
     console.log("ControlRoomScreen", "press menu " + value);
@@ -202,7 +197,7 @@ class ControlRoomScreen extends React.Component {
     const i = this.props.bridgeIndex
     const bridgeip = this.props.bridgeip
     const username = this.props.username[i]
-    const url = this.props.cloud_enable === false ? `http://${bridgeip}/api/${username}/groups/${this.state.id}/state` : `https://api.meethue.com/bridge/${username}/groups/${this.state.id}/state`;
+    const url = this.props.cloud_enable === false ? `http://${bridgeip}/api/${username}/groups/${this.state.id}/action` : `https://api.meethue.com/bridge/${username}/groups/${this.state.id}/action`;
     const headers = this.props.cloud_enable === true ? { "Authorization": `Bearer ${this.props.cloud.token}`, "Content-Type": "application/json" } : { "Content-Type": "application/json" };
 
     axios({
@@ -220,7 +215,7 @@ class ControlRoomScreen extends React.Component {
     const i = this.props.bridgeIndex
     const bridgeip = this.props.bridgeip
     const username = this.props.username[i]
-    const url = this.props.cloud_enable === false ? `http://${bridgeip}/api/${username}/groups/${this.state.id}/state` : `https://api.meethue.com/bridge/${username}/groups/${this.state.id}/state`;
+    const url = this.props.cloud_enable === false ? `http://${bridgeip}/api/${username}/groups/${this.state.id}/action` : `https://api.meethue.com/bridge/${username}/groups/${this.state.id}/action`;
     const headers = this.props.cloud_enable === true ? { "Authorization": `Bearer ${this.props.cloud.token}`, "Content-Type": "application/json" } : { "Content-Type": "application/json" };
 
     axios({
@@ -238,7 +233,7 @@ class ControlRoomScreen extends React.Component {
     const i = this.props.bridgeIndex
     const bridgeip = this.props.bridgeip
     const username = this.props.username[i]
-    const url = this.props.cloud_enable === false ? `http://${bridgeip}/api/${username}/groups/${this.state.id}/state` : `https://api.meethue.com/bridge/${username}/groups/${this.state.id}/state`;
+    const url = this.props.cloud_enable === false ? `http://${bridgeip}/api/${username}/groups/${this.state.id}/action` : `https://api.meethue.com/bridge/${username}/groups/${this.state.id}/action`;
     const headers = this.props.cloud_enable === true ? { "Authorization": `Bearer ${this.props.cloud.token}`, "Content-Type": "application/json" } : { "Content-Type": "application/json" };
 
     axios({
@@ -269,16 +264,21 @@ class ControlRoomScreen extends React.Component {
         <Block containerNoHeader>
           <View style={styles.titleRow}>
             <Text style={[styles.title, titlecolor]}>
-              {this.props.groups[this.state.id].name}
+              {this.state.roomName}
             </Text>
             <ToggleSwitch
               offColor="#DDDDDD"
               onColor={theme.colors.secondary}
-              isOn={this.props.groups[this.state.id].action.on}
+              isOn={this.state.on}
               onToggle={(value) => {
-                _changeGroupStateByID(this.state.id, {
-                  "on": value,
-                })
+                {
+                  _changeGroupStateByID(this.state.id, {
+                    "on": value,
+                  }),
+                    this.setState({
+                      on: value
+                    })
+                }
               }}
             />
           </View>

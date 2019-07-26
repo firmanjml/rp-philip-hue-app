@@ -60,7 +60,7 @@ class SettingScreen extends Component {
     }
 
     render() {
-        const { nightmode, cloud_enable, bridgeip, bridgeIndex, } = this.props;
+        const { nightmode, cloud_enable, bridgeip, bridgeIndex, hardwareSupport } = this.props;
         const { colors } = theme;
         const backgroundcolor = { backgroundColor: nightmode ? colors.background : colors.backgroundLight }
         const textcolor = { color: nightmode ? colors.white : colors.black }
@@ -81,16 +81,23 @@ class SettingScreen extends Component {
                             />
                         </Block>
                         <View style={styles.divider} />
-                        <Block flex={false} row space="between" style={styles.row}>
-                            <Text style={[styles.textSetting, textcolor]}>Enable Fingerprint</Text>
-                            <ToggleSwitch
-                                offColor="#DDDDDD"
-                                onColor={theme.colors.secondary}
-                                isOn={this.props.authentication}
-                                onToggle={(boolean) => this.props._UpdateAuthentication(boolean)}
-                            />
-                        </Block>
-                        <View style={styles.divider} />
+                        {
+                            hardwareSupport != 0 ?
+                                <View>
+                                    <Block flex={false} row space="between" style={styles.row}>
+                                        <Text style={[styles.textSetting, textcolor]}>Enable Fingerprint</Text>
+                                        <ToggleSwitch
+                                            offColor="#DDDDDD"
+                                            onColor={theme.colors.secondary}
+                                            isOn={this.props.authentication}
+                                            onToggle={(boolean) => this.props._UpdateAuthentication(boolean)}
+                                        />
+                                    </Block>
+                                    <View style={styles.divider} />
+                                </View>
+                                :
+                                <View></View>
+                        }
                         {
                             this.props.bridgeip.length > 0 ?
                                 (
@@ -198,7 +205,8 @@ const mapStateToProps = (state) => {
         bridgeIndex: state.bridgeIndex,
         bridgeip: state.bridgeip,
         username: state.username,
-        authentication : state.authentication
+        authentication: state.authentication,
+        hardwareSupport: state.hardwareSupport
     }
 }
 

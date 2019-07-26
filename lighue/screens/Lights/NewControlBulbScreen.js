@@ -31,7 +31,8 @@ class NewControlBulbScreen extends Component {
         roomName: 'None',
         bri: 0,
         sat: 0,
-        dialogModal: false
+        dialogModal: false,
+        dimmableType: null
     }
 
     componentWillMount() {
@@ -39,6 +40,7 @@ class NewControlBulbScreen extends Component {
             id: this.props.navigation.getParam('id', "1"),
             bri: this.props.lights[this.props.navigation.getParam('id', "1")].state.bri,
             sat: this.props.lights[this.props.navigation.getParam('id', "1")].state.sat,
+            dimmableType: this.props.lights[this.props.navigation.getParam('id', "1")].type != "Dimmable light" ? false : true,
         })
     }
 
@@ -107,7 +109,7 @@ class NewControlBulbScreen extends Component {
                 submitInput={(hex) => {
                     {
                         this.setState({ dialogModal: false }),
-                        this.applyHexCode(hex)
+                            this.applyHexCode(hex)
                     }
                 }}
                 closeDialog={() => this.setState({ dialogModal: false })}
@@ -118,7 +120,7 @@ class NewControlBulbScreen extends Component {
     applyHexCode(hex) {
         if (validator.isHexColor(hex)) {
             this.props._ChangeLampStateByID(this.state.id, {
-                on : true,
+                on: true,
                 xy: HexColorConversionToXY(hex)
             })
         }
@@ -229,26 +231,31 @@ class NewControlBulbScreen extends Component {
                         value={this.state.bri}
                         onValueChange={this.changeBrightnessState}
                     />
-                    <Text style={[styles.textPer, textcolor]}>{this.state.briPer}</Text>
-                    <Text style={[styles.textControl, textcolor, { marginBottom: 10 }]}>Saturation</Text>
-                    <Slider
-                        minimumValue={1}
-                        maximumValue={254}
-                        step={10}
-                        style={{ height: 25 }}
-                        thumbStyle={styles.thumb}
-                        trackStyle={{ height: 15, borderRadius: 10 }}
-                        minimumTrackTintColor={colors.secondary}
-                        maximumTrackTintColor={trackTintColor}
-                        value={this.state.sat}
-                        onValueChange={this.changeSaturationState}
-                    />
-                    <Text style={[styles.textPer, textcolor]}>{this.state.satPer}</Text>
-                    <ColorPicker
-                        onColorChange={this.changeColorLightState}
-                        style={{ flex: 1 }}
-                        hideSliders={true}
-                    />
+                    {
+                        !this.state.dimmableType ?
+                            <Block>
+                                <Text style={[styles.textControl, textcolor, { marginTop: 10, marginBottom : 10 }]}>Saturation</Text>
+                                <Slider
+                                    minimumValue={1}
+                                    maximumValue={254}
+                                    step={10}
+                                    style={{ height: 25 }}
+                                    thumbStyle={styles.thumb}
+                                    trackStyle={{ height: 15, borderRadius: 10 }}
+                                    minimumTrackTintColor={colors.secondary}
+                                    maximumTrackTintColor={trackTintColor}
+                                    value={this.state.sat}
+                                    onValueChange={this.changeSaturationState}
+                                />
+                                <ColorPicker
+                                    onColorChange={this.changeColorLightState}
+                                    style={{ flex: 1 }}
+                                    hideSliders={true}
+                                />
+                            </Block>
+                            :
+                            <View></View>
+                    }
                 </Block>
             </Block>
         )

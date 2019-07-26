@@ -127,7 +127,7 @@ class EditRoomScreen extends React.Component {
       "This will remove this group from the bridge",
       [
         { text: "No", onPress: () => { }, style: "cancel" },
-        { text: "Yes", onPress: () => this.props._deleteGroup(this.state.id) }
+        { text: "Yes", onPress: () => this.props._deleteGroup(this.state.id, this.props.navigation) }
       ],
       { cancelable: false }
     );
@@ -199,8 +199,8 @@ const mapDispatchToProps = dispatch => {
     _changeGroupAttribute(id, data, navigate) {
       return dispatch(SetGroupAttributes(id, data, navigate));
     },
-    _deleteGroup(id) {
-      return dispatch(DeleteGroup(id))
+    _deleteGroup(id, navigation) {
+      return dispatch(DeleteGroup(id, navigation))
     }
   };
 };

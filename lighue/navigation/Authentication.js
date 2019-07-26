@@ -1,7 +1,7 @@
 import React from 'react';
-import { StyleSheet, Platform, View, Modal, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { StyleSheet, Platform, View, Modal, TouchableOpacity } from 'react-native';
 import { theme } from '../constants';
-import { Text, Block } from '../components';
+import { Text } from '../components';
 
 import Fingerprint from '../assets/lottie/fingerprint.json'
 import { connect } from 'react-redux'
@@ -14,13 +14,11 @@ class Authentication extends React.Component {
         authenticate: null,
         androidModal: false,
         animation: Fingerprint,
-        status: false,
-        retry: 0,
-        retryText: ""
+        status: false
     }
 
-    componentWillMount() {
-        this.authentication()
+    async componentWillMount() {
+        await this.authentication();
     }
 
     componentDidMount() {
@@ -45,8 +43,6 @@ class Authentication extends React.Component {
             }
         }
         else {
-            // android work in progress
-            // this.animation.play(38, 38);
             this.setState({
                 androidModal: true
             })
@@ -68,6 +64,7 @@ class Authentication extends React.Component {
             }
         }
     }
+
 
     cancelAuthentication() {
         LocalAuthentication.cancelAuthenticate();
@@ -107,7 +104,7 @@ class Authentication extends React.Component {
                             <TouchableOpacity
                                 style={{ alignItems: 'center' }}
                                 onPress={() => this.cancelAuthentication()}>
-                                <Text light style={{ marginBottom: 15, color: '#20D29B' }}>Cancel</Text>
+                                <Text title light style={{ marginBottom: 15, color: '#20D29B' }}>Cancel</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
