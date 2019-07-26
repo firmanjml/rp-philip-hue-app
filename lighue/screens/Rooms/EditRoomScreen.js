@@ -5,7 +5,8 @@ import {
   Alert,
   TouchableOpacity,
   BackHandler,
-  View
+  View,
+  Modal, ActivityIndicator
 } from "react-native";
 import { connect } from "react-redux";
 import { Button, Block, Text, Input } from "../../components";
@@ -77,8 +78,7 @@ class EditRoomScreen extends React.Component {
   confirmEditRoom() {
     this.props._changeGroupAttribute(this.state.id, {
       "name": this.state.roomName
-    }, 
-    this.props.navigation);
+    }, this.props.navigation);
   }
 
   returnClassData = (val) => {
@@ -86,6 +86,26 @@ class EditRoomScreen extends React.Component {
       roomClass: val
     })
   }
+
+  renderLoadingModal() {
+    return (
+      <Modal
+        transparent={true}
+        animationType={'none'}
+        visible={this.props.saving}
+        onRequestClose={() => { console.log('close modal') }}>
+        <View style={styles.modalBackground}>
+          <View style={styles.activityIndicatorWrapper}>
+            <ActivityIndicator
+              animating={this.props.saving}
+              color="#00ff00" />
+            <Text>Saving...</Text>
+          </View>
+        </View>
+      </Modal>
+    )
+  }
+
 
   renderRoomType(textcolor) {
     return (
@@ -118,27 +138,29 @@ class EditRoomScreen extends React.Component {
     const { colors } = theme;
     const backgroundcolor = { backgroundColor: nightmode ? colors.background : colors.backgroundLight };
     const titlecolor = { color: nightmode ? colors.white : colors.black };
+    const bordercolor = { borderColor: nightmode ? colors.white : colors.black }
     const textcolor = { color: nightmode ? colors.white : colors.gray3 };
     return (
       <Block style={backgroundcolor}>
         <Block container>
-          <Text h1 center bold color={"white"} style={{ textAlign: "left" }}>Edit Room Info</Text>
+          <Text h1 center bold style={[titlecolor, { textAlign: "left" }]}>Edit Room Info</Text>
           <Block marginTop={30}>
-            <Text semibold paragraph white>
+            {this.renderLoadingModal()}
+            <Text semibold paragraph style={titlecolor}>
               Room Name
             </Text>
             <Input
-              style={styles.textInput}
+              style={[styles.textInput, textcolor, bordercolor]}
               value={this.state.roomName}
               onChangeText={this.handleName}
               placeholderTextColor={theme.colors.gray2}
             />
             <Block flex={false} column style={styles.row}>
-              <Text bold style={[titlecolor]}>Room Type</Text>
+              <Text style={[titlecolor]}>Room Type</Text>
               <View style={{ marginTop: 20 }}>
                 {this.renderRoomType(textcolor)}
               </View>
-              <View style={[styles.divider, { marginTop: 5 }]} />
+              <View style={[styles.divider, bordercolor, { marginTop: 5 }]} />
             </Block>
           </Block>
           <Block bottom flex={1} style={{ marginBottom: 20 }}>
@@ -151,7 +173,7 @@ class EditRoomScreen extends React.Component {
             </Button>
             <TouchableOpacity
               onPress={() => this.confirmDeleteRoom()}>
-              <Text center semibold white style={{alignSelf : 'center'}}>Delete Room</Text>
+              <Text center semibold white style={{ alignSelf: 'center' }}>Delete Room</Text>
             </TouchableOpacity>
           </Block>
         </Block>
@@ -162,7 +184,7 @@ class EditRoomScreen extends React.Component {
 
 const mapStateToProps = state => {
   return {
-    loading: state.loading,
+    saving: state.saving,
     groups: state.groups,
     lights: state.lights,
     nightmode: state.nightmode
@@ -195,8 +217,23 @@ const styles = StyleSheet.create({
     paddingBottom: 10
   },
   divider: {
-    borderBottomWidth: 0.5,
-    borderColor: "#E1E3E8"
+    borderBottomWidth: 0.5
+  },
+  modalBackground: {
+    flex: 1,
+    alignItems: 'center',
+    flexDirection: 'column',
+    justifyContent: 'space-around',
+    backgroundColor: '#00000040'
+  },
+  activityIndicatorWrapper: {
+    backgroundColor: '#FFFFFF',
+    height: 100,
+    width: 100,
+    borderRadius: 10,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-around'
   }
 });
 

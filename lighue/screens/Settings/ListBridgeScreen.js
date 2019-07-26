@@ -2,12 +2,11 @@ import React, { Component } from 'react';
 import { StyleSheet, TouchableOpacity, Image, View, Alert } from 'react-native';
 import { Block, Text } from '../../components';
 import { theme } from '../../constants';
-import { ConvertXYtoHex } from '../../components/ColorConvert';
 import { connect } from 'react-redux'
 import { ScrollView } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons';
 import DialogInput from 'react-native-dialog-input';
-import { AddBridge, SwitchBridge, DeleteBridge } from '../../redux/actions';
+import { AddBridge, SwitchBridge, DeleteBridge, GetConfig } from '../../redux/actions';
 
 class ListBridgeScreen extends Component {
     static navigationOptions = ({ navigation }) => {
@@ -47,12 +46,11 @@ class ListBridgeScreen extends Component {
         const backgroundcolor = { backgroundColor: nightmode ? colors.background : colors.backgroundLight };
         const titlecolor = { color: nightmode ? colors.white : colors.black };
         const textcolor = { color: nightmode ? colors.white : colors.gray3 };
-
         return (
             <Block style={backgroundcolor}>
                 <Block container>
                     <Block flex={false} center row space="between">
-                        <Text h1 bold style={[textcolor]}>List of Bridge</Text>
+                        <Text h1 bold style={[titlecolor]}>List of Bridge</Text>
                         <TouchableOpacity
                             onPress={() => this.setState({ dialogModal: true })}
                         >
@@ -83,7 +81,10 @@ class ListBridgeScreen extends Component {
                                             ) : <TouchableOpacity
                                                 onPress={() => {
                                                     this.props._switchBridge(i);
-                                                    this.props.navigation.navigate("ListRoom");
+                                                    setTimeout(() => {
+                                                        this.props._fetchEverything(true);
+                                                        this.props.navigation.navigate("ListRoom");
+                                                    }, 1000);
                                                 }}
                                             >
                                                     <Text bold style={[textcolor]}>{i + 1}) Bridge IP: {bridge}</Text>
@@ -144,6 +145,9 @@ const mapDispatchToProps = (dispatch) => {
         },
         _switchBridge: (i) => {
             return dispatch(SwitchBridge(i));
+        },
+        _fetchEverything(isLoading) {
+            return dispatch(GetConfig(isLoading));
         }
     }
 }

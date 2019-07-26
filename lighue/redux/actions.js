@@ -7,12 +7,17 @@ import { constant } from '../constants';
 
 
 /** 
- * ChangeLoading
+ * 
  * * Change loading state before rendering the information to screen.
  * @param {boolean} visibility This paramter takes in boolean data
 */
 export const ChangeLoading = (visibility) => ({
     type: C.CHANGE_LOADING,
+    payload: visibility
+});
+
+export const ChangeSaving = (visibility) => ({
+    type: C.CHANGE_SAVING,
     payload: visibility
 });
 
@@ -111,6 +116,7 @@ export const ChangeStatus = (boolean) => (dispatch) => {
     })
 }
 
+
 /** 
  * Hardware Support
  * * Index "1" for Fingerprint (Android, iPhone 5s > iPhone 8), Index "2" for Face ID (iPhone X & newer)
@@ -132,7 +138,6 @@ export const ChangeHardwareSupport = (index = 0) => (dispatch) => {
  * @param {string} bridgeip This paramter takes in the bridge ip address if 'isManual' is true.
 */
 export const GetBridgeIP = (navigation, isManual = false, bridgeip = '') => async (dispatch, getState) => {
-    dispatch(ChangeLoading(true));
     if (isManual) {
         await axios({
             url: `http://${bridgeip}/api/nouser/config`,
@@ -145,7 +150,14 @@ export const GetBridgeIP = (navigation, isManual = false, bridgeip = '') => asyn
                 })
                 navigation.navigate('LinkButton');
             } else {
-                throw Error('Invalid IP');
+                setTimeout(() => {
+                    Alert.alert(
+                        'Bridge is not supported',
+                        "Use Bridge V1 only",
+                        [{ text: "OK", onPress: () => console.log("OK Pressed") }],
+                        { cancelable: false }
+                    );
+                }, 500);
             }
         }).catch((error) => {
             setTimeout(() => {
@@ -156,9 +168,7 @@ export const GetBridgeIP = (navigation, isManual = false, bridgeip = '') => asyn
                     { cancelable: false }
                 );
             }, 500);
-        }).then(() => {
-            dispatch(ChangeLoading(false));
-        });
+        })
     } else {
         await axios({
             url: 'https://discovery.meethue.com',
@@ -170,12 +180,7 @@ export const GetBridgeIP = (navigation, isManual = false, bridgeip = '') => asyn
                     payload: res.data[0].internalipaddress
                 })
             }
-        }).catch((error) => {
-            dispatch(ChangeLoading(false));
-            console.log(error)
-        }).then(() => {
-            dispatch(ChangeLoading(false));
-        });
+        })
     }
 }
 
@@ -191,10 +196,14 @@ export const AddBridge = (bridgeip = "", navigation) => async (dispatch) => {
             })
             navigation.navigate('PairNewBridge');
         } else {
-            throw Error('Invalid IP');
+            Alert.alert(
+                'Bridge is not supported',
+                "Use Bridge V1 only",
+                [{ text: "OK", onPress: () => console.log("OK Pressed") }],
+                { cancelable: false }
+            );
         }
     }).catch((error) => {
-        console.log(error);
         setTimeout(() => {
             Alert.alert(
                 'IP address you entered cannot be reached',
@@ -204,7 +213,7 @@ export const AddBridge = (bridgeip = "", navigation) => async (dispatch) => {
             );
         }, 500);
     }).then(() => {
-        dispatch(ChangeLoading(false));
+        // 
     });
 }
 
@@ -231,7 +240,6 @@ export const GetAllLights = () => (dispatch, getState) => {
     const url = getState().cloud_enable === false ? `http://${bridgeip}/api/${username}/lights` : `https://api.meethue.com/bridge/${username}/lights`;
     const headers = getState().cloud_enable === true ? { "Authorization": `Bearer ${getState().cloud.token}`, "Content-Type": "application/json" } : { "Content-Type": "application/json" };
 
-    dispatch(ChangeLoading(true));
     axios({
         url,
         method: 'GET',
@@ -241,11 +249,11 @@ export const GetAllLights = () => (dispatch, getState) => {
             type: C.FETCH_ALL_LIGHTS,
             payload: res.data
         })
+        dispatch(ChangeLoading(false))
     }).catch((error) => {
-        dispatch(ChangeLoading(false));
-        // console.log(error);
-    }).then(dispatch(ChangeLoading(false)));
-};
+        dispatch(ChangeLoading(false))
+    });
+}
 
 /** 
  * GetLightsAttributes&States
@@ -260,7 +268,6 @@ export const GetLightAtrributes = (lampID) => (dispatch, getState) => {
     const url = getState().cloud_enable === false ? `http://${bridgeip}/api/${username}/lights/${lampID}` : `https://api.meethue.com/bridge/${username}/lights/${lampID}`;
     const headers = getState().cloud_enable === true ? { "Authorization": `Bearer ${getState().cloud.token}`, "Content-Type": "application/json" } : { "Content-Type": "application/json" };
 
-    dispatch(ChangeLoading(true));
     axios({
         url,
         method: 'GET',
@@ -276,9 +283,8 @@ export const GetLightAtrributes = (lampID) => (dispatch, getState) => {
             throw Error('An error has occur');
         }
     }).catch((error) => {
-        dispatch(ChangeLoading(false));
         console.log(error);
-    }).then(dispatch(ChangeLoading(false)));
+    }).then();
 };
 
 
@@ -317,7 +323,6 @@ export const SetLampState = (lampID, lampData) => (dispatch, getState) => {
     const url = getState().cloud_enable === false ? `http://${bridgeip}/api/${username}/lights/${lampID}/state` : `https://api.meethue.com/bridge/${username}/lights/${lampID}/state`;
     const headers = getState().cloud_enable === true ? { "Authorization": `Bearer ${getState().cloud.token}`, "Content-Type": "application/json" } : { "Content-Type": "application/json" };
 
-    dispatch(ChangeLoading(true));
     axios({
         url,
         method: 'PUT',
@@ -340,9 +345,7 @@ export const SetLampState = (lampID, lampData) => (dispatch, getState) => {
             throw Error('An error has occur');
         }
     }).catch((error) => {
-        dispatch(ChangeLoading(false));
-        // console.log(error);
-    }).then(dispatch(ChangeLoading(false)));
+    }).then();
 };
 
 /** 
@@ -358,7 +361,6 @@ export const DeleteLight = (lampID) => (dispatch, getState) => {
     const url = getState().cloud_enable === false ? `http://${bridgeip}/api/${username}/lights/${lampID}` : `https://api.meethue.com/bridge/${username}/lights/${lampID}`;
     const headers = getState().cloud_enable === true ? { "Authorization": `Bearer ${getState().cloud.token}`, "Content-Type": "application/json" } : { "Content-Type": "application/json" };
 
-    dispatch(ChangeLoading(true));
     axios({
         url,
         method: 'DELETE',
@@ -384,9 +386,7 @@ export const DeleteLight = (lampID) => (dispatch, getState) => {
             );
         }
     }).catch((error) => {
-        dispatch(ChangeLoading(false));
-        console.log(error);
-    }).then(dispatch(ChangeLoading(false)));
+    }).then();
 };
 
 /** 
@@ -401,7 +401,6 @@ export const GetAllGroups = () => (dispatch, getState) => {
     const url = getState().cloud_enable === false ? `http://${bridgeip}/api/${username}/groups` : `https://api.meethue.com/bridge/${username}/groups`;
     const headers = getState().cloud_enable === true ? { "Authorization": `Bearer ${getState().cloud.token}`, "Content-Type": "application/json" } : { "Content-Type": "application/json" };
 
-    dispatch(ChangeLoading(true));
     axios({
         url,
         method: 'GET',
@@ -411,10 +410,9 @@ export const GetAllGroups = () => (dispatch, getState) => {
             type: C.FETCH_ALL_GROUPS,
             payload: res.data
         })
+        dispatch(ChangeLoading(false))
     }).catch((error) => {
-        dispatch(ChangeLoading(false));
-        console.log(error);
-    }).then(dispatch(ChangeLoading(false)));
+    }).then();
 };
 
 /** 
@@ -430,43 +428,73 @@ export const CreateGroup = (groupData, navigation) => (dispatch, getState) => {
     const url = getState().cloud_enable === false ? `http://${bridgeip}/api/${username}/groups` : `https://api.meethue.com/bridge/${username}/groups`;
     const headers = getState().cloud_enable === true ? { "Authorization": `Bearer ${getState().cloud.token}`, "Content-Type": "application/json" } : { "Content-Type": "application/json" };
 
-    dispatch(ChangeLoading(true));
-    axios({
-        url,
-        method: 'POST',
-        headers,
-        data: groupData
-    }).then(res => {
-        if (res.data[0].success) {
-            console.log(res.data[0])
-            dispatch({
-                type: C.CREATE_GROUP,
-                id: res.data[0].success.id,
-                payload: {
-                    "name": groupData.name,
-                    "lights": groupData.lights,
-                    "type": groupData.type,
-                    "action": {}
-                }
-            })
-            navigation.navigate("PostUpdate", {
-                meta: {
-                    title: "Successfully added!"
-                }
-            })
-        } else if (res.data[0].error) {
-            console.log(res.data)
-            Alert.alert(
-                'Error',
-                "Please try again",
-                [{ text: "OK", onPress: () => console.log("OK Pressed") }],
-                { cancelable: false }
-            );
-        }
-    }).catch((error) => {
-        dispatch(ChangeLoading(false));
-        console.log(error);
-    }).then(dispatch(ChangeLoading(false)));
+    dispatch(ChangeSaving(true))
+    if (getState().status) {
+        axios({
+            url,
+            method: 'POST',
+            headers,
+            data: groupData
+        }).then(res => {
+            if (res.data[0].success) {
+                dispatch(ChangeSaving(false))
+                dispatch({
+                    type: C.CREATE_GROUP,
+                    id: res.data[0].success.id,
+                    payload: {
+                        "name": groupData.name,
+                        "lights": groupData.lights,
+                        "type": groupData.type,
+                        "action": {}
+                    }
+                })
+                navigation.navigate("PostUpdate", {
+                    meta: {
+                        title: "Successfully added!"
+                    }
+                })
+            } else if (res.data[0].error) {
+                dispatch(ChangeSaving(false))
+                setTimeout(() => {
+                    Alert.alert(
+                        'Error',
+                        "Please check you input, such as selecting bulb that is not assigned to any room yet.",
+                        [{ text: "OK", onPress: () => console.log("OK Pressed") }],
+                        { cancelable: false }
+                    );
+                }, 1000);
+            }
+        }).catch((error) => {
+            dispatch(ChangeSaving(false))
+            setTimeout(() => {
+                Alert.alert(
+                    'Error',
+                    "Please try again",
+                    [{ text: "OK", onPress: () => console.log("OK Pressed") }],
+                    { cancelable: false }
+                );
+            }, 1000);
+        }).then(
+
+        )
+    }
+    else {
+        dispatch(ChangeSaving(false))
+        Alert.alert(
+            'No connection to Philips Hue Bridge',
+            "Please try to reconnect",
+            [{
+                text: 'Cancel',
+                onPress: () => console.log('Cancel Pressed'),
+                style: 'cancel',
+            },
+            {
+                text: "Reconnect",
+                onPress: () => dispatch(GetConfig())
+            }],
+            { cancelable: true }
+        );
+    }
 };
 
 /** 
@@ -482,7 +510,6 @@ export const GetGroupAtrributes = (groupID) => (dispatch, getState) => {
     const url = getState().cloud_enable === false ? `http://${bridgeip}/api/${username}/groups/${groupID}` : `https://api.meethue.com/bridge/${username}/groups/${groupID}`;
     const headers = getState().cloud_enable === true ? { "Authorization": `Bearer ${getState().cloud.token}`, "Content-Type": "application/json" } : { "Content-Type": "application/json" };
 
-    dispatch(ChangeLoading(true));
     axios({
         url,
         method: 'GET',
@@ -496,10 +523,7 @@ export const GetGroupAtrributes = (groupID) => (dispatch, getState) => {
         } else {
             throw Error('An error has occur');
         }
-    }).catch((error) => {
-        dispatch(ChangeLoading(false));
-        console.log(error);
-    }).then(dispatch(ChangeLoading(false)));
+    })
 };
 
 /** 
@@ -515,8 +539,8 @@ export const SetGroupAttributes = (groupID, groupData, navigation) => (dispatch,
     const username = getState().username[i];
     const url = getState().cloud_enable === false ? `http://${bridgeip}/api/${username}/groups/${groupID}` : `https://api.meethue.com/bridge/${username}/groups/${groupID}`;
     const headers = getState().cloud_enable === true ? { "Authorization": `Bearer ${getState().cloud.token}`, "Content-Type": "application/json" } : { "Content-Type": "application/json" };
-    
-    dispatch(ChangeLoading(true));
+
+    dispatch(ChangeSaving(true));
     axios({
         url,
         method: 'PUT',
@@ -530,6 +554,7 @@ export const SetGroupAttributes = (groupID, groupData, navigation) => (dispatch,
             payload[key] = value;
         })
         if (payload) {
+            dispatch(ChangeSaving(false));
             dispatch({
                 type: C.CHANGE_GROUP_ATTR,
                 id: groupID,
@@ -539,13 +564,27 @@ export const SetGroupAttributes = (groupID, groupData, navigation) => (dispatch,
                 id: groupID
             });
         } else {
-            console.log("error else")
-            throw Error('An error has occur');
+            dispatch(ChangeSaving(false))
+            setTimeout(() => {
+                Alert.alert(
+                    'Error',
+                    "Please check your input",
+                    [{ text: "OK", onPress: () => console.log("OK Pressed") }],
+                    { cancelable: false }
+                );
+            }, 1000);
         }
     }).catch((error) => {
-        console.log(error)
-        dispatch(ChangeLoading(false));
-    }).then(dispatch(ChangeLoading(false)));
+        dispatch(ChangeSaving(false))
+        setTimeout(() => {
+            Alert.alert(
+                'Error',
+                "Please try again",
+                [{ text: "OK", onPress: () => console.log("OK Pressed") }],
+                { cancelable: false }
+            );
+        }, 1000);
+    })
 };
 
 /** 
@@ -562,7 +601,6 @@ export const SetGroupState = (groupID, groupData) => (dispatch, getState) => {
     const url = getState().cloud_enable === false ? `http://${bridgeip}/api/${username}/groups/${groupID}/action` : `https://api.meethue.com/bridge/${username}/groups/${groupID}/action`;
     const headers = getState().cloud_enable === true ? { "Authorization": `Bearer ${getState().cloud.token}`, "Content-Type": "application/json" } : { "Content-Type": "application/json" };
 
-    dispatch(ChangeLoading(true));
     axios({
         url,
         method: 'PUT',
@@ -585,9 +623,8 @@ export const SetGroupState = (groupID, groupData) => (dispatch, getState) => {
             throw Error('An error has occur');
         }
     }).catch((error) => {
-        dispatch(ChangeLoading(false));
-        console.log(error);
-    }).then(dispatch(ChangeLoading(false)));
+
+    }).then();
 };
 
 /** 
@@ -603,7 +640,6 @@ export const DeleteGroup = (groupID) => (dispatch, getState) => {
     const url = getState().cloud_enable === false ? `http://${bridgeip}/api/${username}/groups/${groupID}` : `https://api.meethue.com/bridge/${username}/groups/${groupID}`;
     const headers = getState().cloud_enable === true ? { "Authorization": `Bearer ${getState().cloud.token}`, "Content-Type": "application/json" } : { "Content-Type": "application/json" };
 
-    dispatch(ChangeLoading(true));
     axios({
         url,
         method: 'DELETE',
@@ -618,9 +654,8 @@ export const DeleteGroup = (groupID) => (dispatch, getState) => {
             throw Error('An error has occur')
         }
     }).catch((error) => {
-        dispatch(ChangeLoading(false));
-        console.log(error);
-    }).then(dispatch(ChangeLoading(false)));
+
+    }).then();
 };
 
 /** 
@@ -632,7 +667,6 @@ export const DeleteGroup = (groupID) => (dispatch, getState) => {
 export const CreateUser = (i = 0) => (dispatch, getState) => {
     const bridgeip = getState().bridgeip[i];
 
-    dispatch(ChangeLoading(true));
     axios({
         url: `http://${bridgeip}/api`,
         method: 'POST',
@@ -645,23 +679,32 @@ export const CreateUser = (i = 0) => (dispatch, getState) => {
                 type: C.FETCH_USERNAME,
                 payload: res.data[0].success.username
             });
+            dispatch(ChangeStatus(true));
         }
     }).catch((error) => {
-        dispatch(ChangeLoading(false));
-        console.log(error);
-    }).then(dispatch(ChangeLoading(false)));
+        Alert.alert(
+            'Error',
+            "Please try again",
+            [{ text: "OK", onPress: () => console.log("OK Pressed") }],
+            { cancelable: false }
+        );
+    }).then();
 };
 
 /** 
  * GetConfig
  * * Document 7.2. Get configuration
+ * * Also acts as a check Status and get all information
  * * https://developers.meethue.com/develop/hue-api/7-configuration-api/#get-configuration 
 */
-export const GetConfig = () => (dispatch, getState) => {
+export const GetConfig = (initialCheck = false) => (dispatch, getState) => {
     const i = getState().bridgeIndex;
     const bridgeip = getState().bridgeip[i];
     const username = getState().username[i];
 
+    if (initialCheck) {
+        dispatch(ChangeLoading(true))
+    }
     axios({
         url: `http://${bridgeip}/api/${username}/config`,
         method: 'GET'
@@ -670,12 +713,16 @@ export const GetConfig = () => (dispatch, getState) => {
             type: C.FETCH_CONFIG,
             payload: res.data
         })
-        dispatch(ChangeStatus(true));
+        dispatch(ChangeStatus(true))
+        dispatch(GetAllGroups());
+        dispatch(GetAllLights());
     }).catch((error) => {
+        dispatch(ChangeLoading(false))
         dispatch(ChangeStatus(false))
-        console.log(error);
-    });
-};
+    }).then(
+        dispatch(ChangeLoading(false))
+    )
+}
 
 /** 
  * SetLampAttributes
@@ -684,14 +731,14 @@ export const GetConfig = () => (dispatch, getState) => {
  * @param {number} lampID This paramter takes in the light ID.
  * @param {object} lampData This paramter takes in the body argument of the request.
 */
-export const SetLampAttributes = (lampID, lampData) => (dispatch, getState) => {
+export const SetLampAttributes = (lampID, lampData, navigation) => (dispatch, getState) => {
     const i = getState().bridgeIndex;
     const bridgeip = getState().bridgeip[i];
     const username = getState().username[i];
     const url = getState().cloud_enable === false ? `http://${bridgeip}/api/${username}/lights/${lampID}` : `https://api.meethue.com/bridge/${username}/lights/${lampID}`;
     const headers = getState().cloud_enable === true ? { "Authorization": `Bearer ${getState().cloud.token}`, "Content-Type": "application/json" } : { "Content-Type": "application/json" };
 
-    dispatch(ChangeLoading(true));
+    dispatch(ChangeSaving(true));
     axios({
         url,
         method: 'PUT',
@@ -705,18 +752,37 @@ export const SetLampAttributes = (lampID, lampData) => (dispatch, getState) => {
             payload[key] = value;
         })
         if (payload) {
+            dispatch(ChangeSaving(false));
             dispatch({
                 type: C.CHANGE_LIGHT_ATTR,
                 id: lampID,
                 payload: payload
             })
+            navigation.navigate('ControlBulb', {
+                id: lampID
+            });
         } else {
-            throw Error('An error has occur');
+            dispatch(ChangeSaving(false))
+            setTimeout(() => {
+                Alert.alert(
+                    'Error',
+                    "Please check your input",
+                    [{ text: "OK", onPress: () => console.log("OK Pressed") }],
+                    { cancelable: false }
+                );
+            }, 1000);
         }
     }).catch((error) => {
-        dispatch(ChangeLoading(false));
-        console.log(error);
-    }).then(dispatch(ChangeLoading(false)));
+        dispatch(ChangeSaving(false))
+        setTimeout(() => {
+            Alert.alert(
+                'Error',
+                "Please try again",
+                [{ text: "OK", onPress: () => console.log("OK Pressed") }],
+                { cancelable: false }
+            );
+        }, 1000);
+    })
 };
 
 
@@ -732,7 +798,6 @@ export const GetSchedules = () => (dispatch, getState) => {
     const url = getState().cloud_enable === false ? `http://${bridgeip}/api/${username}/schedules` : `https://api.meethue.com/bridge/${username}/schedules`;
     const headers = getState().cloud_enable === true ? { "Authorization": `Bearer ${getState().cloud.token}`, "Content-Type": "application/json" } : { "Content-Type": "application/json" };
 
-    dispatch(ChangeLoading(true));
     axios({
         url,
         method: 'GET',
@@ -742,10 +807,7 @@ export const GetSchedules = () => (dispatch, getState) => {
             type: C.FETCH_ALL_SCHEDULES,
             payload: res.data
         })
-    }).catch((error) => {
-        dispatch(ChangeLoading(false));
-        console.log(error);
-    }).then(dispatch(ChangeLoading(false)));
+    });
 };
 
 /** 
@@ -761,41 +823,62 @@ export const CreateSchedules = (scheduleData, navigation) => (dispatch, getState
     const url = getState().cloud_enable === false ? `http://${bridgeip}/api/${username}/schedules` : `https://api.meethue.com/bridge/${username}/schedules`;
     const headers = getState().cloud_enable === true ? { "Authorization": `Bearer ${getState().cloud.token}`, "Content-Type": "application/json" } : { "Content-Type": "application/json" };
 
-    dispatch(ChangeLoading(true));
-    axios({
-        // url: `https://api.meethue.com/bridge/FBeqf8XG4zmws0hkhJVKnI5UWoSswzKd1H39z-eO/schedules`,
-        // method: "POST",
-        // headers: {
-        //     "Content-Type": "application/json",
-        //     'Authorization': "Bearer hwpfFce4GlLUsf50GKf0rNEtGvoa"
-        // },
-        url,
-        method: 'POST',
-        headers,
-        data: JSON.stringify(scheduleData)
-    }).then((res) => {
-        if (res.data[0].success) {
-            console.log(res.data[0].success)
-            dispatch({
-                type: C.CREATE_SCHEDULE,
-                id: res.data[0].success.id,
-                payload: JSON.stringify(scheduleData)
-            })
-            navigation.navigate("PostUpdate", {
-                meta: {
-                    title: "Successfully added!"
-                }
-            })
-        } else if (res.data[0].error) {
-            console.log(res.data[0].error)
-            Alert.alert(
-                'Error',
-                "Please try again",
-                [{ text: "OK", onPress: () => console.log("OK Pressed") }],
-                { cancelable: false }
-            );
-        }
-    }).catch((error) => {
-        dispatch(ChangeLoading(false));
-    }).then(dispatch(ChangeLoading(false)));
+    dispatch(ChangeSaving(true));
+    if (getState().status) {
+        axios({
+            url,
+            method: 'POST',
+            headers,
+            data: JSON.stringify(scheduleData)
+        }).then(res => {
+            if (res.data[0].success) {
+                dispatch(ChangeSaving(false));
+                dispatch({
+                    type: C.CREATE_SCHEDULE,
+                    id: res.data[0].success.id,
+                    payload: JSON.stringify(scheduleData)
+                })
+                navigation.navigate("PostUpdate", {
+                    meta: {
+                        title: "Successfully added!"
+                    }
+                })
+            } else if (res.data[0].error) {
+                dispatch(ChangeSaving(false));
+                Alert.alert(
+                    'Error',
+                    "Please check your input",
+                    [{ text: "OK", onPress: () => console.log("OK Pressed") }],
+                    { cancelable: false }
+                );
+            }
+        }).catch((error) => {
+            dispatch(ChangeSaving(false))
+            setTimeout(() => {
+                Alert.alert(
+                    'Error',
+                    "Please try again",
+                    [{ text: "OK", onPress: () => console.log("OK Pressed") }],
+                    { cancelable: false }
+                );
+            }, 1000);
+        })
+    }
+    else {
+        dispatch(ChangeSaving(false));
+        Alert.alert(
+            'No connection to Philips Hue Bridge',
+            "Please try to reconnect",
+            [{
+                text: 'Cancel',
+                onPress: () => console.log('Cancel Pressed'),
+                style: 'cancel',
+            },
+            {
+                text: "Reconnect",
+                onPress: () => dispatch(GetConfig())
+            }],
+            { cancelable: true }
+        );
+    }
 };

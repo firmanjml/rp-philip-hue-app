@@ -1,20 +1,21 @@
 {
-  "loading": false,
   "cloud_enable": false,
   "cloud": {
     "token": "",
     "refresh_token": ""
   },
-  "status" : false,
+  "loading": false,
+  "saving": false,
+  "status": false,
   "nightmode": true,
-  "authentication" : false,
-  "hardwareSupport" : 0,
+  "authentication": false,
+  "hardwareSupport": 0,
   "bridgeIndex": 0,
   "bridgeip": [],
   "username": [],
   "config": {},
   "groups": {},
-  "schedules" : {},
-  "scenes" : {},
+  "schedules": {},
+  "scenes": {},
   "lights": {}
 }

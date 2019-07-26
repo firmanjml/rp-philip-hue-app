@@ -67,7 +67,7 @@ class ManualScreen extends React.Component {
         const backgroundcolor = { backgroundColor: nightmode ? colors.background : colors.backgroundLight };
         const textcolor = { color: nightmode ? colors.white : colors.gray3}
         const titlecolor = { color: nightmode ? colors.white : colors.black }
-        const bordercolor = { borderColor: nightmode ? colors.white : colors.gray2 }
+        const bordercolor = { borderColor: nightmode ? colors.white : colors.black }
         const placeholdercolor = nightmode ? colors.gray2 : colors.gray3
         return (
                 <Block style={backgroundcolor} >

@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Image, StyleSheet, TouchableOpacity, View, ScrollView, Alert } from 'react-native'
+import { Image, StyleSheet, TouchableOpacity, View, ScrollView, Alert, Modal, ActivityIndicator } from 'react-native'
 import { Block, Text, Button, Input } from '../../components';
 import { theme } from '../../constants';
 import { CreateSchedules } from '../../redux/actions';
@@ -13,9 +13,9 @@ class AddSchedules extends Component {
         return {
             headerLeft:
                 <TouchableOpacity
-                        onPress={() => navigation.goBack()}
-                        style={{ height: 40, width: 80, justifyContent: 'center' }}>
-                        <Image source={require('../../assets/icons/back.png')} />
+                    onPress={() => navigation.goBack()}
+                    style={{ height: 40, width: 80, justifyContent: 'center' }}>
+                    <Image source={require('../../assets/icons/back.png')} />
                 </TouchableOpacity>
         }
     }
@@ -29,8 +29,10 @@ class AddSchedules extends Component {
         roomSelected: null,
         bulbSelected: null,
         enabled: true,
-        date: "Add date",
         mode: "Repeat",
+        displaydate: null,
+        displaymonth: null,
+        displayyear: null,
         isTimePickerVisible: false,
         isDatePickerVisible: false
     }
@@ -128,6 +130,25 @@ class AddSchedules extends Component {
         return `W${this.bin_to_dec(utc)}`
     }
 
+    renderLoadingModal() {
+        return (
+            <Modal
+                transparent={true}
+                animationType={'none'}
+                visible={this.props.saving}
+                onRequestClose={() => { console.log('close modal') }}>
+                <View style={styles.modalBackground}>
+                    <View style={styles.activityIndicatorWrapper}>
+                        <ActivityIndicator
+                            animating={this.props.saving}
+                            color="#00ff00" />
+                        <Text>Saving...</Text>
+                    </View>
+                </View>
+            </Modal>
+        )
+    }
+
 
     confirmAddSchedule = async () => {
         const { username, bridgeIndex } = this.props;
@@ -167,7 +188,7 @@ class AddSchedules extends Component {
                 var datetime = `${utcDaySelected}/T${time}:00`
             }
             else if (mode == "Specific Date") {
-                var datetime = `${date}T${time}:00`
+                var datetime = `${this.state.displayyear}-${this.state.displaymonth}-${this.state.displayyear}T${time}:00`
             }
 
             const scheduleData =
@@ -313,10 +334,14 @@ class AddSchedules extends Component {
 
     handleDatePicked = (date) => {
         var Dates = new Date(date);
-        var newDate = `${Dates.getFullYear()}-${Dates.getMonth() + 1}-${Dates.getDate()}`
+        var day = Dates.getDate();
+        var month = Dates.getMonth() + 1
+        var year = Dates.getFullYear()
         this.setState({
             isDatePickerVisible: false,
-            date: newDate
+            displaydate: day,
+            displaymonth: month,
+            displayyear: year
         })
     }
 
@@ -416,7 +441,7 @@ class AddSchedules extends Component {
     }
 
     renderDate(textcolor) {
-        if (this.state.date == "Add date") {
+        if (this.state.displaydate == null) {
             return (
                 <TouchableOpacity
                     onPress={() => { this.setState({ isDatePickerVisible: true }) }} >
@@ -426,12 +451,14 @@ class AddSchedules extends Component {
             )
         }
         else {
+            const monthNames = ["January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"
+            ];
             return (
                 <Block flex={false} row space="between" style={{ alignSelf: 'center' }}>
                     <TouchableOpacity
                         onPress={() => this.setState({ isDatePickerVisible: true })}>
-                        {/* <Text style={{ color: '#20D29B' }}>Edit</Text> */}
-                        <Text style={{ color: '#20D29B', alignSelf: 'center' }}>{this.state.date}</Text>
+                        <Text style={{ color: '#20D29B', alignSelf: 'center' }}>{`${this.state.displaydate} ${monthNames[this.state.displaymonth - 1]} ${this.state.displayyear}`}</Text>
                     </TouchableOpacity>
                     {this.renderDatePicker()}
                 </Block>
@@ -497,11 +524,12 @@ class AddSchedules extends Component {
         const backgroundcolor = { backgroundColor: nightmode ? colors.background : colors.backgroundLight }
         const titlecolor = { color: nightmode ? colors.white : colors.black }
         const textcolor = { color: nightmode ? colors.gray2 : colors.black }
-        const bordercolor = { borderColor: nightmode ? colors.white : colors.gray2 }
+        const bordercolor = { borderColor: nightmode ? colors.white : colors.black }
         return (
             <Block style={backgroundcolor}>
                 <Block container style={{ marginBottom: 20 }}>
                     <Text h1 bold style={titlecolor}>Add Schedules</Text>
+                    {this.renderLoadingModal()}
                     <ScrollView
                         showsVerticalScrollIndicator={false}>
                         {this.renderInput(titlecolor, bordercolor, textcolor, nightmode, colors)}
@@ -547,7 +575,7 @@ const mapStateToProps = (state) => {
         groups: state.groups,
         lights: state.lights,
         schedules: state.schedules,
-        loading: state.loading
+        saving: state.saving
     }
 }
 
@@ -568,13 +596,6 @@ const styles = StyleSheet.create({
     row: {
         marginTop: 20,
     },
-    modalBackground: {
-        flex: 1,
-        alignItems: 'center',
-        flexDirection: 'column',
-        justifyContent: 'space-around',
-        backgroundColor: '#00000040'
-    },
     tabs: {
         marginTop: 30,
         justifyContent: 'space-between',
@@ -589,6 +610,13 @@ const styles = StyleSheet.create({
     active: {
         borderBottomColor: theme.colors.secondary,
         borderBottomWidth: 3,
+    },
+    modalBackground: {
+        flex: 1,
+        alignItems: 'center',
+        flexDirection: 'column',
+        justifyContent: 'space-around',
+        backgroundColor: '#00000040'
     },
     activityIndicatorWrapper: {
         backgroundColor: '#FFFFFF',

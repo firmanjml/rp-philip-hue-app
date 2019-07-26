@@ -5,7 +5,7 @@ import {
     Alert
 } from 'react-native';
 import { connect } from 'react-redux';
-import { CreateUser, SwitchBridge } from '../../redux/actions';
+import { CreateUser, SwitchBridge, GetConfig } from '../../redux/actions';
 import { theme } from '../../constants';
 import { Block, Text } from '../../components';
 import Countdown from 'react-countdown-now';
@@ -29,7 +29,10 @@ class PairNewBridgeScreen extends Component {
             this.props._CreateUser(bridgeLength);
         } else {
             this.props._SwitchBridge(bridgeLength);
-            this.props.navigation.navigate("ListRoom");
+            setTimeout(() => {
+                this.props._fetchEverything(true);
+                this.props.navigation.navigate("ListRoom");
+            }, 1000);
         }
     }
 
@@ -114,6 +117,9 @@ const mapDispatchToProps = (dispatch) => {
         },
         _SwitchBridge(i) {
             return dispatch(SwitchBridge(i));
+        },
+        _fetchEverything(isLoading) {
+            return dispatch(GetConfig(isLoading));
         }
     }
 }

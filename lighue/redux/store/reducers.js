@@ -14,6 +14,20 @@ export const loading = (state = false, action) => {
     }
 }
 
+
+/** 
+ * saving
+ * * Redux reducer stores saving data to Redux state.
+*/
+export const saving = (state = false, action) => {
+    if (action.type === C.CHANGE_SAVING) {
+        return action.payload;
+    } else {
+        return state;
+    }
+}
+
+
 /** 
  * nightmode
  * * Redux reducer stores nightmode data to Redux state.
@@ -209,8 +223,7 @@ export const lights = (state = {}, action) => {
             return _state;
         case C.CHANGE_LIGHT_ATTR:
             _state = JSON.parse(JSON.stringify(state));
-            _state[action.id] = action.payload;
-            return _state;
+            _.merge(_state[action.id].action, action.payload);
         case C.DELETE_LIGHT:
             _state = JSON.parse(JSON.stringify(state));
             delete _state[action.payload]
@@ -277,6 +290,7 @@ export default combineReducers({
     hardwareSupport,
     lights,
     schedules,
+    saving,
     loading,
     scenes,
     status,

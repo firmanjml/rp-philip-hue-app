@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Image, StyleSheet, TouchableOpacity, View } from 'react-native'
+import { Image, StyleSheet, TouchableOpacity, View, Alert } from 'react-native'
 import { Block, Text, Input } from '../../components';
 import Slider from 'react-native-slider';
 import { theme } from '../../constants';
@@ -8,7 +8,9 @@ import { ColorPicker } from "react-native-color-picker";
 import { connect } from 'react-redux';
 import ToggleSwitch from '../../components/ToggleSwitch'
 import _ from 'lodash';
-import { ColorConversionToXY } from '../../components/ColorConvert';
+import DialogInput from 'react-native-dialog-input';
+import validator from 'validator';
+import { ColorConversionToXY, HexColorConversionToXY } from '../../components/ColorConvert';
 import { GetLightAtrributes, SetLampState } from '../../redux/actions';
 
 import axios from 'axios';
@@ -28,7 +30,8 @@ class NewControlBulbScreen extends Component {
         id: 0,
         roomName: 'None',
         bri: 0,
-        sat: 0
+        sat: 0,
+        dialogModal: false
     }
 
     componentWillMount() {
@@ -39,41 +42,97 @@ class NewControlBulbScreen extends Component {
         })
     }
 
+
     changeColorLightState = _.throttle((values) => {
+        const i = this.props.bridgeIndex
+        const bridgeip = this.props.bridgeip
+        const username = this.props.username[i]
+        const url = this.props.cloud_enable === false ? `http://${bridgeip}/api/${username}/lights/${this.state.id}/state` : `https://api.meethue.com/bridge/${username}/lights/${this.state.id}/state`;
+        const headers = this.props.cloud_enable === true ? { "Authorization": `Bearer ${this.props.cloud.token}`, "Content-Type": "application/json" } : { "Content-Type": "application/json" };
+
         axios({
-            method: "PUT",
-            url: `http://${this.props.bridgeip[this.props.bridgeIndex]}/api/${
-                this.props.username[this.props.bridgeIndex]}/lights/${this.state.id}/state`,
+            url,
+            method: 'PUT',
+            headers,
             data: {
                 on: true,
                 xy: ColorConversionToXY(values)
             }
-        })
-    }, 600);
+        }, 600);
+    })
 
     changeBrightnessState = _.throttle((value) => {
+        const i = this.props.bridgeIndex
+        const bridgeip = this.props.bridgeip
+        const username = this.props.username[i]
+        const url = this.props.cloud_enable === false ? `http://${bridgeip}/api/${username}/lights/${this.state.id}/state` : `https://api.meethue.com/bridge/${username}/lights/${this.state.id}/state`;
+        const headers = this.props.cloud_enable === true ? { "Authorization": `Bearer ${this.props.cloud.token}`, "Content-Type": "application/json" } : { "Content-Type": "application/json" };
+
         axios({
-            method: "PUT",
-            url: `http://${this.props.bridgeip[this.props.bridgeIndex]}/api/${
-                this.props.username[this.props.bridgeIndex]}/lights/${this.state.id}/state`,
+            url,
+            method: 'PUT',
+            headers,
             data: {
                 on: true,
                 bri: value
             }
-        })
-    }, 50)
+        }, 50);
+    })
 
     changeSaturationState = _.throttle((value) => {
+        const i = this.props.bridgeIndex
+        const bridgeip = this.props.bridgeip
+        const username = this.props.username[i]
+        const url = this.props.cloud_enable === false ? `http://${bridgeip}/api/${username}/lights/${this.state.id}/state` : `https://api.meethue.com/bridge/${username}/lights/${this.state.id}/state`;
+        const headers = this.props.cloud_enable === true ? { "Authorization": `Bearer ${this.props.cloud.token}`, "Content-Type": "application/json" } : { "Content-Type": "application/json" };
+
         axios({
-            method: "PUT",
-            url: `http://${this.props.bridgeip[this.props.bridgeIndex]}/api/${
-                this.props.username[this.props.bridgeIndex]}/lights/${this.state.id}/state`,
+            url,
+            method: 'PUT',
+            headers,
             data: {
                 on: true,
                 sat: value
             }
-        })
-    }, 50);
+        }, 50);
+    });
+
+    _renderModal() {
+        return (
+            <DialogInput
+                isDialogVisible={this.state.dialogModal}
+                title={"Color Control Advanced"}
+                message={"Please enter hex code"}
+                hintInput={"#ffffff"}
+                submitInput={(hex) => {
+                    {
+                        this.setState({ dialogModal: false }),
+                        this.applyHexCode(hex)
+                    }
+                }}
+                closeDialog={() => this.setState({ dialogModal: false })}
+            />
+        )
+    }
+
+    applyHexCode(hex) {
+        if (validator.isHexColor(hex)) {
+            this.props._ChangeLampStateByID(this.state.id, {
+                on : true,
+                xy: HexColorConversionToXY(hex)
+            })
+        }
+        else {
+            Alert.alert(
+                'Incorrect input',
+                'Make sure that the input is a hex code',
+                [
+                    { text: "Ok", onPress: () => { } },
+                ],
+                { cancelable: false },
+            );
+        }
+    }
 
     renderBackButton() {
         const { navigation } = this.props;
@@ -98,7 +157,7 @@ class NewControlBulbScreen extends Component {
                 </MenuTrigger>
                 <MenuOptions style={{ padding: 15 }}>
                     <MenuOption value={1}>
-                        <Text h3>Show advanced option</Text>
+                        <Text h3>Enter hex code for color</Text>
                     </MenuOption>
                     <View style={styles.divider} />
                     <MenuOption value={2}>
@@ -111,9 +170,9 @@ class NewControlBulbScreen extends Component {
 
     onMenuRoomSelect(value) {
         if (value == 1) {
-            this.props.navigation.navigate("ControlBulbAdvanced", {
-                id: this.state.id
-            });
+            this.setState({
+                dialogModal: true
+            })
         }
         else if (value == 2) {
             this.props.navigation.navigate('BulbInfo', {
@@ -128,13 +187,14 @@ class NewControlBulbScreen extends Component {
         const backgroundcolor = { backgroundColor: nightmode ? colors.background : colors.backgroundLight }
         const textcolor = { color: nightmode ? colors.white : colors.black }
         const titlecolor = { color: nightmode ? colors.white : colors.black }
-        const bordercolor = { borderColor: nightmode ? colors.white : colors.gray2 }
+        const bordercolor = { borderColor: nightmode ? colors.white : colors.black }
         const trackTintColor = nightmode ? "rgba(157, 163, 180, 0.10)" : "#DDDDDD"
         return (
             <Block style={backgroundcolor}>
                 <View style={styles.header}>
                     {this.renderBackButton()}
                     {this.renderMenu()}
+                    {this._renderModal()}
                 </View>
                 <Block containerNoHeader>
                     <View style={styles.titleRow}>
@@ -213,7 +273,8 @@ const mapStateToProps = (state) => {
         bridgeip: state.bridgeip,
         bridgeIndex: state.bridgeIndex,
         username: state.username,
-        lights: state.lights
+        lights: state.lights,
+        cloud: state.cloud
     }
 }
 

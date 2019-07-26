@@ -9,7 +9,7 @@ import AppIntroSlider from 'react-native-app-intro-slider';
 import { LocalAuthentication, DangerZone } from 'expo';
 const { Lottie } = DangerZone;
 
-import { GetAllLights, GetAllGroups, GetSchedules, ChangeHardwareSupport, GetConfig } from '../redux/actions'
+import { GetConfig, ChangeHardwareSupport } from '../redux/actions'
 
 var interval;
 class Splash extends Component {
@@ -22,15 +22,9 @@ class Splash extends Component {
     };
 
     componentWillMount() {
-        this.props._fetchAllLights();
-        this.props._fetchAllGroups();
-        this.props._fetchAllSchedules();
-        this.props._fetchAllConfig();
+        this.props._fetchEverything();
         interval = setInterval(() => {
-            this.props._fetchAllLights();
-            this.props._fetchAllGroups();
-            this.props._fetchAllSchedules();
-            this.props._fetchAllConfig();
+            this.props._fetchEverything();
         }, 3000)
     }
 
@@ -145,13 +139,12 @@ class Splash extends Component {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        _fetchAllGroups: () => dispatch(GetAllGroups()),
-        _fetchAllLights: () => dispatch(GetAllLights()),
-        _fetchAllSchedules: () => dispatch(GetSchedules()),
-        _fetchAllConfig: () => dispatch(GetConfig()),
         _UpdateHardwareSupport(index) {
             return dispatch(ChangeHardwareSupport(index))
         },
+        _fetchEverything(isLoading) {
+            return dispatch(GetConfig(isLoading));
+        }
     }
 }
 

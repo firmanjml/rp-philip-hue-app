@@ -9,16 +9,13 @@ import SettingsScreen from '../screens/Settings/SettingScreen';
 import AddSchedulesScreen from '../screens/Schedules/AddSchedules';
 import CategoryScreen from '../screens/Schedules/CategoryList';
 import ScheduleLocationScreen from '../screens/Schedules/LocationList';
-import AddSceneScreen from '../screens/Scenes/AddScenes';
 import PostUpdateScreen from '../screens/Miscellaneous/PostUpdateScreen';
-import SceneLocationScreen from '../screens/Scenes/SceneLocationList';
 import ControlRoomScreen from '../screens/Rooms/ControlRoomScreen';
 import BridgeInfoScreen from '../screens/Settings/BridgeInfoScreen';
 import LightInfo from '../screens/Lights/BulbInfoScreen';
 import EditBulbScreen from '../screens/Lights/EditBulbScreen';
 import RoomTypeList from '../screens/Rooms/RoomTypeList';
 import SearchScreen from '../screens/Lights/SearchBulbScreen';
-import ControlLightAdvanced from '../screens/Lights/ControlBulbAdvancedScreen';
 import ListBridgeScreen from '../screens/Settings/ListBridgeScreen';
 import PairNewBridgeScreen from '../screens/DiscoveryBridge/PairNewBridgeScreen';
 
@@ -53,9 +50,6 @@ const SetupNavigatorApp = createStackNavigator(
     AddSchedules: {
       screen: AddSchedulesScreen
     },
-    ControlBulbAdvanced: {
-      screen: ControlLightAdvanced
-    },
     ScheduleLocationListScreen: {
       screen: ScheduleLocationScreen
     },
@@ -64,12 +58,6 @@ const SetupNavigatorApp = createStackNavigator(
     },
     RoomType: {
       screen: RoomTypeList
-    },
-    AddScenes: {
-      screen: AddSceneScreen
-    },
-    SceneLocationListScreen: {
-      screen: SceneLocationScreen
     },
     BridgeInfo: {
       screen: BridgeInfoScreen

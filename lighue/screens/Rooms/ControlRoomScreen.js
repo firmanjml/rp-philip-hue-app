@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View, TouchableOpacity, Image } from "react-native";
+import { StyleSheet, View, TouchableOpacity, Image, ScrollView } from "react-native";
 import { ColorPicker } from "react-native-color-picker";
 import { connect } from "react-redux";
 import { SetGroupState, SetLampState, GetAllLights } from "../../redux/actions";
@@ -43,18 +43,13 @@ class ControlRoomScreen extends React.Component {
     });
   }
 
-  renderType() {
-    const { nightmode } = this.props;
-    const { colors } = theme;
-    const titlecolor = { color: nightmode ? colors.white : colors.black };
-    const textcolor = { color: nightmode ? colors.white : colors.gray3 };
-    const bordercolor = { borderColor: nightmode ? colors.white : colors.gray2 };
+  renderType(titlecolor, textcolor, bordercolor, nightmode, colors) {
     const { type } = this.state;
     return (
       <View>
-        <Text style={[styles.textControl, textcolor]}>Room Type</Text>
+        <Text style={[styles.textControl, titlecolor]}>Room Type</Text>
         <Input
-          style={[styles.textInput, titlecolor, bordercolor]}
+          style={[styles.textInput, textcolor, bordercolor]}
           editable={false}
           value={type}
           placeholderTextColor={nightmode ? colors.gray2 : colors.black}
@@ -113,7 +108,7 @@ class ControlRoomScreen extends React.Component {
     }
   }
 
-  renderView() {
+  renderView(textcolor) {
     const { lights, groups, navigation } = this.props;
     if (this.state.active == "Main") {
       return (
@@ -125,12 +120,11 @@ class ControlRoomScreen extends React.Component {
       );
     } else if (this.state.active == "ShowMoreInfo") {
       return (
-        (groups[this.state.id].lights.map(val => (
-          <View style={{ marginTop: 30 }}>
-            <View style={styles.bulbRow}>
+        <ScrollView style={{ marginTop: 30 }}>
+          {groups[this.state.id].lights.map((val, index) => (
+            <View key={index} style={styles.bulbRow}>
               <View style={{ flexDirection: 'row' }}>
                 <TouchableOpacity
-                  key={val}
                   onPress={() => {
                     this.props._fetchAllLights();
                     setTimeout(() => {
@@ -139,28 +133,35 @@ class ControlRoomScreen extends React.Component {
                       });
                     }, 700);
                   }}>
-                  <Text style={{ color: 'white', fontSize: 21, alignSelf: 'center' }}>{lights[val].name.length > 15 ? lights[val].name.substring(0, 15) + "..." : lights[val].name}</Text>
+                  <View style={{ flexDirection: 'row' }}>
+                    <Icon.Ionicons name="ios-bulb" size={25} style={{ alignSelf: 'center', marginRight: 10 }} color={theme.colors.gray} />
+                    <Text style={[textcolor, { fontSize: 21, alignSelf: 'center' }]}>{lights[val].name.length > 15 ? lights[val].name.substring(0, 15) + "..." : lights[val].name}</Text>
+                  </View>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  key={val}
                   onPress={() => {
                     navigation.navigate('BulbInfo', {
                       id: val
-                    })
+                    });
                   }}>
-                  <Icon.Ionicons name="ios-information-circle-outline" size={22} style={{ marginLeft: 10, alignSelf: 'center' }} color={theme.colors.gray} />
+                  <Icon.Ionicons name="md-information-circle-outline" size={22} style={{ marginLeft: 15, alignSelf: 'center' }} color={theme.colors.gray} />
                 </TouchableOpacity>
               </View>
               <ToggleSwitch
                 offColor="#DDDDDD"
                 onColor={theme.colors.secondary}
-                isOn={lights[val].state.on}
-                onToggle={(toggleState) => this.props._changeLightState(val, { on: toggleState })}
+                isOn={this.props.lights[val].state.on}
+                onToggle={(value) => {
+                  this.props._changeLightState(val, {
+                    "on": value,
+                  })
+                }}
               />
             </View>
-          </View>
-        ))
-        ))
+          ))
+          }
+        </ScrollView>
+      )
     }
   }
 
@@ -198,51 +199,69 @@ class ControlRoomScreen extends React.Component {
   }
 
   changeColorGroupState = _.throttle((values) => {
+    const i = this.props.bridgeIndex
+    const bridgeip = this.props.bridgeip
+    const username = this.props.username[i]
+    const url = this.props.cloud_enable === false ? `http://${bridgeip}/api/${username}/groups/${this.state.id}/state` : `https://api.meethue.com/bridge/${username}/groups/${this.state.id}/state`;
+    const headers = this.props.cloud_enable === true ? { "Authorization": `Bearer ${this.props.cloud.token}`, "Content-Type": "application/json" } : { "Content-Type": "application/json" };
+
     axios({
-      method: "PUT",
-      url: `http://${this.props.bridgeip[this.props.bridgeIndex]}/api/${
-        this.props.username[this.props.bridgeIndex]}/groups/${this.state.id}/action`,
+      url,
+      method: 'PUT',
+      headers,
       data: {
         on: true,
         xy: ColorConversionToXY(values)
       }
-    })
-  }, 600);
+    }, 600);
+  });
 
   changeBrightnessState = _.throttle((value) => {
-    console.log("changing")
+    const i = this.props.bridgeIndex
+    const bridgeip = this.props.bridgeip
+    const username = this.props.username[i]
+    const url = this.props.cloud_enable === false ? `http://${bridgeip}/api/${username}/groups/${this.state.id}/state` : `https://api.meethue.com/bridge/${username}/groups/${this.state.id}/state`;
+    const headers = this.props.cloud_enable === true ? { "Authorization": `Bearer ${this.props.cloud.token}`, "Content-Type": "application/json" } : { "Content-Type": "application/json" };
+
     axios({
-      method: "PUT",
-      url: `http://${this.props.bridgeip[this.props.bridgeIndex]}/api/${
-        this.props.username[this.props.bridgeIndex]}/groups/${this.state.id}/action`,
+      url,
+      method: 'PUT',
+      headers,
       data: {
         on: true,
         bri: value
       }
-    })
-  }, 50);
+    }, 50);
+  });
 
   changeSaturationState = _.throttle((value) => {
+    const i = this.props.bridgeIndex
+    const bridgeip = this.props.bridgeip
+    const username = this.props.username[i]
+    const url = this.props.cloud_enable === false ? `http://${bridgeip}/api/${username}/groups/${this.state.id}/state` : `https://api.meethue.com/bridge/${username}/groups/${this.state.id}/state`;
+    const headers = this.props.cloud_enable === true ? { "Authorization": `Bearer ${this.props.cloud.token}`, "Content-Type": "application/json" } : { "Content-Type": "application/json" };
+
     axios({
-      method: "PUT",
-      url: `http://${this.props.bridgeip[this.props.bridgeIndex]}/api/${
-        this.props.username[this.props.bridgeIndex]}/groups/${this.state.id}/action`,
+      url,
+      method: 'PUT',
+      headers,
       data: {
         on: true,
         sat: value
       }
-    })
-  }, 50);
+    }, 50);
+  })
 
   render() {
     const { nightmode, _changeGroupStateByID } = this.props;
     const { colors } = theme;
+    const bordercolor = { borderColor: nightmode ? colors.white : colors.black }
     const backgroundcolor = { backgroundColor: nightmode ? colors.background : colors.backgroundLight };
     const titlecolor = { color: nightmode ? colors.white : colors.black };
     const textcolor = { color: nightmode ? colors.white : colors.gray3 };
     const trackTintColor = nightmode ? "rgba(157, 163, 180, 0.10)" : "#DDDDDD"
     return (
-      <Block style={backgroundcolor}>
+      <Block style={backgroundcolor} >
         <Block flex={false} center row space="between" style={styles.header}>
           {this.renderBackButton()}
           {this.renderMenu()}
@@ -263,8 +282,8 @@ class ControlRoomScreen extends React.Component {
               }}
             />
           </View>
-          {this.renderType()}
-          <Text style={[styles.textControl, textcolor, { marginBottom: 10 }]}>
+          {this.renderType(titlecolor, textcolor, bordercolor, nightmode, colors)}
+          <Text style={[styles.textControl, titlecolor, { marginBottom: 10 }]}>
             Brightness
           </Text>
           <Slider
@@ -279,7 +298,7 @@ class ControlRoomScreen extends React.Component {
             value={this.state.bri}
             onValueChange={this.changeBrightnessState}
           />
-          <Text style={[styles.textControl, textcolor, { marginBottom: 10 }]}>
+          <Text style={[styles.textControl, titlecolor, { marginBottom: 10 }]}>
             Saturation
           </Text>
           <Slider
@@ -294,7 +313,7 @@ class ControlRoomScreen extends React.Component {
             value={this.state.sat}
             onValueChange={this.changeSaturationState}
           />
-          {this.renderView()}
+          {this.renderView(textcolor)}
         </Block>
       </Block >
     );
@@ -322,7 +341,8 @@ const mapStateToProps = state => {
     bridgeIndex: state.bridgeIndex,
     bridgeip: state.bridgeip,
     username: state.username,
-    nightmode: state.nightmode
+    nightmode: state.nightmode,
+    cloud_enable: state.cloud_enable
   };
 };
 

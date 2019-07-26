@@ -1,9 +1,9 @@
 import React from 'react';
-import { StyleSheet, Platform, View, Modal, TouchableOpacity } from 'react-native';
+import { StyleSheet, Platform, View } from 'react-native';
 import { BlurView } from 'expo';
 import { Block, Text, Button } from '../components';
 import { connect } from 'react-redux'
-import { DangerZone, LocalAuthentication } from 'expo';
+import { DangerZone } from 'expo';
 import { theme } from '../constants';
 import { ChangeAuthentication } from '../redux/actions'
 import Security from '../assets/lottie/cloud-security.json'

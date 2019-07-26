@@ -3,9 +3,11 @@ import {
   StyleSheet,
   Image,
   TouchableOpacity,
+  Modal,
+  ActivityIndicator,
+  View
 } from "react-native";
 import { connect } from "react-redux";
-import validator from "validator";
 import { Button, Block, Text, Input } from "../../components";
 import { theme } from "../../constants";
 import { SetLampAttributes } from "../../redux/actions";
@@ -39,6 +41,25 @@ class EditBulbScreen extends React.Component {
     });
   }
 
+  renderLoadingModal() {
+    return (
+      <Modal
+        transparent={true}
+        animationType={'none'}
+        visible={this.props.saving}
+        onRequestClose={() => { console.log('close modal') }}>
+        <View style={styles.modalBackground}>
+          <View style={styles.activityIndicatorWrapper}>
+            <ActivityIndicator
+              animating={this.props.saving}
+              color="#00ff00" />
+            <Text>Saving...</Text>
+          </View>
+        </View>
+      </Modal>
+    )
+  }
+
 
   changeName = (value) => {
     this.setState({ bulbName: value })
@@ -47,22 +68,24 @@ class EditBulbScreen extends React.Component {
   saveBulbName() {
     this.props._changeLampName(this.state.id, {
       name: this.state.bulbName
-    })
+    }, this.props.navigation)
   }
 
 
   render() {
     const { nightmode } = this.props;
     const { colors } = theme;
-    const bordercolor = { borderColor: nightmode ? colors.white : colors.gray2 }
-    const textcolor = { color: colors.gray2 }
+    const bordercolor = { borderColor: nightmode ? colors.white : colors.black }
+    const titlecolor = { color: nightmode ? colors.white : colors.black };
+    const textcolor = { color: nightmode ? colors.white : colors.gray3 };
     const backgroundcolor = { backgroundColor: nightmode ? colors.background : colors.backgroundLight }
     return (
       <Block style={backgroundcolor}>
         <Block container>
-          <Text h1 bold color={"white"} style={{ textAlign: "left" }}>Edit Bulb Info</Text>
+          <Text h1 bold style={[titlecolor, { textAlign: "left" }]}>Edit Bulb Info</Text>
+          {this.renderLoadingModal()}
           <Block style={{ marginTop: 10 }}>
-            <Text semibold paragraph white style={{ marginTop: 20 }}>Bulb Name</Text>
+            <Text semibold paragraph style={[titlecolor, { marginTop: 20 }]}>Bulb Name</Text>
             <Input
               style={[styles.textInput, textcolor, bordercolor]}
               value={this.state.bulbName}
@@ -90,7 +113,7 @@ class EditBulbScreen extends React.Component {
 
 const mapStateToProps = (state) => {
   return {
-    loading: state.loading,
+    saving: state.saving,
     lights: state.lights,
     nightmode: state.nightmode
   }
@@ -99,8 +122,8 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    _changeLampName(id, data) {
-      return dispatch(SetLampAttributes(id, data));
+    _changeLampName(id, data, navigation) {
+      return dispatch(SetLampAttributes(id, data, navigation));
     }
   };
 };
@@ -125,7 +148,23 @@ const styles = StyleSheet.create({
     marginHorizontal: 2,
     borderBottomWidth: 1,
     borderColor: "#E1E3E8"
-  }
+  },
+  modalBackground: {
+    flex: 1,
+    alignItems: 'center',
+    flexDirection: 'column',
+    justifyContent: 'space-around',
+    backgroundColor: '#00000040'
+  },
+  activityIndicatorWrapper: {
+    backgroundColor: '#FFFFFF',
+    height: 100,
+    width: 100,
+    borderRadius: 10,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-around'
+  },
 });
 export default connect(
   mapStateToProps,

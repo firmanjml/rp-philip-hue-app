@@ -3,11 +3,12 @@ import { Image, StyleSheet, TouchableOpacity, Dimensions, View, Alert } from 're
 import { Block, Text, Button } from '../../components';
 import { theme } from '../../constants';
 import { connect } from 'react-redux';
-import { Updates, BlurView, AuthSession, Constants, WebBrowser } from 'expo';
+import { Updates, AuthSession, Constants } from 'expo';
 import { persistor } from "../../redux/store";
-const { width } = Dimensions.get('window');
-import { ChangeThemeMode, ChangeCloudToken, ChangeCloudState } from '../../redux/actions'
+import { ChangeThemeMode, ChangeCloudToken, ChangeAuthentication } from '../../redux/actions'
 import ToggleSwitch from '../../components/ToggleSwitch';
+import Base64 from 'Base64';
+import { ScrollView } from 'react-native-gesture-handler';
 
 class SettingScreen extends Component {
     static navigationOptions = ({ navigation }) => {
@@ -31,40 +32,35 @@ class SettingScreen extends Component {
     }
 
     renderBridgeInfo(textcolor) {
-        const { username, bridgeIndex } = this.props;
-        if (username[bridgeIndex]) {
-            return (
-                <View>
-                    <Block flex={false} row space="between" style={styles.row}>
-                        <TouchableOpacity
-                            onPress={() => this.props.navigation.navigate("BridgeInfo")}>
-                            <Text style={[styles.textSetting, textcolor]}>Bridge Info</Text>
-                        </TouchableOpacity>
-                    </Block>
-                    <View style={styles.divider} />
-                </View>
-            )
-        }
+        return (
+            <View>
+                <Block flex={false} row space="between" style={styles.row}>
+                    <TouchableOpacity
+                        onPress={() => this.props.navigation.navigate("BridgeInfo")}>
+                        <Text style={[styles.textSetting, textcolor]}>Bridge Info</Text>
+                    </TouchableOpacity>
+                </Block>
+                <View style={styles.divider} />
+            </View>
+        )
+
     }
 
     renderClearButton() {
-        const { username, bridgeIndex } = this.props;
-        if (username[bridgeIndex]) {
-            return (
-                <Block bottom flex={1} style={{ marginBottom: 10 }}>
-                    <Button gradient
-                        startColor='#C40A0A'
-                        endColor='#E86241'
-                        onPress={() => this.clearAppData()}>
-                        <Text center semibold white>Clear app data</Text>
-                    </Button>
-                </Block>
-            )
-        }
+        return (
+            <Block bottom flex={1} style={{ marginBottom: 10 }}>
+                <Button gradient
+                    startColor='#C40A0A'
+                    endColor='#E86241'
+                    onPress={() => this.clearAppData()}>
+                    <Text center semibold white>Clear app data</Text>
+                </Button>
+            </Block>
+        )
     }
 
     render() {
-        const { nightmode, cloud_enable, bridgeip } = this.props;
+        const { nightmode, cloud_enable, bridgeip, bridgeIndex, } = this.props;
         const { colors } = theme;
         const backgroundcolor = { backgroundColor: nightmode ? colors.background : colors.backgroundLight }
         const textcolor = { color: nightmode ? colors.white : colors.black }
@@ -72,47 +68,67 @@ class SettingScreen extends Component {
             <Block style={backgroundcolor}>
                 <Block container>
                     <Text h1 bold style={[textcolor, { marginTop: 10 }]}>Settings</Text>
-                    <Block flex={false} row space="between" style={styles.row}>
-                        <Text style={[styles.textSetting, textcolor]}>Dark mode</Text>
-                        <ToggleSwitch
-                            offColor="#DDDDDD"
-                            onColor={theme.colors.secondary}
-                            isOn={nightmode}
-                            onToggle={nightmode => {
-                                this.props._changeTheme(nightmode);
-                            }}
-                        />
-                    </Block>
-                    <View style={styles.divider} />
-                    <Block flex={false} row space="between" style={styles.row}>
+                    <ScrollView>
+                        <Block flex={false} row space="between" style={styles.row}>
+                            <Text style={[styles.textSetting, textcolor]}>Dark mode</Text>
+                            <ToggleSwitch
+                                offColor="#DDDDDD"
+                                onColor={theme.colors.secondary}
+                                isOn={nightmode}
+                                onToggle={nightmode => {
+                                    this.props._changeTheme(nightmode);
+                                }}
+                            />
+                        </Block>
+                        <View style={styles.divider} />
+                        <Block flex={false} row space="between" style={styles.row}>
+                            <Text style={[styles.textSetting, textcolor]}>Enable Fingerprint</Text>
+                            <ToggleSwitch
+                                offColor="#DDDDDD"
+                                onColor={theme.colors.secondary}
+                                isOn={this.props.authentication}
+                                onToggle={(boolean) => this.props._UpdateAuthentication(boolean)}
+                            />
+                        </Block>
+                        <View style={styles.divider} />
                         {
-                            cloud_enable === true ?
-                                <Text style={[styles.textSetting, { color: theme.colors.gray2 }]}>Connected via Cloud</Text>
-                                :
-                                <TouchableOpacity
-                                    onPress={() => this._handleoAuth()}>
-                                    <Text style={[styles.textSetting, textcolor]}>Setup Remote Control via Cloud</Text>
-                                </TouchableOpacity>
-                        }
-                    </Block>
-                    <View style={styles.divider} />
-                    <Block flex={false} row space="between" style={styles.row}>
-                        <TouchableOpacity
-                            onPress={() => this.props.navigation.navigate("ListBridge")}>
-                            <Text style={[styles.textSetting, textcolor]}>{(bridgeip.length > 1) ? "Switch Bridge" : "Add new Bridge"}</Text>
-                        </TouchableOpacity>
+                            this.props.bridgeip.length > 0 ?
+                                (
+                                    <Block>
+                                        <Block flex={false} row space="between" style={styles.row}>
+                                            {
+                                                cloud_enable === true ?
+                                                    <Text style={[styles.textSetting, { color: theme.colors.gray2 }]}>Connected via Cloud</Text>
+                                                    :
+                                                    <TouchableOpacity
+                                                        onPress={() => this._handleoAuth()}>
+                                                        <Text style={[styles.textSetting, textcolor]}>Setup Remote Control via Cloud</Text>
+                                                    </TouchableOpacity>
+                                            }
+                                        </Block>
+                                        <View style={styles.divider} />
+                                        <Block flex={false} row space="between" style={styles.row}>
+                                            <TouchableOpacity
+                                                onPress={() => this.props.navigation.navigate("ListBridge")}>
+                                                <Text style={[styles.textSetting, textcolor]}>{(bridgeip.length > 1) ? "Switch Bridge" : "Add new Bridge"}</Text>
+                                            </TouchableOpacity>
 
-                    </Block>
-                    <View style={styles.divider} />
-                    {this.renderBridgeInfo(textcolor)}
+                                        </Block>
+                                        <View style={styles.divider} />
+                                        {this.renderBridgeInfo(textcolor)}
+                                    </Block>
+                                )
+                                :
+                                null
+                        }
+                    </ScrollView>
                     {this.renderClearButton()}
                 </Block>
             </Block>
         )
     }
     _handleoAuth = async () => {
-        const redirectUrl = AuthSession.getRedirectUrl();
-        const csrf = 'lighue' + Constants.installationId + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        const csrf = Base64.btoa('lighue' + Constants.installationId + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15));
 
         const queryParams = toQueryString({
             clientid: 'SFL5STvqIFZb219NUAflwg8UIeQm7KmD',
@@ -124,26 +140,16 @@ class SettingScreen extends Component {
         let result = await AuthSession.startAsync({
             authUrl: `https://api.meethue.com/oauth2/auth${queryParams}`,
         })
+
         console.log(csrf);
 
-        if (result.params.status === "error") {
-            Alert.alert(
-                "Please try again.",
-                'There\'s something wrong with the authentication right now.',
-                [{ text: "OK" }],
-                { cancelable: false }
-            );
-        } else if (result.params.status === "success") {
-            if (result.params.state === csrf) {
+        if (result.params) {
+            if (result.params === csrf && result.params.code) {
                 this.props._changeCloudToken(result.params.code);
                 Alert.alert(
                     'Hooray 🥳',
                     'Successfully paired to cloud.',
-                    [{
-                        text: "OK", onPress: () => {
-
-                        }
-                    }],
+                    [{ text: "OK" }],
                     { cancelable: false }
                 );
             } else {
@@ -156,8 +162,8 @@ class SettingScreen extends Component {
             }
         } else {
             Alert.alert(
-                'Please try again. 😉',
-                'Hacking attempt an invalid request.',
+                'Please try again',
+                'There\'s something wrong with the authentication right now.',
                 [{ text: "OK" }],
                 { cancelable: false }
             );
@@ -178,6 +184,9 @@ const mapDispatchToProps = (dispatch) => {
         },
         _changeCloudToken: (code) => {
             return dispatch(ChangeCloudToken(code));
+        },
+        _UpdateAuthentication: (boolean) => {
+            return dispatch(ChangeAuthentication(boolean));
         }
     }
 }
@@ -188,7 +197,8 @@ const mapStateToProps = (state) => {
         cloud_enable: state.cloud_enable,
         bridgeIndex: state.bridgeIndex,
         bridgeip: state.bridgeip,
-        username: state.username
+        username: state.username,
+        authentication : state.authentication
     }
 }
 

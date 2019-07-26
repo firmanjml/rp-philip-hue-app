@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, Image, Alert, TouchableOpacity, Picker, View, BackHandler, Platform, ScrollView } from "react-native";
+import { StyleSheet, Image, Alert, TouchableOpacity, View, BackHandler, ScrollView, Modal, ActivityIndicator } from "react-native";
 import { connect } from "react-redux";
 import CheckBox from 'react-native-check-box';
 import { Button, Block, Text, Input } from "../../components";
@@ -59,13 +59,13 @@ class AddRoomScreen extends React.Component {
     this.forceUpdate()
   }
 
-  renderListBulb() {
+  renderListBulb(titlecolor, checkboxcolor) {
     const { lights, _ChangeLampStateByID } = this.props;
     const { lightBulbSelected } = this;
     return (
       Object.entries(lightBulbSelected).length === 0 && lightBulbSelected.constructor === Object ?
         <Block middle center>
-          <Text h1 style={{ color: "white" }}>No Bulb Found</Text>
+          <Text h1 style={titlecolor}>No Bulb Found</Text>
         </Block>
         :
         Object.keys(lightBulbSelected).map((val, index) => (
@@ -75,13 +75,13 @@ class AddRoomScreen extends React.Component {
               onPress={() => _ChangeLampStateByID(val, {
                 "alert": "select"
               })}>
-              <Text paragraph style={{ alignSelf: 'center', color: 'white' }}>{lights[val].name}</Text>
+              <Text paragraph style={[{ alignSelf: 'center' }, titlecolor]}>{lights[val].name}</Text>
             </TouchableOpacity>
             <CheckBox
               onClick={() => this.updateBulb(val)}
               isChecked={lightBulbSelected[val].selected}
               checkedCheckBoxColor="#1CD0A1"
-              uncheckedCheckBoxColor="white"
+              uncheckedCheckBoxColor={checkboxcolor}
             />
           </View>
         ))
@@ -194,45 +194,67 @@ class AddRoomScreen extends React.Component {
     }
   }
 
+  renderLoadingModal() {
+    return (
+      <Modal
+        transparent={true}
+        animationType={'none'}
+        visible={this.props.saving}
+        onRequestClose={() => { console.log('close modal') }}>
+        <View style={styles.modalBackground}>
+          <View style={styles.activityIndicatorWrapper}>
+            <ActivityIndicator
+              animating={this.props.saving}
+              color="#00ff00" />
+            <Text>Adding..</Text>
+          </View>
+        </View>
+      </Modal>
+    )
+  }
+
 
   render() {
     const { nightmode } = this.props;
     const { colors } = theme;
     const backgroundcolor = { backgroundColor: nightmode ? colors.background : colors.backgroundLight }
-    const textcolor = { color: nightmode ? colors.white : colors.black }
     const titlecolor = { color: nightmode ? colors.white : colors.black }
+    const textcolor = { color: nightmode ? colors.white : colors.gray2 }
+    const bordercolor = { borderColor: nightmode ? colors.white : colors.black }
+    const checkboxcolor = nightmode ? "white" : "black"
     return (
       <Block style={backgroundcolor}>
         <View style={styles.header}>
           {this.renderBackButton()}
+          {this.renderLoadingModal()}
           {this.renderSave()}
         </View>
         <Block containerNoHeader>
-          <Text h1 bold style={[textcolor]}>Create New Room</Text>
+          <Text h1 bold style={titlecolor}>Create New Room</Text>
           <ScrollView>
             <Block flex={false} column style={styles.row}>
-              <Text bold style={textcolor}>Name</Text>
+              <Text bold style={titlecolor}>Name</Text>
               <Input
-                style={styles.textInput}
+                style={[styles.textInput, textcolor, bordercolor]}
                 onChangeText={this.handleName}
                 placeholder={"Insert Room Name"}
                 placeholderTextColor={theme.colors.gray2}
               />
             </Block>
             <Block flex={false} column style={styles.row}>
-              <Text bold style={[titlecolor]}>Room Type</Text>
+              <Text bold style={titlecolor}>Room Type</Text>
               <View style={{ marginTop: 20 }}>
                 {this.renderRoomType(textcolor)}
               </View>
-              <View style={[styles.divider, { marginTop: 5 }]} />
+              <View style={[styles.divider, bordercolor, { marginTop: 5 }]} />
             </Block>
             <Block flex={false} column style={styles.row}>
               <View>
-                <Text bold style={[{ marginTop: 10 }, textcolor]}>Assign Bulb To Room</Text>
+                <Text bold style={[{ marginTop: 10 }, titlecolor]}>Assign Bulb To Room</Text>
                 <Text bold style={{ marginTop: 2, color: theme.colors.gray2 }}>Tap one of the bulb to make it blink</Text>
               </View>
               <View style={{ marginTop: 20 }}>
-                {this.renderListBulb()}
+                {this.renderListBulb(titlecolor, checkboxcolor)}
               </View>
             </Block>
           </ScrollView>
@@ -244,10 +266,10 @@ class AddRoomScreen extends React.Component {
 
 const mapStateToProps = state => {
   return {
-    loading: state.loading,
     groups: state.groups,
     lights: state.lights,
-    nightmode: state.nightmode
+    nightmode: state.nightmode,
+    saving: state.saving
   };
 };
 
@@ -282,8 +304,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   divider: {
-    borderBottomWidth: 0.5,
-    borderColor: "#E1E3E8"
+    borderBottomWidth: 0.5
   },
   header: {
     marginTop: 30,
@@ -291,6 +312,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center'
+  },
+  modalBackground: {
+    flex: 1,
+    alignItems: 'center',
+    flexDirection: 'column',
+    justifyContent: 'space-around',
+    backgroundColor: '#00000040'
+  },
+  activityIndicatorWrapper: {
+    backgroundColor: '#FFFFFF',
+    height: 100,
+    width: 100,
+    borderRadius: 10,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-around'
   },
 });
 

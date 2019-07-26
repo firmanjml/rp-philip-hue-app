@@ -111,46 +111,46 @@ class BulbInfoScreen extends React.Component {
   }
 
   render() {
-    const { id } = this.state;
-    const { lights, nightmode } = this.props;
+    const { nightmode } = this.props;
     const { colors } = theme;
-    const textcolor = { color: nightmode ? colors.white : colors.gray3 }
+    const titlecolor = { color: nightmode ? colors.white : colors.black };
+    const textcolor = { color: nightmode ? colors.white : colors.gray3 };
     const backgroundcolor = { backgroundColor: nightmode ? colors.background : colors.backgroundLight }
     return (
       <Block style={backgroundcolor}>
         <Block container style={{ marginBottom: 20 }}>
           <Block flex={false} row space="between">
-            <Text h1 bold style={[textcolor, { marginTop: 10 }]}>Bulb Info</Text>
+            <Text h1 bold style={[titlecolor, { marginTop: 10 }]}>Bulb Info</Text>
             {this.renderMenu()}
           </Block>
           <ScrollView>
             <Block flex={false} column style={styles.row}>
-              <Text bold style={textcolor}>Name</Text>
+              <Text bold style={titlecolor}>Name</Text>
               <Text style={[styles.text, textcolor]}>{this.state.name}</Text>
               <View style={styles.divider} />
             </Block>
             <Block flex={false} column style={styles.row}>
-              <Text bold style={textcolor}>Type</Text>
+              <Text bold style={titlecolor}>Type</Text>
               <Text style={[styles.text, textcolor]}>{this.state.type}</Text>
               <View style={styles.divider} />
             </Block>
             <Block flex={false} column style={styles.row}>
-              <Text bold style={textcolor}>Manufacturer</Text>
+              <Text bold style={titlecolor}>Manufacturer</Text>
               <Text style={[styles.text, textcolor]}>{this.state.manufacturername}</Text>
               <View style={styles.divider} />
             </Block>
             <Block flex={false} column style={styles.row}>
-              <Text bold style={textcolor}>Model Id</Text>
+              <Text bold style={titlecolor}>Model Id</Text>
               <Text style={[styles.text, textcolor]}>{this.state.modelid}</Text>
               <View style={styles.divider} />
             </Block>
             <Block flex={false} column style={styles.row}>
-              <Text bold style={textcolor}>Mac Address</Text>
+              <Text bold style={titlecolor}>Mac Address</Text>
               <Text style={[styles.text, textcolor]}>{this.state.uniqueid}</Text>
               <View style={styles.divider} />
             </Block>
             <Block flex={false} column style={styles.row}>
-              <Text bold style={textcolor}>Software Version</Text>
+              <Text bold style={titlecolor}>Software Version</Text>
               <Text style={[styles.text, textcolor]}>{this.state.swversion}</Text>
               <View style={styles.divider} />
             </Block>

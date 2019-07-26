@@ -1,13 +1,12 @@
 import React, { Component } from 'react'
-import { Dimensions, Image, StyleSheet, ScrollView, TouchableOpacity, View, RefreshControl, Platform } from 'react-native'
+import { Dimensions, Image, StyleSheet, ScrollView, TouchableOpacity, View, RefreshControl, Platform, Modal, ActivityIndicator, Alert } from 'react-native'
 import { Card, Badge, Block, Text } from '../../components';
 import { theme, constant } from '../../constants';
 import Icon from 'react-native-vector-icons';
 import ToggleSwitch from "../../components/ToggleSwitch";
 import { connect } from 'react-redux';
 import { SetLampState } from '../../redux/actions';
-import { ConvertXYtoHex } from '../../components/ColorConvert';
-import { GetAllGroups, GetAllLights, GetSchedules, GetConfig } from '../../redux/actions';
+import { GetAllGroups, GetAllLights, GetConfig, ChangeSaving } from '../../redux/actions';
 
 import {
     Menu,
@@ -18,7 +17,6 @@ import {
 
 const { width } = Dimensions.get('window');
 
-var interval;
 class DefaultScreen extends Component {
     static navigationOptions = {
         header: null
@@ -27,20 +25,63 @@ class DefaultScreen extends Component {
     state = {
         active: 'Rooms',
         categories: [],
-        refreshing: false
+        refreshing: false,
+        alertStatus: false
     }
 
     componentWillMount() {
-        this.props._fetchAllLights();
-        this.props._fetchAllGroups();
-        this.props._fetchAllSchedules();
-        this.props._fetchAllConfig();
+        this.props._fetchEverything(true);
+        this.props._changeSavingToFalse(false);
         setInterval(() => {
-            this.props._fetchAllLights();
-            this.props._fetchAllGroups();
-            this.props._fetchAllSchedules();
-            this.props._fetchAllConfig();
-        }, 2000)
+            this.props._fetchEverything();
+            this.checkBridgeStatus()
+        }, 3000)
+    }
+
+    checkBridgeStatus() {
+        if (!this.props.status && !this.state.alertStatus && !this.props.cloud_enable) {
+            this.setState({
+                alertStatus: true
+            })
+            Alert.alert(
+                'No connection to Philips Hue Bridge',
+                "Please try to reconnect",
+                [{
+                    text: 'Cancel',
+                    onPress: () => { this.setState({ alertStatus: false }) },
+                    style: 'cancel',
+                },
+                {
+                    text: "Reconnect",
+                    onPress: () => {
+                        {
+                            this.setState({ alertStatus: false }),
+                                this.props._fetchEverything(true),
+                                console.log("reconnect")
+                        }
+                    }
+                }],
+                { cancelable: false }
+            );
+        }
+    }
+
+    renderLoadingModal() {
+        return (
+            <Modal
+                transparent={true}
+                animationType={'none'}
+                visible={this.props.loading}
+                onRequestClose={() => { console.log('close modal') }}>
+                <View style={styles.modalBackground}>
+                    <View style={styles.activityIndicatorWrapper}>
+                        <ActivityIndicator
+                            animating={this.props.loading}
+                            color="#00ff00" />
+                    </View>
+                </View>
+            </Modal>
+        )
     }
 
     renderTab(tab, backgroundcolor) {
@@ -194,44 +235,50 @@ class DefaultScreen extends Component {
                         </TouchableOpacity>
                     </Block>
                     :
-                    Object.keys(lights).map((val, index) => (
-                        <View key={index} style={{ paddingHorizontal: theme.sizes.base * 2 }}>
-                            <View style={styles.bulbRow}>
-                                <View style={{ flexDirection: 'row' }}>
-                                    <TouchableOpacity
-                                        onPress={() => {
-                                            this.props._fetchAllLights();
-                                            setTimeout(() => {
-                                                navigation.navigate('ControlBulb', {
-                                                    id: val
-                                                });
-                                            }, 700);
-                                        }}>
-                                        <Text style={{ color: 'white', fontSize: 21, alignSelf: 'center' }}>{lights[val].name.length > 15 ? lights[val].name.substring(0, 15) + "..." : lights[val].name}</Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity
-                                        key={val}
-                                        onPress={() => {
-                                            navigation.navigate('BulbInfo', {
-                                                id: val
-                                            });
-                                        }}>
-                                        <Icon.Ionicons name="ios-information-circle-outline" size={22} style={{ marginLeft: 10, alignSelf: 'center' }} color={theme.colors.gray} />
-                                    </TouchableOpacity>
+                    <ScrollView>
+                        {
+                            Object.keys(lights).map((val, index) => (
+                                <View key={index} style={{ paddingHorizontal: theme.sizes.base * 2 }}>
+                                    <View style={styles.bulbRow}>
+                                        <View style={{ flexDirection: 'row' }}>
+                                            <TouchableOpacity
+                                                onPress={() => {
+                                                    this.props._fetchAllLights();
+                                                    setTimeout(() => {
+                                                        navigation.navigate('ControlBulb', {
+                                                            id: val
+                                                        });
+                                                    }, 700);
+                                                }}>
+                                                <View style={{ flexDirection: 'row' }}>
+                                                    <Icon.Ionicons name="ios-bulb" size={25} style={{ alignSelf: 'center', marginRight: 10 }} color={theme.colors.gray} />
+                                                    <Text style={[textcolor, { fontSize: 21, alignSelf: 'center' }]}>{lights[val].name.length > 15 ? lights[val].name.substring(0, 15) + "..." : lights[val].name}</Text>
+                                                </View>
+                                            </TouchableOpacity>
+                                            <TouchableOpacity
+                                                onPress={() => {
+                                                    navigation.navigate('BulbInfo', {
+                                                        id: val
+                                                    });
+                                                }}>
+                                                <Icon.Ionicons name="md-information-circle-outline" size={22} style={{ marginLeft: 15, alignSelf: 'center' }} color={theme.colors.gray} />
+                                            </TouchableOpacity>
+                                        </View>
+                                        <ToggleSwitch
+                                            offColor="#DDDDDD"
+                                            onColor={theme.colors.secondary}
+                                            isOn={this.props.lights[val].state.on}
+                                            onToggle={(value) => {
+                                                _changeLightState(val, {
+                                                    "on": value,
+                                                })
+                                            }}
+                                        />
+                                    </View>
                                 </View>
-                                <ToggleSwitch
-                                    offColor="#DDDDDD"
-                                    onColor={theme.colors.secondary}
-                                    isOn={this.props.lights[val].state.on}
-                                    onToggle={(value) => {
-                                        _changeLightState(val, {
-                                            "on": value,
-                                        })
-                                    }}
-                                />
-                            </View>
-                        </View>
-                    ))
+                            ))
+                        }
+                    </ScrollView>
             )
         } else if (this.state.active === "Schedules") {
             return (
@@ -292,11 +339,11 @@ class DefaultScreen extends Component {
         const { colors } = theme;
         const backgroundcolor = { backgroundColor: nightmode ? colors.background : colors.backgroundLight }
         const textcolor = { color: nightmode ? colors.white : colors.black }
-        const refreshtextcolor = nightmode ? colors.white : colors.black
         return (
             <Block style={backgroundcolor}>
                 <Block flex={false} center row space="between" style={styles.header}>
                     <Text h1 style={[textcolor, { fontWeight: 'bold' }]}>Explore</Text>
+                    {this.renderLoadingModal()}
                     {this.renderMenu(this.state.active)}
                 </Block>
                 <Block flex={false} row style={[styles.tabs, backgroundcolor]}>
@@ -312,10 +359,14 @@ const mapDispatchToProps = (dispatch) => {
     return {
         _fetchAllGroups: () => dispatch(GetAllGroups()),
         _fetchAllLights: () => dispatch(GetAllLights()),
-        _fetchAllSchedules: () => dispatch(GetSchedules()),
-        _fetchAllConfig: () => dispatch(GetConfig()),
         _changeLightState(id, data) {
             return dispatch(SetLampState(id, data));
+        },
+        _fetchEverything(isLoading) {
+            return dispatch(GetConfig(isLoading));
+        },
+        _changeSavingToFalse(boolean) {
+            return dispatch(ChangeSaving(boolean))
         }
     }
 }
@@ -324,8 +375,11 @@ const mapStateToProps = (state) => {
     return {
         loading: state.loading,
         groups: state.groups,
+        status: state.status,
         lights: state.lights,
-        nightmode: state.nightmode
+        nightmode: state.nightmode,
+        loading: state.loading,
+        cloud_enable: state.cloud_enable
     }
 }
 
@@ -382,7 +436,23 @@ const styles = StyleSheet.create({
         marginHorizontal: 2,
         borderBottomWidth: 1,
         borderColor: '#ccc',
-    }
+    },
+    modalBackground: {
+        flex: 1,
+        alignItems: 'center',
+        flexDirection: 'column',
+        justifyContent: 'space-around',
+        backgroundColor: '#00000040'
+    },
+    activityIndicatorWrapper: {
+        backgroundColor: '#FFFFFF',
+        height: 100,
+        width: 100,
+        borderRadius: 10,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-around'
+    },
 
 
 
