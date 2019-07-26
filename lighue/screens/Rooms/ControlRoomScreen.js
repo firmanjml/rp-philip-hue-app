@@ -195,7 +195,7 @@ class ControlRoomScreen extends React.Component {
 
   changeColorGroupState = _.throttle((values) => {
     const i = this.props.bridgeIndex
-    const bridgeip = this.props.bridgeip
+    const bridgeip = this.props.bridgeip[i]
     const username = this.props.username[i]
     const url = this.props.cloud_enable === false ? `http://${bridgeip}/api/${username}/groups/${this.state.id}/action` : `https://api.meethue.com/bridge/${username}/groups/${this.state.id}/action`;
     const headers = this.props.cloud_enable === true ? { "Authorization": `Bearer ${this.props.cloud.token}`, "Content-Type": "application/json" } : { "Content-Type": "application/json" };
@@ -213,7 +213,7 @@ class ControlRoomScreen extends React.Component {
 
   changeBrightnessState = _.throttle((value) => {
     const i = this.props.bridgeIndex
-    const bridgeip = this.props.bridgeip
+    const bridgeip = this.props.bridgeip[i]
     const username = this.props.username[i]
     const url = this.props.cloud_enable === false ? `http://${bridgeip}/api/${username}/groups/${this.state.id}/action` : `https://api.meethue.com/bridge/${username}/groups/${this.state.id}/action`;
     const headers = this.props.cloud_enable === true ? { "Authorization": `Bearer ${this.props.cloud.token}`, "Content-Type": "application/json" } : { "Content-Type": "application/json" };
@@ -231,7 +231,7 @@ class ControlRoomScreen extends React.Component {
 
   changeSaturationState = _.throttle((value) => {
     const i = this.props.bridgeIndex
-    const bridgeip = this.props.bridgeip
+    const bridgeip = this.props.bridgeip[i]
     const username = this.props.username[i]
     const url = this.props.cloud_enable === false ? `http://${bridgeip}/api/${username}/groups/${this.state.id}/action` : `https://api.meethue.com/bridge/${username}/groups/${this.state.id}/action`;
     const headers = this.props.cloud_enable === true ? { "Authorization": `Bearer ${this.props.cloud.token}`, "Content-Type": "application/json" } : { "Content-Type": "application/json" };

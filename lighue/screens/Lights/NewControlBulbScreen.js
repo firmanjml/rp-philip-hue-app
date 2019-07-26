@@ -47,7 +47,7 @@ class NewControlBulbScreen extends Component {
 
     changeColorLightState = _.throttle((values) => {
         const i = this.props.bridgeIndex
-        const bridgeip = this.props.bridgeip
+        const bridgeip = this.props.bridgeip[i]
         const username = this.props.username[i]
         const url = this.props.cloud_enable === false ? `http://${bridgeip}/api/${username}/lights/${this.state.id}/state` : `https://api.meethue.com/bridge/${username}/lights/${this.state.id}/state`;
         const headers = this.props.cloud_enable === true ? { "Authorization": `Bearer ${this.props.cloud.token}`, "Content-Type": "application/json" } : { "Content-Type": "application/json" };
@@ -65,7 +65,7 @@ class NewControlBulbScreen extends Component {
 
     changeBrightnessState = _.throttle((value) => {
         const i = this.props.bridgeIndex
-        const bridgeip = this.props.bridgeip
+        const bridgeip = this.props.bridgeip[i]
         const username = this.props.username[i]
         const url = this.props.cloud_enable === false ? `http://${bridgeip}/api/${username}/lights/${this.state.id}/state` : `https://api.meethue.com/bridge/${username}/lights/${this.state.id}/state`;
         const headers = this.props.cloud_enable === true ? { "Authorization": `Bearer ${this.props.cloud.token}`, "Content-Type": "application/json" } : { "Content-Type": "application/json" };
@@ -83,7 +83,7 @@ class NewControlBulbScreen extends Component {
 
     changeSaturationState = _.throttle((value) => {
         const i = this.props.bridgeIndex
-        const bridgeip = this.props.bridgeip
+        const bridgeip = this.props.bridgeip[i]
         const username = this.props.username[i]
         const url = this.props.cloud_enable === false ? `http://${bridgeip}/api/${username}/lights/${this.state.id}/state` : `https://api.meethue.com/bridge/${username}/lights/${this.state.id}/state`;
         const headers = this.props.cloud_enable === true ? { "Authorization": `Bearer ${this.props.cloud.token}`, "Content-Type": "application/json" } : { "Content-Type": "application/json" };
@@ -234,7 +234,7 @@ class NewControlBulbScreen extends Component {
                     {
                         !this.state.dimmableType ?
                             <Block>
-                                <Text style={[styles.textControl, textcolor, { marginTop: 10, marginBottom : 10 }]}>Saturation</Text>
+                                <Text style={[styles.textControl, textcolor, { marginTop: 10, marginBottom: 10 }]}>Saturation</Text>
                                 <Slider
                                     minimumValue={1}
                                     maximumValue={254}
