@@ -205,7 +205,8 @@ class ControlRoomScreen extends React.Component {
       method: 'PUT',
       headers,
       data: {
-        xy: ColorConversionToXY(values)
+        xy: ColorConversionToXY(values),
+        transitiontime: 0
       }
     }, 600);
   });
@@ -222,7 +223,8 @@ class ControlRoomScreen extends React.Component {
       method: 'PUT',
       headers,
       data: {
-        bri: value
+        bri: value,
+        transitiontime: 0
       }
     }, 60);
   });
@@ -239,7 +241,8 @@ class ControlRoomScreen extends React.Component {
       method: 'PUT',
       headers,
       data: {
-        sat: value
+        sat: value,
+        transitiontime: 0
       }
     }, 60);
   })
