@@ -188,7 +188,7 @@ class AddSchedules extends Component {
                 var datetime = `${utcDaySelected}/T${time}:00`
             }
             else if (mode == "Specific Date") {
-                var datetime = `${this.state.displayyear}-${this.state.displaymonth}-${this.state.displayyear}T${time}:00`
+                var datetime = `${this.state.displayyear}-${this.state.displaymonth < 10 ? `0${this.state.displaymonth}` : this.state.displaymonth}-${this.state.displaydate < 10 ? `0${this.state.displaydate}` : this.state.displaydate}T${time}:00`
             }
 
             const scheduleData =

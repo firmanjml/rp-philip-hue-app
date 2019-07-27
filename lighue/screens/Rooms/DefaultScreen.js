@@ -35,7 +35,7 @@ class DefaultScreen extends Component {
         setInterval(() => {
             this.props._fetchEverything();
             this.checkBridgeStatus()
-        }, 3000)
+        }, 5000)
     }
 
     checkBridgeStatus() {
@@ -158,6 +158,7 @@ class DefaultScreen extends Component {
         const { colors } = theme;
         const refreshtextcolor = nightmode ? colors.white : colors.black
         const textcolor = { color: nightmode ? colors.white : colors.black }
+        const graytextcolor = { color: nightmode ? colors.gray2 : colors.black }
         const marginTop = { marginTop: Platform.OS == "android" ? 20 : 0 }
 
         if (this.state.active === 'Rooms') {
@@ -293,7 +294,7 @@ class DefaultScreen extends Component {
                     :
 
                     <View style={{ paddingHorizontal: theme.sizes.base * 2 }}>
-                        <Text bold style={[textcolor, { fontSize: 21, marginBottom: 10 }]}>List of Schedueles</Text>
+                        <Text bold style={[textcolor, { fontSize: 21, marginBottom: 10 }]}>List of Schedules</Text>
                         <ScrollView>
                             {
                                 Object.keys(schedules).map((val, index) => {
@@ -304,7 +305,14 @@ class DefaultScreen extends Component {
                                                 onPress={() => this.props.navigation.navigate("ViewSchedule", {
                                                     id: val
                                                 })}>
-                                                <Text style={[textcolor, { fontSize: 21, alignSelf: 'center', marginTop: 10 }]}>{str[0]}</Text>
+                                                {str[1] == null ?
+                                                    <Text style={[textcolor, { fontSize: 21, alignSelf: 'center', marginTop: 10, marginBottom: 10 }]}>{`${str[0]}`}</Text>
+                                                    :
+                                                    <View style={{ flexDirection: 'row', alignSelf: 'center', marginTop: 10, marginBottom: 10 }}>
+                                                        <Text style={[textcolor, { fontSize: 21 }]}>{`${str[0]}`}</Text>
+                                                        <Text style={[graytextcolor, { fontSize: 21 }]}>{` - ${str[1]}`}</Text>
+                                                    </View>
+                                                }
                                             </TouchableOpacity>
                                             <View style={styles.divider} />
                                         </View>
