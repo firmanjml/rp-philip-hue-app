@@ -31,6 +31,8 @@ class NewControlBulbScreen extends Component {
         roomName: 'None',
         bri: 0,
         sat: 0,
+        dialogTransitionModal: false,
+        transitiontime: 0,
         dialogModal: false,
         dimmableType: null
     }
@@ -58,7 +60,7 @@ class NewControlBulbScreen extends Component {
             headers,
             data: {
                 xy: ColorConversionToXY(values),
-                transitiontime: 0
+                transitiontime: this.state.transitiontime
             }
         }, 600);
     })
@@ -76,7 +78,7 @@ class NewControlBulbScreen extends Component {
             headers,
             data: {
                 bri: value,
-                transitiontime: 0
+                transitiontime: this.state.transitiontime
             }
         }, 60);
     })
@@ -94,7 +96,7 @@ class NewControlBulbScreen extends Component {
             headers,
             data: {
                 sat: value,
-                transitiontime: 0
+                transitiontime: this.state.transitiontime
             }
         }, 60);
     });
@@ -125,6 +127,25 @@ class NewControlBulbScreen extends Component {
             />
         )
     }
+
+    _renderTransitionModal() {
+        return (
+            <DialogInput
+                isDialogVisible={this.state.dialogTransitionModal}
+                title={"Change transition time"}
+                message={"Please enter transition time. Default 0ms"}
+                hintInput={"0"}
+                submitInput={(transition) => {
+                    this.setState({
+                        dialogTransitionModal: false,
+                        transitiontime: transition
+                    })
+                }}
+                closeDialog={() => this.setState({ dialogTransitionModal: false })}
+            />
+        )
+    }
+
 
     applyHexCode(hex) {
         if (validator.isHexColor(hex)) {
@@ -167,10 +188,14 @@ class NewControlBulbScreen extends Component {
                 </MenuTrigger>
                 <MenuOptions style={{ padding: 15 }}>
                     <MenuOption value={1}>
-                        <Text h3>Input Hex Code Color</Text>
+                        <Text h3>Apply Hex Code Color</Text>
                     </MenuOption>
                     <View style={styles.divider} />
                     <MenuOption value={2}>
+                        <Text h3>Modify Transition Time</Text>
+                    </MenuOption>
+                    <View style={styles.divider} />
+                    <MenuOption value={3}>
                         <Text h3>Show bulb info</Text>
                     </MenuOption>
                 </MenuOptions>
@@ -192,6 +217,11 @@ class NewControlBulbScreen extends Component {
 
         }
         else if (value == 2) {
+            this.setState({
+                dialogTransitionModal: true
+            })
+        }
+        else if (value == 3) {
             this.props.navigation.navigate('BulbInfo', {
                 id: this.state.id
             });
@@ -212,6 +242,7 @@ class NewControlBulbScreen extends Component {
                     {this.renderBackButton()}
                     {this.renderMenu()}
                     {this._renderModal()}
+                    {this._renderTransitionModal()}
                 </View>
                 <Block containerNoHeader>
                     <View style={styles.titleRow}>

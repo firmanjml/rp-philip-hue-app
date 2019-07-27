@@ -5,8 +5,9 @@ import { connect } from "react-redux";
 import { SetGroupState, SetLampState, GetAllLights } from "../../redux/actions";
 import ToggleSwitch from "../../components/ToggleSwitch";
 import Icon from "react-native-vector-icons";
-import { ColorConversionToXY } from "../../components/ColorConvert";
+import { ColorConversionToXY, HexColorConversionToXY } from "../../components/ColorConvert";
 import { theme } from "../../constants";
+import DialogInput from 'react-native-dialog-input';
 import _ from 'lodash';
 import { Block, Input, Text } from "../../components";
 import axios from 'axios';
@@ -33,7 +34,10 @@ class ControlRoomScreen extends React.Component {
     on: false,
     type: "",
     active: "Main",
-    roomName: ""
+    roomName: "",
+    transitiontime: 0,
+    dialogModal: false,
+    dialogTransitionModal: false
   };
 
   componentWillMount() {
@@ -75,6 +79,60 @@ class ControlRoomScreen extends React.Component {
     );
   }
 
+  _renderModal() {
+    return (
+      <DialogInput
+        isDialogVisible={this.state.dialogModal}
+        title={"Color Control Advanced"}
+        message={"Please enter hex code"}
+        hintInput={"#ffffff"}
+        submitInput={(hex) => {
+          {
+            this.setState({ dialogModal: false }),
+              this.applyHexCode(hex)
+          }
+        }}
+        closeDialog={() => this.setState({ dialogModal: false })}
+      />
+    )
+  }
+
+  applyHexCode(hex) {
+    if (validator.isHexColor(hex)) {
+      this.props._changeGroupStateByID(this.state.id, {
+        xy: HexColorConversionToXY(hex)
+      })
+    }
+    else {
+      Alert.alert(
+        'Incorrect input',
+        'Make sure that the input is a hex code',
+        [
+          { text: "Ok", onPress: () => { } },
+        ],
+        { cancelable: false },
+      );
+    }
+  }
+
+  _renderTransitionModal() {
+    return (
+      <DialogInput
+        isDialogVisible={this.state.dialogTransitionModal}
+        title={"Change transition time"}
+        message={"Please enter transition time. Default 0ms"}
+        hintInput={"0"}
+        submitInput={(transition) => {
+          this.setState({
+            dialogTransitionModal: false,
+            transitiontime: transition
+          })
+        }}
+        closeDialog={() => this.setState({ dialogTransitionModal: false })}
+      />
+    )
+  }
+
   renderMenu() {
     return (
       <Menu onSelect={value => this.onMenuRoomSelect(value)}>
@@ -90,6 +148,14 @@ class ControlRoomScreen extends React.Component {
           <View style={styles.divider} />
           <MenuOption value={2}>
             <Text h3>Edit Room Info</Text>
+          </MenuOption>
+          <View style={styles.divider} />
+          <MenuOption value={3}>
+            <Text h3>Modify Transition Time</Text>
+          </MenuOption>
+          <View style={styles.divider} />
+          <MenuOption value={4}>
+            <Text h3>Apply Hex Code</Text>
           </MenuOption>
           <View style={styles.divider} />
         </MenuOptions>
@@ -191,6 +257,16 @@ class ControlRoomScreen extends React.Component {
         roomClass: this.props.groups[this.state.id].class
       });
     }
+    else if (value == 3) {
+      this.setState({
+        dialogTransitionModal: true
+      })
+    }
+    else if (value == 4) {
+      this.setState({
+        dialogModal: true
+      })
+    }
   }
 
   changeColorGroupState = _.throttle((values) => {
@@ -206,7 +282,7 @@ class ControlRoomScreen extends React.Component {
       headers,
       data: {
         xy: ColorConversionToXY(values),
-        transitiontime: 0
+        transitiontime: this.state.transitiontime
       }
     }, 600);
   });
@@ -224,7 +300,7 @@ class ControlRoomScreen extends React.Component {
       headers,
       data: {
         bri: value,
-        transitiontime: 0
+        transitiontime: this.state.transitiontime
       }
     }, 60);
   });
@@ -242,7 +318,7 @@ class ControlRoomScreen extends React.Component {
       headers,
       data: {
         sat: value,
-        transitiontime: 0
+        transitiontime: this.state.transitiontime
       }
     }, 60);
   })
@@ -269,6 +345,8 @@ class ControlRoomScreen extends React.Component {
         <Block flex={false} center row space="between" style={styles.header}>
           {this.renderBackButton()}
           {this.renderMenu()}
+          {this._renderModal()}
+          {this._renderTransitionModal()}
         </Block>
         <Block containerNoHeader>
           <View style={styles.titleRow}>
