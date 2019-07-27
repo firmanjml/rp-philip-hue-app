@@ -154,7 +154,7 @@ class DefaultScreen extends Component {
     }
 
     displayLayout() {
-        const { navigation, groups, nightmode, lights, _changeLightState } = this.props;
+        const { navigation, groups, nightmode, lights, schedules, _changeLightState } = this.props;
         const { colors } = theme;
         const refreshtextcolor = nightmode ? colors.white : colors.black
         const textcolor = { color: nightmode ? colors.white : colors.black }
@@ -282,17 +282,38 @@ class DefaultScreen extends Component {
             )
         } else if (this.state.active === "Schedules") {
             return (
-                <Block style={{ paddingHorizontal: theme.sizes.base * 2, alignItems: 'center', justifyContent: 'center' }}>
-                    <Text h1 bold style={[textcolor]}>
-                        No schedules created.
-                    </Text>
-                    <TouchableOpacity
-                        onPress={() => {
-                            navigation.navigate('AddSchedules');
-                        }}>
-                        <Text h2 style={{ marginTop: 5, color: '#20D29B' }}>Add schedules</Text>
-                    </TouchableOpacity>
-                </Block>
+                Object.entries(schedules).length === 0 && lights.constructor === Object ?
+                    <Block style={{ paddingHorizontal: theme.sizes.base * 2, alignItems: 'center', justifyContent: 'center' }}>
+                        <Text h1 bold style={[textcolor]}>No schedules created.</Text>
+                        <TouchableOpacity
+                            onPress={() => navigation.navigate('AddSchedules')}>
+                            <Text h2 style={{ marginTop: 5, color: '#20D29B' }}>Add schedules</Text>
+                        </TouchableOpacity>
+                    </Block>
+                    :
+
+                    <View style={{ paddingHorizontal: theme.sizes.base * 2 }}>
+                        <Text bold style={[textcolor, { fontSize: 21, marginBottom: 10 }]}>List of Schedueles</Text>
+                        <ScrollView>
+                            {
+                                Object.keys(schedules).map((val, index) => {
+                                    const str = schedules[val].name.split("#");
+                                    return (
+                                        <View key={index} style={{ flexDirection: 'row' }}>
+                                            <TouchableOpacity
+                                                onPress={() => this.props.navigation.navigate("ViewSchedule", {
+                                                    id: val
+                                                })}>
+                                                <Text style={[textcolor, { fontSize: 21, alignSelf: 'center', marginTop: 10 }]}>{str[0]}</Text>
+                                            </TouchableOpacity>
+                                            <View style={styles.divider} />
+                                        </View>
+                                    )
+                                })
+                            }
+                        </ScrollView>
+                    </View>
+
             )
         }
     }
@@ -374,6 +395,7 @@ const mapDispatchToProps = (dispatch) => {
 const mapStateToProps = (state) => {
     return {
         loading: state.loading,
+        schedules: state.schedules,
         groups: state.groups,
         status: state.status,
         lights: state.lights,
@@ -453,10 +475,13 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-around'
     },
-
-
-
-
+    divider: {
+        marginTop: 20,
+        marginVertical: 5,
+        marginHorizontal: 2,
+        borderBottomWidth: 1,
+        borderColor: "#747880"
+    }
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(DefaultScreen);

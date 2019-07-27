@@ -18,6 +18,7 @@ import RoomTypeList from '../screens/Rooms/RoomTypeList';
 import SearchScreen from '../screens/Lights/SearchBulbScreen';
 import ListBridgeScreen from '../screens/Settings/ListBridgeScreen';
 import PairNewBridgeScreen from '../screens/DiscoveryBridge/PairNewBridgeScreen';
+import ViewScheduleScreen from '../screens/Schedules/ViewScheduleScreen';
 
 import { theme } from '../constants';
 import { fromRight } from 'react-navigation-transitions';
@@ -79,6 +80,9 @@ const SetupNavigatorApp = createStackNavigator(
     },
     PairNewBridge: {
       screen: PairNewBridgeScreen
+    },
+    ViewSchedule: {
+      screen: ViewScheduleScreen
     }
   },
   {

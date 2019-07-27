@@ -740,6 +740,7 @@ export const GetConfig = (initialCheck = false) => (dispatch, getState) => {
         dispatch(ChangeStatus(true))
         dispatch(GetAllGroups());
         dispatch(GetAllLights());
+        dispatch(GetSchedules());
     }).catch((error) => {
         dispatch(ChangeLoading(false))
         dispatch(ChangeStatus(false))
