@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View, TouchableOpacity, Image, ScrollView } from "react-native";
+import { StyleSheet, View, TouchableOpacity, Image, ScrollView, Alert } from "react-native";
 import { ColorPicker } from "react-native-color-picker";
 import { connect } from "react-redux";
 import { SetGroupState, SetLampState, GetAllLights } from "../../redux/actions";
@@ -118,7 +118,7 @@ class ControlRoomScreen extends React.Component {
     if (this.state.active == "Main") {
       return (
         <ColorPicker
-          onColorChange={this.changeColorGroupState}
+          onColorChange={this.state.on ? this.changeColorGroupState : this.AlertUser}
           style={{ flex: 1 }}
           hideSliders={true}
         />
@@ -205,7 +205,6 @@ class ControlRoomScreen extends React.Component {
       method: 'PUT',
       headers,
       data: {
-        on: true,
         xy: ColorConversionToXY(values)
       }
     }, 600);
@@ -223,10 +222,9 @@ class ControlRoomScreen extends React.Component {
       method: 'PUT',
       headers,
       data: {
-        on: true,
         bri: value
       }
-    }, 50);
+    }, 60);
   });
 
   changeSaturationState = _.throttle((value) => {
@@ -241,11 +239,19 @@ class ControlRoomScreen extends React.Component {
       method: 'PUT',
       headers,
       data: {
-        on: true,
         sat: value
       }
-    }, 50);
+    }, 60);
   })
+
+  AlertUser() {
+    Alert.alert(
+      'The lights is off',
+      "Please turn on your lights first",
+      [{ text: "OK", onPress: () => console.log("OK Pressed") }],
+      { cancelable: false }
+    );
+  }
 
   render() {
     const { nightmode, _changeGroupStateByID } = this.props;
@@ -296,7 +302,7 @@ class ControlRoomScreen extends React.Component {
             minimumTrackTintColor={colors.secondary}
             maximumTrackTintColor={trackTintColor}
             value={this.state.bri}
-            onValueChange={this.changeBrightnessState}
+            onValueChange={this.state.on ? this.changeBrightnessState : this.AlertUser}
           />
           <Text style={[styles.textControl, titlecolor, { marginBottom: 10 }]}>
             Saturation
@@ -311,7 +317,7 @@ class ControlRoomScreen extends React.Component {
             minimumTrackTintColor={colors.secondary}
             maximumTrackTintColor={trackTintColor}
             value={this.state.sat}
-            onValueChange={this.changeSaturationState}
+            onValueChange={this.state.on ? this.changeSaturationState : this.AlertUser}
           />
           {this.renderView(textcolor)}
         </Block>

@@ -57,7 +57,6 @@ class NewControlBulbScreen extends Component {
             method: 'PUT',
             headers,
             data: {
-                on: true,
                 xy: ColorConversionToXY(values)
             }
         }, 600);
@@ -75,10 +74,9 @@ class NewControlBulbScreen extends Component {
             method: 'PUT',
             headers,
             data: {
-                on: true,
                 bri: value
             }
-        }, 50);
+        }, 60);
     })
 
     changeSaturationState = _.throttle((value) => {
@@ -93,11 +91,19 @@ class NewControlBulbScreen extends Component {
             method: 'PUT',
             headers,
             data: {
-                on: true,
                 sat: value
             }
-        }, 50);
+        }, 60);
     });
+
+    AlertUser() {
+        Alert.alert(
+            'The lights is off',
+            "Please turn on your lights first",
+            [{ text: "OK", onPress: () => console.log("OK Pressed") }],
+            { cancelable: false }
+        );
+    }
 
     _renderModal() {
         return (
@@ -120,7 +126,6 @@ class NewControlBulbScreen extends Component {
     applyHexCode(hex) {
         if (validator.isHexColor(hex)) {
             this.props._ChangeLampStateByID(this.state.id, {
-                on: true,
                 xy: HexColorConversionToXY(hex)
             })
         }
@@ -159,7 +164,7 @@ class NewControlBulbScreen extends Component {
                 </MenuTrigger>
                 <MenuOptions style={{ padding: 15 }}>
                     <MenuOption value={1}>
-                        <Text h3>Enter hex code for color</Text>
+                        <Text h3>Input Hex Code Color</Text>
                     </MenuOption>
                     <View style={styles.divider} />
                     <MenuOption value={2}>
@@ -172,9 +177,16 @@ class NewControlBulbScreen extends Component {
 
     onMenuRoomSelect(value) {
         if (value == 1) {
-            this.setState({
-                dialogModal: true
-            })
+            {
+                this.props.lights[this.state.id].state.on
+                    ?
+                    this.setState({
+                        dialogModal: true
+                    })
+                    :
+                    this.AlertUser()
+            }
+
         }
         else if (value == 2) {
             this.props.navigation.navigate('BulbInfo', {
@@ -229,7 +241,7 @@ class NewControlBulbScreen extends Component {
                         minimumTrackTintColor={colors.secondary}
                         maximumTrackTintColor={trackTintColor}
                         value={this.state.bri}
-                        onValueChange={this.changeBrightnessState}
+                        onValueChange={this.props.lights[this.state.id].state.on ? this.changeBrightnessState : this.AlertUser}
                     />
                     {
                         !this.state.dimmableType ?
@@ -245,10 +257,10 @@ class NewControlBulbScreen extends Component {
                                     minimumTrackTintColor={colors.secondary}
                                     maximumTrackTintColor={trackTintColor}
                                     value={this.state.sat}
-                                    onValueChange={this.changeSaturationState}
+                                    onValueChange={this.props.lights[this.state.id].state.on ? this.changeSaturationState : this.AlertUser}
                                 />
                                 <ColorPicker
-                                    onColorChange={this.changeColorLightState}
+                                    onColorChange={this.props.lights[this.state.id].state.on ? this.changeColorLightState : this.AlertUser}
                                     style={{ flex: 1 }}
                                     hideSliders={true}
                                 />
