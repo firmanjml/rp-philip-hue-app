@@ -363,8 +363,8 @@ class DefaultScreen extends Component {
         return (
             <Block style={backgroundcolor}>
                 <Block flex={false} center row space="between" style={styles.header}>
-                    <Text h1 style={[textcolor, { fontWeight: 'bold' }]}>Explore</Text>
                     {this.renderLoadingModal()}
+                    <Text h1 style={[textcolor, { fontWeight: 'bold' }]}>Explore</Text>
                     {this.renderMenu(this.state.active)}
                 </Block>
                 <Block flex={false} row style={[styles.tabs, backgroundcolor]}>

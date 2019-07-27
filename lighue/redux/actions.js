@@ -663,7 +663,7 @@ export const DeleteGroup = (groupID, navigation) => (dispatch, getState) => {
                 meta: {
                     title: "Successfully deleted!"
                 }
-             })
+            })
             dispatch({
                 type: C.DELETE_GROUP,
                 payload: groupID
@@ -738,15 +738,14 @@ export const GetConfig = (initialCheck = false) => (dispatch, getState) => {
             payload: res.data
         })
         dispatch(ChangeStatus(true))
+        dispatch(ChangeLoading(false))
         dispatch(GetAllGroups());
         dispatch(GetAllLights());
         dispatch(GetSchedules());
     }).catch((error) => {
         dispatch(ChangeLoading(false))
         dispatch(ChangeStatus(false))
-    }).then(
-        dispatch(ChangeLoading(false))
-    )
+    })
 }
 
 /** 

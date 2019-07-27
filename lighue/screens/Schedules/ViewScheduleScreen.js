@@ -1,11 +1,9 @@
 import React, { Component } from 'react'
-import { Image, StyleSheet, TouchableOpacity, View, ScrollView, Alert, Modal, ActivityIndicator } from 'react-native'
-import { Block, Text, Button, Input } from '../../components';
+import { Image, StyleSheet, TouchableOpacity, View, ScrollView } from 'react-native'
+import { Block, Text } from '../../components';
 import { theme } from '../../constants';
 import { CreateSchedules, GetSchedules } from '../../redux/actions';
 import { connect } from 'react-redux';
-import ToggleSwitch from '../../components/ToggleSwitch'
-import DateTimePicker from "react-native-modal-datetime-picker";
 
 class ViewScheduleScreen extends Component {
     static navigationOptions = ({ navigation }) => {
@@ -50,37 +48,39 @@ class ViewScheduleScreen extends Component {
         return (
             <Block style={backgroundcolor}>
                 <Block container style={{ marginBottom: 20 }}>
-                    <Text h1 bold style={titlecolor}>Schedules Details</Text>
-                    <Block flex={false} column style={styles.row}>
-                        <Text bold style={titlecolor}>Name</Text>
-                        <Text style={[styles.text, textcolor]}>{this.state.name}</Text>
-                        <View style={styles.divider} />
-                    </Block>
-                    <Block flex={false} column style={styles.row}>
-                        <Text bold style={titlecolor}>Description</Text>
-                        <Text style={[styles.text, textcolor]}>{this.state.description}</Text>
-                        <View style={styles.divider} />
-                    </Block>
-                    <Block flex={false} column style={styles.row}>
-                        <Text bold style={titlecolor}>Category</Text>
-                        <Text style={[styles.text, textcolor]}>{this.state.category}</Text>
-                        <View style={styles.divider} />
-                    </Block>
-                    <Block flex={false} column style={styles.row}>
-                        <Text bold style={titlecolor}>Status</Text>
-                        <Text style={[styles.text, textcolor]}>{this.state.status}</Text>
-                        <View style={styles.divider} />
-                    </Block>
-                    <Block flex={false} column style={styles.row}>
-                        <Text bold style={titlecolor}>Time</Text>
-                        <Text style={[styles.text, textcolor]}>{this.state.time}</Text>
-                        <View style={styles.divider} />
-                    </Block>
+                    <ScrollView>
+                        <Text h1 bold style={titlecolor}>Schedules Details</Text>
+                        <Block flex={false} column style={styles.row}>
+                            <Text bold style={titlecolor}>Name</Text>
+                            <Text style={[styles.text, textcolor]}>{this.state.name}</Text>
+                            <View style={styles.divider} />
+                        </Block>
+                        <Block flex={false} column style={styles.row}>
+                            <Text bold style={titlecolor}>Description</Text>
+                            <Text style={[styles.text, textcolor]}>{this.state.description}</Text>
+                            <View style={styles.divider} />
+                        </Block>
+                        <Block flex={false} column style={styles.row}>
+                            <Text bold style={titlecolor}>Category</Text>
+                            <Text style={[styles.text, textcolor]}>{this.state.category}</Text>
+                            <View style={styles.divider} />
+                        </Block>
+                        <Block flex={false} column style={styles.row}>
+                            <Text bold style={titlecolor}>Status</Text>
+                            <Text style={[styles.text, textcolor]}>{this.state.status}</Text>
+                            <View style={styles.divider} />
+                        </Block>
+                        <Block flex={false} column style={styles.row}>
+                            <Text bold style={titlecolor}>Time</Text>
+                            <Text style={[styles.text, textcolor]}>{this.state.time}</Text>
+                            <View style={styles.divider} />
+                        </Block>
 
-                    <Block flex={false} center style={styles.row}>
-                        <Text bold style={[titlecolor, { fontSize: 21 }]}>{this.state.bin}</Text>
-                        <View style={styles.divider} />
-                    </Block>
+                        <Block flex={false} center style={styles.row}>
+                            <Text bold style={[titlecolor, { fontSize: 21 }]}>{this.state.bin}</Text>
+                            <View style={styles.divider} />
+                        </Block>
+                    </ScrollView>
                 </Block>
             </Block>
         )

@@ -214,7 +214,6 @@ class NewControlBulbScreen extends Component {
                     :
                     this.AlertUser()
             }
-
         }
         else if (value == 2) {
             this.setState({
