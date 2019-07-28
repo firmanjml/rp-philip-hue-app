@@ -2,9 +2,9 @@ import React from 'react';
 import { StyleSheet, Platform, View, Modal, TouchableOpacity } from 'react-native';
 import { theme } from '../constants';
 import { Text } from '../components';
-
-import Fingerprint from '../assets/lottie/fingerprint.json'
-import { connect } from 'react-redux'
+import { RefreshCloudToken } from '../redux/actions';
+import Fingerprint from '../assets/lottie/fingerprint.json';
+import { connect } from 'react-redux';
 import { DangerZone, LocalAuthentication, BlurView } from 'expo';
 
 const { Lottie } = DangerZone;
@@ -19,6 +19,9 @@ class Authentication extends React.Component {
 
     async componentWillMount() {
         await this.authentication();
+        if (this.props.cloud_enable) {
+            await this.props._refreshToken();
+        }
     }
 
     componentDidMount() {
@@ -145,13 +148,22 @@ class Authentication extends React.Component {
 const mapStateToProps = (state) => {
     return {
         nightmode: state.nightmode,
-        hardwareSupport: state.hardwareSupport
+        hardwareSupport: state.hardwareSupport,
+        cloud_enable: state.cloud_enable
+    }
+}
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        _refreshToken() {
+            return dispatch(RefreshCloudToken());
+        }
     }
 }
 
 export default connect(
     mapStateToProps,
-    null
+    mapDispatchToProps
 )(Authentication)
 
 const styles = StyleSheet.create({
@@ -161,4 +173,3 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     }
 })
-

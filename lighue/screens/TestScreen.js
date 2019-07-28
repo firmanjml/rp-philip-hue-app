@@ -117,7 +117,6 @@ class TestScreen extends Component {
 
     switchBridge() {
         // this.props._switchBridge(1);
-
     }
 
     render() {

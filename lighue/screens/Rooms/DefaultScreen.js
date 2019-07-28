@@ -114,8 +114,8 @@ class DefaultScreen extends Component {
                     <MenuOptions style={{ padding: 15 }} >
                         <MenuOption value={1}><Text h3>Create new room</Text></MenuOption>
                         <View style={styles.divider} />
-                        <MenuOption value={2}><Text h3>Debug mode</Text></MenuOption>
-                        <View style={styles.divider} />
+                        {/* <MenuOption value={2}><Text h3>Debug mode</Text></MenuOption>
+                        <View style={styles.divider} /> */}
                         <MenuOption value={3}><Text h3>Settings</Text></MenuOption>
                     </MenuOptions>
                 </Menu>
@@ -130,8 +130,8 @@ class DefaultScreen extends Component {
                     <MenuOptions style={{ padding: 15 }} >
                         <MenuOption value={1}><Text h3>Search for new bulb</Text></MenuOption>
                         <View style={styles.divider} />
-                        <MenuOption value={2}><Text h3>Demo mode</Text></MenuOption>
-                        <View style={styles.divider} />
+                        {/* <MenuOption value={2}><Text h3>Demo mode</Text></MenuOption>
+                        <View style={styles.divider} /> */}
                         <MenuOption value={3}><Text h3>Settings</Text></MenuOption>
                     </MenuOptions>
                 </Menu>
