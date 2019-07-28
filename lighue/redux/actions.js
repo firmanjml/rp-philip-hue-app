@@ -705,14 +705,7 @@ export const CreateUser = (i = 0) => (dispatch, getState) => {
             });
             dispatch(ChangeStatus(true));
         }
-    }).catch((error) => {
-        Alert.alert(
-            'Error',
-            "Please try again",
-            [{ text: "OK", onPress: () => console.log("OK Pressed") }],
-            { cancelable: false }
-        );
-    }).then();
+    })
 };
 
 /** 
@@ -725,13 +718,17 @@ export const GetConfig = (initialCheck = false) => (dispatch, getState) => {
     const i = getState().bridgeIndex;
     const bridgeip = getState().bridgeip[i];
     const username = getState().username[i];
+    const url = getState().cloud_enable === false ? `http://${bridgeip}/api/${username}/config` : `https://api.meethue.com/bridge/${username}/config`;
+    const headers = getState().cloud_enable === true ? { "Authorization": `Bearer ${getState().cloud.token}`, "Content-Type": "application/json" } : { "Content-Type": "application/json" };
+
 
     if (initialCheck) {
         dispatch(ChangeLoading(true))
     }
     axios({
-        url: `http://${bridgeip}/api/${username}/config`,
-        method: 'GET'
+        url,
+        method: 'GET',
+        headers
     }).then((res) => {
         dispatch({
             type: C.FETCH_CONFIG,
