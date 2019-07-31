@@ -35,7 +35,7 @@ class DefaultScreen extends Component {
         setInterval(() => {
             this.props._fetchEverything();
             this.checkBridgeStatus()
-        }, 5000)
+        }, 3000)
     }
 
     checkBridgeStatus() {
