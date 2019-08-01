@@ -151,7 +151,7 @@ class SettingScreen extends Component {
         console.log(csrf);
 
         if (result.params) {
-            if (result.params === csrf && result.params.code) {
+            if (result.params.state === csrf && result.params.code) {
                 this.props._changeCloudToken(result.params.code);
                 Alert.alert(
                     'Hooray 🥳',
