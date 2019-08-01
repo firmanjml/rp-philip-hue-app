@@ -6,7 +6,8 @@ import Icon from 'react-native-vector-icons';
 import ToggleSwitch from "../../components/ToggleSwitch";
 import { connect } from 'react-redux';
 import { SetLampState } from '../../redux/actions';
-import { GetAllGroups, GetAllLights, GetConfig, ChangeSaving } from '../../redux/actions';
+import { GetAllGroups, GetAllLights, GetConfig, ChangeSaving, SearchForNewLights } from '../../redux/actions';
+import DialogInput from 'react-native-dialog-input';
 
 import {
     Menu,
@@ -23,6 +24,8 @@ class DefaultScreen extends Component {
     }
 
     state = {
+        tapBridgeInfo: false,
+        dialogModal: false,
         active: 'Rooms',
         categories: [],
         refreshing: false,
@@ -130,8 +133,8 @@ class DefaultScreen extends Component {
                     <MenuOptions style={{ padding: 15 }} >
                         <MenuOption value={1}><Text h3>Search for new bulb</Text></MenuOption>
                         <View style={styles.divider} />
-                        {/* <MenuOption value={2}><Text h3>Demo mode</Text></MenuOption>
-                        <View style={styles.divider} /> */}
+                        <MenuOption value={2}><Text h3>Manual bulb search</Text></MenuOption>
+                        <View style={styles.divider} />
                         <MenuOption value={3}><Text h3>Settings</Text></MenuOption>
                     </MenuOptions>
                 </Menu>
@@ -348,7 +351,8 @@ class DefaultScreen extends Component {
         if (value == 1) {
             this.props.navigation.navigate('SearchBulbScreen');
         } else if (value == 2) {
-            this.props.navigation.navigate("LightDemo")
+            // this.props.navigation.navigate("LightDemo");
+            this.setState({ dialogModal: true });
         } else if (value == 3) {
             this.props.navigation.navigate("Settings")
         }
@@ -360,6 +364,31 @@ class DefaultScreen extends Component {
         } else if (value == 2) {
             this.props.navigation.navigate("Settings")
         }
+    }
+
+    _renderModal() {
+        return (
+            <DialogInput
+                isDialogVisible={this.state.dialogModal}
+                title={"Manual Search"}
+                message={"Please enter the 6 digit sn"}
+                hintInput={"34AFBE"}
+                submitInput={(sn) => {
+                    this.setState({ dialogModal: false });
+                    if (sn.length == 6) {
+                        this.props.navigation.navigate('SearchBulbScreen', {
+                            "sn": sn
+                        });
+                    } else {
+                        Alert.alert("Validation error", "Please enter 6 digit",
+                            [{ text: "OK" }],
+                            { cancelable: false })
+                    }
+
+                }}
+                closeDialog={() => this.setState({ dialogModal: false })}
+            />
+        )
     }
 
     render() {
@@ -375,10 +404,29 @@ class DefaultScreen extends Component {
                     <Text h1 style={[textcolor, { fontWeight: 'bold' }]}>Explore</Text>
                     {this.renderMenu(this.state.active)}
                 </Block>
+                <Block flex={false} style={{
+                    paddingHorizontal: theme.sizes.base * 2
+                }}>
+                    <TouchableOpacity
+                        onPress={() => {
+                            this.setState(previousState => (
+                                { tapBridgeInfo: !previousState.tapBridgeInfo }
+                            ))
+                        }}>
+                        {
+                            this.state.tapBridgeInfo ?
+                            <Text p style={[textcolor]}>Current Bridge: {this.props.config.ipaddress}</Text>
+                            :
+                            <Text p style={[textcolor]}>Bridge Name: {this.props.config.name}</Text>
+                        }
+                    </TouchableOpacity>
+
+                </Block>
                 <Block flex={false} row style={[styles.tabs, backgroundcolor]}>
                     {tabs.map(tab => this.renderTab(tab))}
                 </Block>
                 {this.displayLayout()}
+                {this._renderModal()}
             </Block>
         )
     }
@@ -409,7 +457,8 @@ const mapStateToProps = (state) => {
         lights: state.lights,
         nightmode: state.nightmode,
         loading: state.loading,
-        cloud_enable: state.cloud_enable
+        cloud_enable: state.cloud_enable,
+        config: state.config
     }
 }
 

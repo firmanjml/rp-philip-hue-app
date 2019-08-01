@@ -129,11 +129,11 @@ class SettingScreen extends Component {
                                 null
                         }
                     </ScrollView>
-                    {this.renderClearButton()}
                 </Block>
             </Block>
         )
     }
+
     _handleoAuth = async () => {
         const csrf = Base64.btoa('lighue' + Constants.installationId + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15));
 
@@ -146,9 +146,11 @@ class SettingScreen extends Component {
 
         let result = await AuthSession.startAsync({
             authUrl: `https://api.meethue.com/oauth2/auth${queryParams}`,
+            returnUrl: 'lighue://'
         })
 
         console.log(csrf);
+        console.log(result);
 
         if (result.params) {
             if (result.params.state === csrf && result.params.code) {

@@ -29,9 +29,17 @@ class SearchBulbScreen extends Component {
     }
 
     componentWillMount() {
-        const { bridgeip, username } = this.props;
+        const { bridgeip, username, navigation } = this.props;
+        const sn = navigation.getParam("sn", "");
+        if (sn) {
+            this.props._searchForNewLights({
+                deviceid: [sn]
+            })
+        } else {
+            this.props._searchForNewLights();
+        }
         SnackBar.show(`Searching for new lights`, { duration: 40000 });
-        this.props._searchForNewLights();
+        //this.props._searchForNewLights();
         interval = setInterval(() => {
             axios({
                 url: `http://${bridgeip}/api/${username}/lights/new`,
@@ -44,7 +52,7 @@ class SearchBulbScreen extends Component {
                     console.log(res.data);
                     delete res.data.lastscan;
                     this.setState({bulbs: res.data})
-                    SnackBar.dismiss()
+                    //SnackBar.dismiss()
                 }
             })
         }, 2000);
@@ -80,8 +88,8 @@ class SearchBulbScreen extends Component {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        _searchForNewLights: () => {
-            return dispatch(SearchForNewLights());
+        _searchForNewLights: (data) => {
+            return dispatch(SearchForNewLights(data));
         }
     }
 }

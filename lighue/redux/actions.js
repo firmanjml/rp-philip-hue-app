@@ -293,7 +293,7 @@ export const GetLightAtrributes = (lampID) => (dispatch, getState) => {
  * * Document 1.3 Search For New Light
  * * https://developers.meethue.com/develop/hue-api/lights-api/#search-for-new-lights
 */
-export const SearchForNewLights = () => (dispatch, getState) => {
+export const SearchForNewLights = (data = {}) => (dispatch, getState) => {
     const i = getState().bridgeIndex;
     const bridgeip = getState().bridgeip[i];
     const username = getState().username[i];
@@ -303,7 +303,8 @@ export const SearchForNewLights = () => (dispatch, getState) => {
     axios({
         url,
         method: 'POST',
-        headers
+        headers,
+        data
     }).catch((error) => {
         console.log(error);
     })
