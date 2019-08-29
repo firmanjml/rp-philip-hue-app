@@ -299,7 +299,7 @@ class ControlRoomScreen extends React.Component {
       method: 'PUT',
       headers,
       data: {
-        bri: value,
+        bri: _.round(value),
         transitiontime: this.state.transitiontime
       }
     }, 60);
@@ -317,7 +317,7 @@ class ControlRoomScreen extends React.Component {
       method: 'PUT',
       headers,
       data: {
-        sat: value,
+        sat: _.round(value),
         transitiontime: this.state.transitiontime
       }
     }, 60);
