@@ -4,7 +4,7 @@
     "name": "lighue",
     "slug": "lighue",
     "privacy": "public",
-    "sdkVersion": "32.0.0",
+    "sdkVersion": "36.0.0",
     "platforms": [
       "ios",
       "android"
@@ -28,8 +28,8 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.rp.lighue",
-      "infoPlist" : {
-        "NSFaceIDUsageDescription" : "This app uses FaceID to authenticate users for usage on this app."
+      "infoPlist": {
+        "NSFaceIDUsageDescription": "This app uses FaceID to authenticate users for usage on this app."
       }
     }
   }
