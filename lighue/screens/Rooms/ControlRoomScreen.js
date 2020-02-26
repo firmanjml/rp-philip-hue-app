@@ -4,14 +4,13 @@ import { ColorPicker } from "react-native-color-picker";
 import { connect } from "react-redux";
 import { SetGroupState, SetLampState, GetAllLights } from "../../redux/actions";
 import ToggleSwitch from "../../components/ToggleSwitch";
-import Icon from "react-native-vector-icons";
+import { Entypo, Ionicons } from '@expo/vector-icons';
 import { ColorConversionToXY, HexColorConversionToXY } from "../../components/ColorConvert";
 import { theme } from "../../constants";
 import DialogInput from 'react-native-dialog-input';
 import _ from 'lodash';
 import { Block, Input, Text } from "../../components";
 import axios from 'axios';
-
 import Slider from "react-native-slider";
 
 import {
@@ -137,7 +136,7 @@ class ControlRoomScreen extends React.Component {
     return (
       <Menu onSelect={value => this.onMenuRoomSelect(value)}>
         <MenuTrigger>
-          <Icon.Entypo
+          <Entypo
             name="dots-three-horizontal"
             size={25}
             color={theme.colors.gray}
@@ -205,7 +204,7 @@ class ControlRoomScreen extends React.Component {
                     }, 700);
                   }}>
                   <View style={{ flexDirection: 'row' }}>
-                    <Icon.Ionicons name="ios-bulb" size={25} style={{ alignSelf: 'center', marginRight: 10 }} color={theme.colors.gray} />
+                    <Ionicons name="ios-bulb" size={25} style={{ alignSelf: 'center', marginRight: 10 }} color={theme.colors.gray} />
                     <Text style={[textcolor, { fontSize: 21, alignSelf: 'center' }]}>{lights[val].name.length > 15 ? lights[val].name.substring(0, 15) + "..." : lights[val].name}</Text>
                   </View>
                 </TouchableOpacity>
@@ -215,7 +214,7 @@ class ControlRoomScreen extends React.Component {
                       id: val
                     });
                   }}>
-                  <Icon.Ionicons name="md-information-circle-outline" size={22} style={{ marginLeft: 15, alignSelf: 'center' }} color={theme.colors.gray} />
+                  <Ionicons name="md-information-circle-outline" size={22} style={{ marginLeft: 15, alignSelf: 'center' }} color={theme.colors.gray} />
                 </TouchableOpacity>
               </View>
               <ToggleSwitch
@@ -348,7 +347,7 @@ class ControlRoomScreen extends React.Component {
           {this._renderModal()}
           {this._renderTransitionModal()}
         </Block>
-        <Block containerNoHeader>
+        <Block>
           <View style={styles.titleRow}>
             <Text style={[styles.title, titlecolor]}>
               {this.state.roomName}

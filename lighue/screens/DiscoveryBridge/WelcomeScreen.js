@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Animated, Image, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import { Animated, Image, FlatList, StyleSheet } from 'react-native';
 import { Button, Block, Text } from '../../components';
 import { theme } from '../../constants';
 import Layout from '../../constants/Layout';
@@ -19,14 +19,6 @@ class WelcomeScreen extends Component {
     }
 
     async componentWillMount() {
-        // TEST
-        // setTimeout(() => {
-        //     this.setState({pairBtn: 'Pair'});
-        //     SnackBar.show('1 new Hue Bridge found', { duration: 4000 });
-        // }, 3000)
-        // console.log(Layout.window.height)
-        // console.log(Layout.window.width)
-
         await this.props._GetBridgeIP();
         if (this.props.bridgeip) {
             SnackBar.show('New Hue Bridge Found!', { duration: 2000 });
@@ -94,19 +86,20 @@ class WelcomeScreen extends Component {
     }
 
     renderPairBtn() {
-        if (this.props.bridgeip) {
+        const {navigation, bridgeip} = this.props;
+        if (bridgeip) {
             return (
-                <Button gradient disabled={false} onPress={() => this.props.navigation.navigate('LinkButton')}>
-                    <Text center semibold white>{this.state.pairBtn}</Text>
-                </Button>
+                <Button shadow onPress={() => navigation.navigate('LinkButton')}>
+                        <Text center semibold>Pair Bridge</Text>
+                    </Button>
             )
         } else {
             return (
-                <Button shadow disabled={true}>
-                    <Text center semibold>Searching....</Text>
+                <Button shadow onPress={() => navigation.navigate('ManualIP')}>
+                        <Text center semibold>Searching</Text>
                 </Button>
             )
-        }
+       }  
     }
 
     render() {

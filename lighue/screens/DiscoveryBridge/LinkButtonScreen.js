@@ -37,9 +37,9 @@ class LinkButtonScreen extends Component {
         const { colors } = theme;
         const textcolor = { color: nightmode ? colors.white : colors.black }
         if (!completed) {
-            return <Text center h1 style={[this.props.style, { fontFamily: 'space-mono' },textcolor]}>{seconds} seconds</Text>;
+            return <Text center h1 style={[this.props.style,textcolor]}>{seconds} seconds</Text>;
         } else {
-            return <Text center h1 style={[this.props.style, { fontFamily: 'space-mono' },textcolor]}>No device link.</Text>;
+            return <Text center h1 style={[this.props.style,textcolor]}>No device link.</Text>;
         }
     };
 

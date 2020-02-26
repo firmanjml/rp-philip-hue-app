@@ -165,9 +165,6 @@ class EditRoomScreen extends React.Component {
           </Block>
           <Block bottom flex={1} style={{ marginBottom: 20 }}>
             <Button
-              gradient
-              startColor="#0A7CC4"
-              endColor="#2BDACD"
               onPress={() => this.confirmEditRoom()}>
               <Text center semibold white>Save</Text>
             </Button>

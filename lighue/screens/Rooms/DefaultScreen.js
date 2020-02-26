@@ -2,13 +2,12 @@ import React, { Component } from 'react'
 import { Dimensions, Image, StyleSheet, ScrollView, TouchableOpacity, View, RefreshControl, Platform, Modal, ActivityIndicator, Alert } from 'react-native'
 import { Card, Badge, Block, Text } from '../../components';
 import { theme, constant } from '../../constants';
-import Icon from 'react-native-vector-icons';
+import { Entypo, Ionicons } from '@expo/vector-icons';
 import ToggleSwitch from "../../components/ToggleSwitch";
 import { connect } from 'react-redux';
 import { SetLampState } from '../../redux/actions';
 import { GetAllGroups, GetAllLights, GetConfig, ChangeSaving, SearchForNewLights } from '../../redux/actions';
 import DialogInput from 'react-native-dialog-input';
-
 import {
     Menu,
     MenuOptions,
@@ -112,7 +111,7 @@ class DefaultScreen extends Component {
             return (
                 <Menu onSelect={value => this.onMenuRoomSelect(value)}>
                     <MenuTrigger>
-                        <Icon.Entypo name="dots-three-horizontal" size={25} color={theme.colors.gray} />
+                        <Entypo name="dots-three-horizontal" size={25} color={theme.colors.gray} />
                     </MenuTrigger>
                     <MenuOptions style={{ padding: 15 }} >
                         <MenuOption value={1}><Text h3>Create new room</Text></MenuOption>
@@ -128,7 +127,7 @@ class DefaultScreen extends Component {
             return (
                 <Menu onSelect={value => this.onMenuLightSelect(value)}>
                     <MenuTrigger>
-                        <Icon.Entypo name="dots-three-horizontal" size={25} color={theme.colors.gray} />
+                        <Entypo name="dots-three-horizontal" size={25} color={theme.colors.gray} />
                     </MenuTrigger>
                     <MenuOptions style={{ padding: 15 }} >
                         <MenuOption value={1}><Text h3>Search for new bulb</Text></MenuOption>
@@ -144,7 +143,7 @@ class DefaultScreen extends Component {
             return (
                 <Menu onSelect={value => this.onMenuScheduleSelect(value)}>
                     <MenuTrigger>
-                        <Icon.Entypo name="dots-three-horizontal" size={25} color={theme.colors.gray} />
+                        <Entypo name="dots-three-horizontal" size={25} color={theme.colors.gray} />
                     </MenuTrigger>
                     <MenuOptions style={{ padding: 15 }} >
                         <MenuOption value={1}><Text h3>Add Schedules</Text></MenuOption>
@@ -255,7 +254,7 @@ class DefaultScreen extends Component {
                                                     }, 700);
                                                 }}>
                                                 <View style={{ flexDirection: 'row' }}>
-                                                    <Icon.Ionicons name="ios-bulb" size={25} style={{ alignSelf: 'center', marginRight: 10 }} color={theme.colors.gray} />
+                                                    <Ionicons name="ios-bulb" size={25} style={{ alignSelf: 'center', marginRight: 10 }} color={theme.colors.gray} />
                                                     <Text style={[textcolor, { fontSize: 21, alignSelf: 'center' }]}>{lights[val].name.length > 15 ? lights[val].name.substring(0, 15) + "..." : lights[val].name}</Text>
                                                 </View>
                                             </TouchableOpacity>
@@ -265,7 +264,7 @@ class DefaultScreen extends Component {
                                                         id: val
                                                     });
                                                 }}>
-                                                <Icon.Ionicons name="md-information-circle-outline" size={22} style={{ marginLeft: 15, alignSelf: 'center' }} color={theme.colors.gray} />
+                                                <Ionicons name="md-information-circle-outline" size={22} style={{ marginLeft: 15, alignSelf: 'center' }} color={theme.colors.gray} />
                                             </TouchableOpacity>
                                         </View>
                                         <ToggleSwitch

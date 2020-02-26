@@ -3,7 +3,7 @@ import { Image, StyleSheet, TouchableOpacity, View, Alert } from 'react-native'
 import { Block, Text, Input } from '../../components';
 import Slider from 'react-native-slider';
 import { theme } from '../../constants';
-import Icon from "react-native-vector-icons";
+import { Entypo } from '@expo/vector-icons';
 import { ColorPicker } from "react-native-color-picker";
 import { connect } from 'react-redux';
 import ToggleSwitch from '../../components/ToggleSwitch'
@@ -12,7 +12,6 @@ import DialogInput from 'react-native-dialog-input';
 import validator from 'validator';
 import { ColorConversionToXY, HexColorConversionToXY } from '../../components/ColorConvert';
 import { GetLightAtrributes, SetLampState } from '../../redux/actions';
-
 import axios from 'axios';
 import {
     Menu,
@@ -180,7 +179,7 @@ class NewControlBulbScreen extends Component {
         return (
             <Menu onSelect={value => this.onMenuRoomSelect(value)}>
                 <MenuTrigger>
-                    <Icon.Entypo
+                    <Entypo
                         name="dots-three-horizontal"
                         size={25}
                         color={theme.colors.gray}
@@ -243,7 +242,7 @@ class NewControlBulbScreen extends Component {
                     {this._renderModal()}
                     {this._renderTransitionModal()}
                 </View>
-                <Block containerNoHeader>
+                <Block>
                     <View style={styles.titleRow}>
                         <Text style={[styles.title, titlecolor]}>{this.props.lights[this.state.id].name}</Text>
                         <ToggleSwitch

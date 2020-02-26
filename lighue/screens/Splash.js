@@ -6,8 +6,8 @@ import { theme, constant } from '../constants';
 import { connect } from 'react-redux'
 import Layout from '../constants/Layout';
 import AppIntroSlider from 'react-native-app-intro-slider';
-import { LocalAuthentication, DangerZone } from 'expo';
-const { Lottie } = DangerZone;
+import LottieView from 'lottie-react-native'
+import * as LocalAuthentication from 'expo-local-authentication'
 
 import { GetConfig, ChangeHardwareSupport } from '../redux/actions'
 
@@ -60,7 +60,7 @@ class Splash extends Component {
             return (
                 <Block container style={styles.slide}>
                     {constant.splash_slider[0].lottie &&
-                        <Lottie
+                        <LottieView
                             ref={animation1 => {
                                 this.animation1 = animation1;
                             }}
@@ -74,7 +74,7 @@ class Splash extends Component {
             return (
                 <Block container style={styles.slide}>
                     {constant.splash_slider[1].lottie &&
-                        <Lottie
+                        <LottieView
                             ref={animation2 => {
                                 this.animation2 = animation2;
                             }}
@@ -88,7 +88,7 @@ class Splash extends Component {
             return (
                 <Block container style={styles.slide}>
                     {constant.splash_slider[2].lottie &&
-                        <Lottie
+                        <LottieView
                             ref={animation3 => {
                                 this.animation3 = animation3;
                             }}

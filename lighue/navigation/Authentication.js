@@ -5,9 +5,11 @@ import { Text } from '../components';
 import { RefreshCloudToken } from '../redux/actions';
 import Fingerprint from '../assets/lottie/fingerprint.json';
 import { connect } from 'react-redux';
-import { DangerZone, LocalAuthentication, BlurView } from 'expo';
+import { BlurView } from 'expo';
+import * as LocalAuthentication from 'expo-local-authentication'
+import LottieView from 'lottie-react-native';
 
-const { Lottie } = DangerZone;
+
 class Authentication extends React.Component {
 
     state = {
@@ -88,7 +90,7 @@ class Authentication extends React.Component {
                 <BlurView tint="dark" intensity={100} style={StyleSheet.absoluteFill}>
                     <View style={{ backgroundColor: 'white', marginHorizontal: theme.sizes.base * 2, marginVertical: 270 }}>
                         {this.state.animation &&
-                            <Lottie
+                            <LottieView
                                 ref={animation => {
                                     this.animation = animation;
                                 }}

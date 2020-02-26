@@ -3,11 +3,10 @@ import { StyleSheet, Platform, View } from 'react-native';
 import { BlurView } from 'expo';
 import { Block, Text, Button } from '../components';
 import { connect } from 'react-redux'
-import { DangerZone } from 'expo';
 import { theme } from '../constants';
 import { ChangeAuthentication } from '../redux/actions'
 import Security from '../assets/lottie/cloud-security.json'
-const { Lottie } = DangerZone;
+import LottieView from 'lottie-react-native'
 
 import ToggleSwitch from '../components/ToggleSwitch'
 
@@ -47,7 +46,7 @@ class AuthenticationSetting extends React.Component {
                     <Text style={textcolor}>You can change settings later.</Text>
                     <Block style={{ justifyContent: 'center', alignItems: 'center', marginTop: 30 }}>
                         {this.state.animation1 &&
-                            <Lottie
+                            <LottieView
                                 ref={animation1 => {
                                     this.animation1 = animation1;
                                 }}
@@ -73,9 +72,7 @@ class AuthenticationSetting extends React.Component {
                             </View>
                             <Text style={[textcolor, { marginTop: 15 }]}>All the {type} on this device can be used to unlock the Lighue app.</Text>
                         </View>
-                        <Button gradient
-                            startColor='#0A7CC4'
-                            endColor='#2BDACD'
+                        <Button
                             onPress={() => this.props.navigation.navigate("ListRoom")}>
                             <Text center semibold white>Next</Text>
                         </Button>

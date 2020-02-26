@@ -1,6 +1,6 @@
 import React from 'react';
 import { Platform, StatusBar, StyleSheet, View, AsyncStorage} from 'react-native';
-import { AppLoading, Asset, Font, Icon } from 'expo';
+import { AppLoading } from 'expo';
 import SwitchNavigator from './navigation/SwitchNavigator';
 import { Provider } from "react-redux";
 import { reduxStore, persistor } from "./redux/store";
@@ -8,57 +8,45 @@ import { PersistGate } from "redux-persist/lib/integration/react";
 import {
   MenuProvider,
 } from 'react-native-popup-menu';
+import * as Font from 'expo-font';
 
 export default class App extends React.Component {
   state = {
-    isLoadingComplete: false,
+    isReady : false
   };
 
   render() {
-    // persistor.flush();
-    // persistor.purge();
-    // AsyncStorage.clear();
-    if (!this.state.isLoadingComplete && !this.props.skipLoadingScreen) {
+    if (!this.state.isReady) {
       return (
         <AppLoading
-          startAsync={this._loadResourcesAsync}
-          onError={this._handleLoadingError}
-          onFinish={this._handleFinishLoading}
+          startAsync={this._loadFontAsync}
+          onFinish={() => this.setState({ isReady: true })}
+          onError={console.warn}
         />
-      );
-    } else {
-      return (
-        <Provider store={reduxStore}>
-          <PersistGate loading={null} persistor={persistor}>
-            <View style={styles.container}>
-              {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
-              <MenuProvider>
-                <SwitchNavigator />
-              </MenuProvider>
-            </View>
-          </PersistGate>
-        </Provider>
-
-      );
+      ); 
     }
+
+    return (
+      <Provider store={reduxStore}>
+        <PersistGate loading={null} persistor={persistor}>
+          <View style={styles.container}>
+            {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
+            <MenuProvider>
+              <SwitchNavigator />
+            </MenuProvider>
+          </View>
+        </PersistGate>
+      </Provider>
+    );
   }
 
-  _loadResourcesAsync = async () => {
-    return Promise.all([
-      Font.loadAsync({
-        ...Icon.Ionicons.font,
-        'space-mono': require('./assets/fonts/SpaceMono-Regular.ttf'),
-      }),
-    ]);
-  };
-
-  _handleLoadingError = error => {
-    console.warn(error);
-  };
-
-  _handleFinishLoading = () => {
-    this.setState({ isLoadingComplete: true });
-  };
+  async _loadFontAsync() {
+    await Font.loadAsync({
+      'googlesans-bold': require('./assets/fonts/GoogleSans-Bold.ttf'),
+      'googlesans-regular': require('./assets/fonts/GoogleSans-Regular.ttf'),
+      'googlesans-medium': require('./assets/fonts/GoogleSans-Medium.ttf')
+    });
+  }
 }
 
 const styles = StyleSheet.create({

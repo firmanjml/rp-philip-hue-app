@@ -49,9 +49,7 @@ class SettingScreen extends Component {
     renderClearButton() {
         return (
             <Block bottom flex={1} style={{ marginBottom: 10 }}>
-                <Button gradient
-                    startColor='#C40A0A'
-                    endColor='#E86241'
+                <Button
                     onPress={() => this.clearAppData()}>
                     <Text center semibold white>Clear app data</Text>
                 </Button>
@@ -69,18 +67,6 @@ class SettingScreen extends Component {
                 <Block container>
                     <Text h1 bold style={[textcolor, { marginTop: 10 }]}>Settings</Text>
                     <ScrollView>
-                        <Block flex={false} row space="between" style={styles.row}>
-                            <Text style={[styles.textSetting, textcolor]}>Dark mode</Text>
-                            <ToggleSwitch
-                                offColor="#DDDDDD"
-                                onColor={theme.colors.secondary}
-                                isOn={nightmode}
-                                onToggle={nightmode => {
-                                    this.props._changeTheme(nightmode);
-                                }}
-                            />
-                        </Block>
-                        <View style={styles.divider} />
                         {
                             hardwareSupport != 0 ?
                                 <View>

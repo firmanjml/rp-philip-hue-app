@@ -91,9 +91,6 @@ class AddRoomScreen extends React.Component {
   renderButton() {
     return (
       <Button
-        gradient
-        startColor="#0A7CC4"
-        endColor="#2BDACD"
         onPress={() => this.createGroup()}>
         <Text center semibold white>Save</Text>
       </Button>
@@ -229,7 +226,7 @@ class AddRoomScreen extends React.Component {
           {this.renderLoadingModal()}
           {this.renderSave()}
         </View>
-        <Block containerNoHeader>
+        <Block>
           <Text h1 bold style={titlecolor}>Create New Room</Text>
           <ScrollView>
             <Block flex={false} column style={styles.row}>

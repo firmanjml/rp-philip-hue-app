@@ -10,7 +10,7 @@ import {
 import { connect } from "react-redux";
 import { Button, Block, Text } from "../../components";
 import { theme } from "../../constants";
-import Icon from 'react-native-vector-icons';
+import { Entypo } from '@expo/vector-icons';
 import { DeleteLight, GetAllLights } from "../../redux/actions";
 import {
   Menu,
@@ -83,7 +83,7 @@ class BulbInfoScreen extends React.Component {
     return (
       <Menu onSelect={value => this.onMenuLampSelect(value)}>
         <MenuTrigger>
-          <Icon.Entypo
+          <Entypo
             name="dots-three-horizontal"
             size={25}
             color={theme.colors.gray}
@@ -156,9 +156,6 @@ class BulbInfoScreen extends React.Component {
             </Block>
             <Block bottom flex={1}>
               <Button
-                gradient
-                startColor="#C40A0A"
-                endColor="#E86241"
                 onPress={() => this.alertUserDeletion()}>
                 <Text center semibold white>Delete Bulb</Text>
               </Button>

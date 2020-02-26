@@ -1,7 +1,7 @@
 import C from './constants';
 import qs from 'qs';
 import axios from 'axios';
-import { Constants } from 'expo';
+import Constants from 'expo-constants';
 import { Alert } from 'react-native';
 import { constant } from '../constants';
 

@@ -4,10 +4,9 @@ import { Block, Text } from '../../components';
 import { theme, constant } from '../../constants';
 import { connect } from 'react-redux'
 import Layout from '../../constants/Layout';
-import { DangerZone } from 'expo';
 import tick from '../../assets/lottie/676-done';
 import _ from 'lodash';
-const { Lottie } = DangerZone;
+import LottieView from 'lottie-react-native'
 
 class PostUpdateScreen extends Component {
   static navigationOptions = ({ navigation }) => {
@@ -40,7 +39,7 @@ class PostUpdateScreen extends Component {
     return (
       <Block style={styles.slide}>
         {tick &&
-          <Lottie
+          <LottieView
             ref={animation1 => {
               this.animation1 = animation1;
             }}

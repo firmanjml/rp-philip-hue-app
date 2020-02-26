@@ -483,9 +483,7 @@ class AddSchedules extends Component {
     renderCreateButton() {
         return (
             <Block bottom flex={1} style={{ marginBottom: 10 }}>
-                <Button gradient
-                    startColor='#0A7CC4'
-                    endColor='#2BDACD'
+                <Button
                     onPress={() => this.confirmAddSchedule()}>
                     <Text center semibold white>Create new schedule</Text>
                 </Button>
