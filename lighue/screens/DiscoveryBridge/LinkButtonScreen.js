@@ -64,6 +64,7 @@ class LinkButtonScreen extends Component {
                             resizeMode='contain'
                             style={{ width: 250, height: 240 }}
                         />
+                        <Text style={{color : 'white'}}>{this.props.bridgeip}</Text>
                     </Block>
                     <Block marginTop={20}>
                         {<Countdown
@@ -101,7 +102,8 @@ class LinkButtonScreen extends Component {
 const mapStateToProps = (state) => {
     return {
         username: state.username,
-        nightmode: state.nightmode
+        nightmode: state.nightmode,
+        bridgeip: state.bridgeip
     }
 }
 

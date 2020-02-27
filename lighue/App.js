@@ -1,5 +1,5 @@
 import React from 'react';
-import { Platform, StatusBar, StyleSheet, View, AsyncStorage} from 'react-native';
+import { Platform, StatusBar, StyleSheet, View } from 'react-native';
 import { AppLoading } from 'expo';
 import SwitchNavigator from './navigation/SwitchNavigator';
 import { Provider } from "react-redux";

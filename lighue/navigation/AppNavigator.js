@@ -90,18 +90,16 @@ const SetupNavigatorApp = createStackNavigator(
     transitionConfig: () => fromRight(),
     defaultNavigationOptions: {
       headerStyle: {
-        backgroundColor: 'transparent',
-        opacity: 1,
-        borderBottomColor: "transparent",
-        elevation: 0, // for android
+        backgroundColor: theme.colors.background,
+        height : 10,
+        elevation: 0,
+        paddingBottom : 20
       },
-      headerTransparent: true,
-      headerBackTitle: null,
+      headerTransparent: false,
       headerLeftContainerStyle: {
         alignItems: 'center',
         marginLeft: theme.sizes.base * 2,
-      },
-      gesturesEnabled: false,
+      }
     },
   }
 );

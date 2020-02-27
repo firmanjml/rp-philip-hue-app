@@ -13,12 +13,15 @@ const SetupNavigatorApp = createStackNavigator(
     initialRouteName: "Splash",
     defaultNavigationOptions: {
       headerStyle: {
-        height: Platform.OS === 'ios' ? theme.sizes.base * 4 : theme.sizes.base,
         backgroundColor: theme.colors.background,
-        borderBottomColor: "transparent",
-        elevation: 0, // for android
+        height : 10,
+        elevation: 0
       },
-      headerBackTitle: null,
+      headerTransparent: false,
+      headerLeftContainerStyle: {
+        alignItems: 'center',
+        marginLeft: theme.sizes.base * 2,
+      }
     },
   }
 );

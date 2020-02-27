@@ -23,7 +23,7 @@ import {
 class NewControlBulbScreen extends Component {
     static navigationOptions = {
         header: null
-    }
+    };
 
     state = {
         id: 0,
@@ -94,7 +94,7 @@ class NewControlBulbScreen extends Component {
             method: 'PUT',
             headers,
             data: {
-                sat:  _.round(value),
+                sat: _.round(value),
                 transitiontime: this.state.transitiontime
             }
         }, 60);
@@ -236,13 +236,13 @@ class NewControlBulbScreen extends Component {
         const trackTintColor = nightmode ? "rgba(157, 163, 180, 0.10)" : "#DDDDDD"
         return (
             <Block style={backgroundcolor}>
-                <View style={styles.header}>
+                <Block flex={false} center row space="between" style={styles.header}>
                     {this.renderBackButton()}
                     {this.renderMenu()}
+                </Block>
+                <Block container>
                     {this._renderModal()}
                     {this._renderTransitionModal()}
-                </View>
-                <Block>
                     <View style={styles.titleRow}>
                         <Text style={[styles.title, titlecolor]}>{this.props.lights[this.state.id].name}</Text>
                         <ToggleSwitch
@@ -351,6 +351,10 @@ const styles = StyleSheet.create({
         textAlign: 'left',
         paddingBottom: 10
     },
+    header: {
+        marginTop: 10,
+        paddingHorizontal: theme.sizes.base * 2
+    },
     textPer: {
         textAlign: 'right'
     },
@@ -359,7 +363,8 @@ const styles = StyleSheet.create({
         fontWeight: 'bold'
     },
     textControl: {
-        textAlign: 'left'
+        textAlign: 'left',
+        fontWeight: 'bold'
     },
     divider: {
         marginTop: 10,
@@ -367,13 +372,6 @@ const styles = StyleSheet.create({
         marginHorizontal: 2,
         borderBottomWidth: 1,
         borderColor: "#E1E3E8"
-    },
-    header: {
-        marginTop: 40,
-        paddingHorizontal: theme.sizes.base * 2,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center'
     }
 });
 

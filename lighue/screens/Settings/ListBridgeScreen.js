@@ -4,7 +4,7 @@ import { Block, Text } from '../../components';
 import { theme } from '../../constants';
 import { connect } from 'react-redux'
 import { ScrollView } from 'react-native-gesture-handler';
-import Icon from 'react-native-vector-icons';
+import { Entypo } from '@expo/vector-icons';
 import DialogInput from 'react-native-dialog-input';
 import { AddBridge, SwitchBridge, DeleteBridge, GetConfig } from '../../redux/actions';
 
@@ -54,7 +54,7 @@ class ListBridgeScreen extends Component {
                         <TouchableOpacity
                             onPress={() => this.setState({ dialogModal: true })}
                         >
-                            <Icon.Entypo name="circle-with-plus" size={25} color={theme.colors.gray} />
+                            <Entypo name="circle-with-plus" size={25} color={theme.colors.gray} />
                         </TouchableOpacity>
                     </Block>
                     <ScrollView>
@@ -108,7 +108,7 @@ class ListBridgeScreen extends Component {
                                                             { cancelable: true }
                                                         );
                                                     }}>
-                                                    <Icon.Entypo name="squared-cross" size={25} color={'#ff0000'} />
+                                                    <Entypo name="squared-cross" size={25} color={'#ff0000'} />
                                                 </TouchableOpacity>)
                                                 :
                                                 null

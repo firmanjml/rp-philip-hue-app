@@ -21,6 +21,8 @@ export default class Typography extends Component {
       // styling
       regular,
       bold,
+      googlebold,
+      googlemedium,
       semibold,
       medium,
       weight,
@@ -63,6 +65,8 @@ export default class Typography extends Component {
       spacing && { letterSpacing: spacing },
       weight && { fontWeight: weight },
       regular && styles.regular,
+      googlebold && styles.googelbold,
+      googlemedium && styles.googlemedium,
       bold && styles.bold,
       semibold && styles.semibold,
       medium && styles.medium,
@@ -97,7 +101,8 @@ const styles = StyleSheet.create({
   // default style
   text: {
     fontSize: theme.sizes.font,
-    color: theme.colors.black
+    color: theme.colors.black,
+    fontFamily: 'googlesans-regular'
   },
   // variations
   regular: {
@@ -105,6 +110,12 @@ const styles = StyleSheet.create({
   },
   bold: {
     fontWeight: "bold",
+  },
+  googlebold: {
+    fontFamily: 'googlesans-bold'
+  },
+  googlemedium: {
+    fontFamily: 'googlesans-medium'
   },
   semibold: {
     fontWeight: "500",
@@ -127,13 +138,13 @@ const styles = StyleSheet.create({
   white: { color: theme.colors.white },
   gray: { color: theme.colors.gray },
   gray2: { color: theme.colors.gray2 },
-  gray3: {color : theme.colors.gray3 },
+  gray3: { color: theme.colors.gray3 },
   red: { color: theme.colors.accent },
   // fonts
   h1: theme.fonts.h1,
   h2: theme.fonts.h2,
   h3: theme.fonts.h3,
-  paragraph : theme.fonts.paragraph,
+  paragraph: theme.fonts.paragraph,
   title: theme.fonts.title,
   body: theme.fonts.body,
   caption: theme.fonts.caption,

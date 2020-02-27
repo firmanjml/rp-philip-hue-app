@@ -3,8 +3,9 @@ import { Image, StyleSheet, TouchableOpacity, Dimensions, View, Alert } from 're
 import { Block, Text, Button } from '../../components';
 import { theme } from '../../constants';
 import { connect } from 'react-redux';
-import { Updates, AuthSession, Constants } from 'expo';
+import { Updates, AuthSession } from 'expo';
 import { persistor } from "../../redux/store";
+import Constants from 'expo-constants';
 import { ChangeThemeMode, ChangeCloudToken, ChangeAuthentication } from '../../redux/actions'
 import ToggleSwitch from '../../components/ToggleSwitch';
 import Base64 from 'Base64';

@@ -1,9 +1,21 @@
 import React, { Component } from 'react'
-import { Dimensions, Image, StyleSheet, ScrollView, TouchableOpacity, View, RefreshControl, Platform, Modal, ActivityIndicator, Alert } from 'react-native'
+import {
+    Dimensions,
+    Image,
+    StyleSheet,
+    TouchableOpacity,
+    View,
+    RefreshControl,
+    Platform,
+    Modal,
+    ActivityIndicator,
+    Alert
+} from 'react-native'
 import { Card, Badge, Block, Text } from '../../components';
 import { theme, constant } from '../../constants';
-import { Entypo, Ionicons } from '@expo/vector-icons';
+import { Entypo, MaterialIcons } from '@expo/vector-icons';
 import ToggleSwitch from "../../components/ToggleSwitch";
+import { ScrollView, FlatList } from 'react-native-gesture-handler';
 import { connect } from 'react-redux';
 import { SetLampState } from '../../redux/actions';
 import { GetAllGroups, GetAllLights, GetConfig, ChangeSaving, SearchForNewLights } from '../../redux/actions';
@@ -14,6 +26,8 @@ import {
     MenuOption,
     MenuTrigger,
 } from 'react-native-popup-menu';
+
+import { ConvertXYtoHex } from '../../components/ColorConvert';
 
 const { width } = Dimensions.get('window');
 
@@ -238,50 +252,51 @@ class DefaultScreen extends Component {
                         </TouchableOpacity>
                     </Block>
                     :
-                    <ScrollView>
-                        {
-                            Object.keys(lights).map((val, index) => (
-                                <View key={index} style={{ paddingHorizontal: theme.sizes.base * 2 }}>
-                                    <View style={styles.bulbRow}>
-                                        <View style={{ flexDirection: 'row' }}>
-                                            <TouchableOpacity
-                                                onPress={() => {
-                                                    this.props._fetchAllLights();
-                                                    setTimeout(() => {
-                                                        navigation.navigate('ControlBulb', {
-                                                            id: val
-                                                        });
-                                                    }, 700);
-                                                }}>
-                                                <View style={{ flexDirection: 'row' }}>
-                                                    <Ionicons name="ios-bulb" size={25} style={{ alignSelf: 'center', marginRight: 10 }} color={theme.colors.gray} />
-                                                    <Text style={[textcolor, { fontSize: 21, alignSelf: 'center' }]}>{lights[val].name.length > 15 ? lights[val].name.substring(0, 15) + "..." : lights[val].name}</Text>
-                                                </View>
-                                            </TouchableOpacity>
-                                            <TouchableOpacity
-                                                onPress={() => {
-                                                    navigation.navigate('BulbInfo', {
-                                                        id: val
-                                                    });
-                                                }}>
-                                                <Ionicons name="md-information-circle-outline" size={22} style={{ marginLeft: 15, alignSelf: 'center' }} color={theme.colors.gray} />
-                                            </TouchableOpacity>
+                    <View style={{ paddingHorizontal: theme.sizes.base * 2 }}>
+                        <FlatList
+                            keyExtractor={(item) => item}
+                            data={Object.keys(lights)}
+                            renderItem={({ item: key }) => (
+                                <View style={[styles.bulbRow, { backgroundColor: ConvertXYtoHex(lights[key].state.xy[0], lights[key].state.xy[1], 254)}]}>
+                                    <TouchableOpacity
+                                        onPress={() => {
+                                            this.props._fetchAllLights();
+                                            setTimeout(() => {
+                                                navigation.navigate('ControlBulb', {
+                                                    id: key
+                                                });
+                                            }, 700);
+                                            console.log(lights)
+                                        }}>
+                                        <View style={{ marginTop: 20, flexDirection: 'row', justifyContent: 'space-between'}}>
+                                            <Text googlemedium style={{ fontSize: 21, marginLeft: 20, color : 'white' }}>{lights[key].name.length > 15 ? lights[key].name.substring(0, 15) + "..." : lights[key].name}</Text>
+                                            <View style={{ marginRight: 20 }}>
+                                                <ToggleSwitch
+                                                    offColor="#DDDDDD"
+                                                    onColor={theme.colors.secondary}
+                                                    onToggle={(value) => {
+                                                        _changeLightState(key, {
+                                                            "on": value,
+                                                        })
+                                                    }}
+                                                    isOn={lights[key].state.on}
+                                                />
+                                            </View>
                                         </View>
-                                        <ToggleSwitch
-                                            offColor="#DDDDDD"
-                                            onColor={theme.colors.secondary}
-                                            isOn={this.props.lights[val].state.on}
-                                            onToggle={(value) => {
-                                                _changeLightState(val, {
-                                                    "on": value,
-                                                })
-                                            }}
-                                        />
-                                    </View>
+                                        <View style={{ marginLeft: 20 }}>
+                                            <Text style={{ marginTop: 5, color : 'white' }}>Brightness {Math.round((lights[key].state.bri * 100) / 254)}%</Text>
+                                            <Text style={{ marginTop: 5, color : 'white' }}>Saturation {Math.round((lights[key].state.sat * 100) / 254)}%</Text>
+                                            <View style={{ marginTop: 10, flexDirection: 'row' }}>
+                                                <MaterialIcons name="room" size={20} color='white'></MaterialIcons>
+                                                <Text style={{ marginLeft: 5, color : 'white' }}>Room</Text>
+                                            </View>
+                                        </View>
+                                    </TouchableOpacity>
                                 </View>
-                            ))
-                        }
-                    </ScrollView>
+                            )
+                            }
+                        />
+                    </View>
             )
         } else if (this.state.active === "Schedules") {
             return (
@@ -404,7 +419,8 @@ class DefaultScreen extends Component {
                     {this.renderMenu(this.state.active)}
                 </Block>
                 <Block flex={false} style={{
-                    paddingHorizontal: theme.sizes.base * 2
+                    paddingHorizontal: theme.sizes.base * 2,
+                    marginTop: 5
                 }}>
                     <TouchableOpacity
                         onPress={() => {
@@ -414,9 +430,9 @@ class DefaultScreen extends Component {
                         }}>
                         {
                             this.state.tapBridgeInfo ?
-                            <Text p style={[textcolor]}>Current Bridge: {this.props.config.ipaddress}</Text>
-                            :
-                            <Text p style={[textcolor]}>Bridge Name: {this.props.config.name}</Text>
+                                <Text p style={[textcolor]}>Current Bridge : {this.props.config.ipaddress}</Text>
+                                :
+                                <Text p style={[textcolor]}>Bridge Name : {this.props.config.name}</Text>
                         }
                     </TouchableOpacity>
 
@@ -468,12 +484,17 @@ const styles = StyleSheet.create({
         backgroundColor: theme.colors.background
     },
     header: {
-        marginTop: 50,
+        marginTop: 10,
         paddingHorizontal: theme.sizes.base * 2,
     },
     avatar: {
         height: theme.sizes.base * 2.2,
         width: theme.sizes.base * 2.2,
+    },
+    bulbRow: {
+        marginBottom: 20,
+        paddingBottom: 15,
+        borderRadius: 10
     },
     tabs: {
         marginTop: 30,
@@ -494,12 +515,6 @@ const styles = StyleSheet.create({
         flexWrap: 'wrap',
         paddingHorizontal: theme.sizes.base * 2,
         marginBottom: theme.sizes.base * 3.5,
-    },
-    bulbRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginBottom: 20,
-        marginTop: 10
     },
     category: {
         minWidth: (width - (theme.sizes.padding * 2.4) - theme.sizes.base) / 2,

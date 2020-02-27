@@ -344,10 +344,10 @@ class ControlRoomScreen extends React.Component {
         <Block flex={false} center row space="between" style={styles.header}>
           {this.renderBackButton()}
           {this.renderMenu()}
+        </Block>
+        <Block container>
           {this._renderModal()}
           {this._renderTransitionModal()}
-        </Block>
-        <Block>
           <View style={styles.titleRow}>
             <Text style={[styles.title, titlecolor]}>
               {this.state.roomName}
@@ -463,7 +463,7 @@ const styles = StyleSheet.create({
     paddingBottom: 10
   },
   header: {
-    marginTop: 50,
+    marginTop: 10,
     paddingHorizontal: theme.sizes.base * 2
   },
   thumb: {

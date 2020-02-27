@@ -4,7 +4,6 @@ import ManualIPScreen from '../screens/DiscoveryBridge/ManualScreen';
 import LinkButtonPage from '../screens/DiscoveryBridge/LinkButtonScreen';
 import WelcomeScreen from '../screens/DiscoveryBridge/WelcomeScreen';
 import SettingDiscovery from '../screens/Settings/SettingScreen';
-import TestScreen from '../screens/TestScreen';
 import { theme } from '../constants';
 
 const MainNavigator = createStackNavigator(
@@ -19,18 +18,15 @@ const MainNavigator = createStackNavigator(
     initialRouteName: "StartPage",
     defaultNavigationOptions: {
       headerStyle: {
-        backgroundColor: 'transparent',
-        opacity: 1,
-        borderBottomColor: "transparent",
-        elevation: 0, // for android
+        backgroundColor: theme.colors.background,
+        height : 10,
+        elevation: 0
       },
-      headerTransparent: true,
-      headerBackTitle: null,
+      headerTransparent: false,
       headerLeftContainerStyle: {
         alignItems: 'center',
         marginLeft: theme.sizes.base * 2,
-      },
-      gesturesEnabled: true,
+      }
     },
   }
 );
