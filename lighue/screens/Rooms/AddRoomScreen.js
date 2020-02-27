@@ -220,7 +220,7 @@ class AddRoomScreen extends React.Component {
     const bordercolor = { borderColor: nightmode ? colors.white : colors.black }
     const checkboxcolor = nightmode ? "white" : "black"
     return (
-      <Block style={backgroundcolor}>
+      <Block container style={backgroundcolor}>
         <View style={styles.header}>
           {this.renderBackButton()}
           {this.renderLoadingModal()}
@@ -304,8 +304,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.5
   },
   header: {
-    marginTop: 30,
-    paddingHorizontal: theme.sizes.base * 2,
+    marginTop: 10,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center'

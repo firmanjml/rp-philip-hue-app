@@ -35,81 +35,40 @@ class BridgeInfo extends Component {
     render() {
         const { nightmode, config } = this.props;
         const { colors } = theme;
-        const backgroundcolor = { backgroundColor: nightmode ? colors.background : colors.backgroundLight }
-        const textcolor = { color: nightmode ? colors.white : colors.black }
         return (
-            <Block style={backgroundcolor}>
-                <Block container style={{ marginBottom: 20 }}>
-                    <Text h1 bold style={[textcolor, { marginTop: 10 }]}>Bridge Info</Text>
-                    <ScrollView>
-                        <Block flex={false} column style={styles.row}>
-                            <Text bold style={textcolor}>Name</Text>
-                            <Text style={[styles.textSetting, textcolor]}>{config.name}</Text>
-                            <View style={styles.divider} />
-                        </Block>
-                        <Block flex={false} column style={styles.row}>
-                            <Text bold style={textcolor}>IP Address</Text>
-                            <Text style={[styles.textSetting, textcolor]}>{config.ipaddress}</Text>
-                            <View style={styles.divider} />
-                        </Block>
-                        <Block flex={false} column style={styles.row}>
-                            <Text bold style={textcolor}>Status</Text>
-                            <Text style={[styles.textSetting, textcolor]}>{this.renderStatus(textcolor)}</Text>
-                            <View style={styles.divider} />
-                        </Block>
-                        <Block flex={false} column style={styles.row}>
-                            <Text bold style={textcolor}>MAC Address</Text>
-                            <Text style={[styles.textSetting, textcolor]}>{config.mac}</Text>
-                            <View style={styles.divider} />
-                        </Block>
-                        <Block flex={false} column style={styles.row}>
-                            <Text bold style={textcolor}>DCHP</Text>
-                            <Text style={[styles.textSetting, textcolor]}>{config.dhcp ? "On" : " Off"}</Text>
-                            <View style={styles.divider} />
-                        </Block>
-                        <Block flex={false} column style={styles.row}>
-                            <Text bold style={textcolor}>Portal Service</Text>
-                            <Text style={[styles.textSetting, textcolor]}>{config.portalservices ? "On" : " Off"}</Text>
-                            <View style={styles.divider} />
-                        </Block>
-                        <Block flex={false} column style={styles.row}>
-                            <Text bold style={textcolor}>Firmware</Text>
-                            <Text style={[styles.textSetting, textcolor]}>{config.swversion}</Text>
-                            <View style={styles.divider} />
-                        </Block>
-                        <Block flex={false} column style={styles.row}>
-                            <Text bold style={textcolor}>Bridge ID</Text>
-                            <Text style={[styles.textSetting, textcolor]}>{config.bridgeid}</Text>
-                            <View style={styles.divider} />
-                        </Block>
-                        <Block flex={false} column style={styles.row}>
-                            <Text bold style={textcolor}>Bridge Model</Text>
-                            <Text style={[styles.textSetting, textcolor]}>{config.modelid}</Text>
-                            <View style={styles.divider} />
-                        </Block>
-                        {
-                            (config.localtime) ?
-                                (<Block>
-                                    <Block flex={false} column style={styles.row}>
-                                        <Text bold style={textcolor}>Bridge Date</Text>
-                                        <Text style={[styles.textSetting, textcolor]}>{(config.localtime).substring(0, 10)}</Text>
-                                        <View style={styles.divider} />
-                                    </Block>
-                                    <Block flex={false} column style={styles.row}>
-                                        <Text bold style={textcolor}>Bridge Time</Text>
-                                        <Text style={[styles.textSetting, textcolor]}>{(config.localtime).substring(11)}</Text>
-                                        <View style={styles.divider} />
-                                    </Block>
-                                </Block>)
-                                : null
-                        }
-                        <Block flex={false} column style={styles.row}>
-                            <Text bold style={textcolor}>ZigBee Channel</Text>
-                            <Text style={[styles.textSetting, textcolor]}>{config.zigbeechannel}</Text>
-                            <View style={styles.divider} />
-                        </Block>
-                    </ScrollView>
+            <Block style={styles.container}>
+                <Block flex={false} center row space="between" style={styles.header}>
+                    <Text h1 googlebold>{config.name}</Text>
                 </Block>
+                <Text gray style={{ marginTop: 10 }}>Bridge Information</Text>
+                <ScrollView>
+                    <Block flex={false} column>
+                        <Text gray googlebold style={styles.textSetting}>Connection</Text>
+                        <Text style={styles.textSetting}>Status : Connected</Text>
+                        <Text style={styles.textSetting}>Portal Services : {config.portalservices ? "Connected through Cloud" : "Not using cloud"}</Text>
+                        <Text style={styles.textSetting}>ZigBee Channel : {config.zigbeechannel}</Text>
+                    </Block>
+                    <Block flex={false} column style={styles.row}>
+                        <Text gray googlebold style={styles.textSetting}>Software</Text>
+                        <Text style={styles.textSetting}>Software Version : {config.swversion}</Text>
+                        <Text style={styles.textSetting}>API Version : {config.apiversion}</Text>
+                    </Block>
+                    <Block flex={false} column style={styles.row}>
+                        <Text gray googlebold style={styles.textSetting}>Network</Text>
+                        <Text style={styles.textSetting}>IP Address : {config.ipaddress}</Text>
+                        <Text style={styles.textSetting}>MAC Address : {config.mac}</Text>
+                        <Text style={styles.textSetting}>Gateway : {config.gateway}</Text>
+                        <Text style={styles.textSetting}>DHCP : {config.dhcp ? "Use assigned IP by DHCP Server" : "Static IP"}</Text>
+                        <Text style={styles.textSetting}>Proxy Address : {config.proxyaddress === "none" ? "None" : config.proxyaddress}</Text>
+                        <Text style={styles.textSetting}>Proxy Port : {config.proxyport}</Text>
+                    </Block>
+                    <Block flex={false} column style={[styles.row, { marginBottom: 20 }]}>
+                        <Text gray googlebold style={styles.textSetting}>Time</Text>
+                        <Text style={styles.textSetting}>Local Time : {config.localtime}</Text>
+                        <Text style={styles.textSetting}>Timezone : {config.timezone}</Text>
+                        <Text style={styles.textSetting}>UTC : {config.UTC}</Text>
+                    </Block>
+                </ScrollView>
             </Block>
         )
     }
@@ -131,17 +90,25 @@ export default connect(
 )(BridgeInfo)
 
 const styles = StyleSheet.create({
+    container: {
+        paddingHorizontal: theme.sizes.base * 2,
+        backgroundColor: theme.colors.background
+    },
+    textSetting: {
+        marginTop: 18,
+        fontSize: 16
+    },
+    header: {
+        marginTop: 25
+    },
     row: {
         marginTop: 20,
     },
-    textSetting: {
-        marginTop: 10
-    },
     divider: {
-        marginTop: 10,
+        marginTop: 15,
         marginVertical: 5,
         marginHorizontal: 2,
-        borderBottomWidth: 1,
+        borderBottomWidth: 0.5,
         borderColor: "#E1E3E8"
-    },
+    }
 });

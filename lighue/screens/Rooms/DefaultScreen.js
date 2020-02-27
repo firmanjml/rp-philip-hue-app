@@ -13,7 +13,7 @@ import {
 } from 'react-native'
 import { Card, Badge, Block, Text } from '../../components';
 import { theme, constant } from '../../constants';
-import { Entypo, MaterialIcons } from '@expo/vector-icons';
+import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import ToggleSwitch from "../../components/ToggleSwitch";
 import { ScrollView, FlatList } from 'react-native-gesture-handler';
 import { connect } from 'react-redux';
@@ -27,7 +27,7 @@ import {
     MenuTrigger,
 } from 'react-native-popup-menu';
 
-import { ConvertXYtoHex } from '../../components/ColorConvert';
+import { ColorizeRows } from '../../components/ColorConvert';
 
 const { width } = Dimensions.get('window');
 
@@ -37,12 +37,12 @@ class DefaultScreen extends Component {
     }
 
     state = {
-        tapBridgeInfo: false,
+        tapBridgeInfo: 0,
         dialogModal: false,
-        active: 'Rooms',
+        active: 'ROOMS',
         categories: [],
         refreshing: false,
-        alertStatus: false
+        alertStatus: false,
     }
 
     componentWillMount() {
@@ -52,6 +52,11 @@ class DefaultScreen extends Component {
             this.props._fetchEverything();
             this.checkBridgeStatus()
         }, 3000)
+    }
+
+    setTapBridgeInfo() {
+        this.state.tapBridgeInfo === 4 ? this.setState({ tapBridgeInfo: 0 }) : this.setState({ tapBridgeInfo: this.state.tapBridgeInfo + 1 });
+        console.log(this.props.lights[1])
     }
 
     checkBridgeStatus() {
@@ -121,48 +126,46 @@ class DefaultScreen extends Component {
     }
 
     renderMenu(tab) {
-        if (this.state.active === 'Rooms') {
+        if (this.state.active === 'ROOMS') {
             return (
                 <Menu onSelect={value => this.onMenuRoomSelect(value)}>
                     <MenuTrigger>
-                        <Entypo name="dots-three-horizontal" size={25} color={theme.colors.gray} />
+                        <Ionicons name="ios-menu" size={30} color="white" />
                     </MenuTrigger>
                     <MenuOptions style={{ padding: 15 }} >
-                        <MenuOption value={1}><Text h3>Create new room</Text></MenuOption>
+                        <MenuOption value={1}><Text black h3>Create new room</Text></MenuOption>
                         <View style={styles.divider} />
-                        {/* <MenuOption value={2}><Text h3>Debug mode</Text></MenuOption>
-                        <View style={styles.divider} /> */}
-                        <MenuOption value={3}><Text h3>Settings</Text></MenuOption>
+                        <MenuOption value={3}><Text black h3>Settings</Text></MenuOption>
                     </MenuOptions>
                 </Menu>
             )
         }
-        else if (this.state.active === "Lights") {
+        else if (this.state.active === "LIGHTS") {
             return (
                 <Menu onSelect={value => this.onMenuLightSelect(value)}>
                     <MenuTrigger>
-                        <Entypo name="dots-three-horizontal" size={25} color={theme.colors.gray} />
+                        <Ionicons name="ios-menu" size={30} color="white" />
                     </MenuTrigger>
                     <MenuOptions style={{ padding: 15 }} >
-                        <MenuOption value={1}><Text h3>Search for new bulb</Text></MenuOption>
+                        <MenuOption value={1}><Text black h3>Search for new bulb</Text></MenuOption>
                         <View style={styles.divider} />
-                        <MenuOption value={2}><Text h3>Manual bulb search</Text></MenuOption>
+                        <MenuOption value={2}><Text black h3>Manual bulb search</Text></MenuOption>
                         <View style={styles.divider} />
-                        <MenuOption value={3}><Text h3>Settings</Text></MenuOption>
+                        <MenuOption value={3}><Text black h3>Settings</Text></MenuOption>
                     </MenuOptions>
                 </Menu>
             )
         }
-        else if (this.state.active === "Schedules") {
+        else if (this.state.active === "SCHEDULES") {
             return (
                 <Menu onSelect={value => this.onMenuScheduleSelect(value)}>
                     <MenuTrigger>
-                        <Entypo name="dots-three-horizontal" size={25} color={theme.colors.gray} />
+                        <Ionicons name="ios-menu" size={30} color="white" />
                     </MenuTrigger>
                     <MenuOptions style={{ padding: 15 }} >
-                        <MenuOption value={1}><Text h3>Add Schedules</Text></MenuOption>
+                        <MenuOption value={1}><Text black h3>Add Schedules</Text></MenuOption>
                         <View style={styles.divider} />
-                        <MenuOption value={2}><Text h3>Settings</Text></MenuOption>
+                        <MenuOption value={2}><Text black h3>Settings</Text></MenuOption>
                     </MenuOptions>
                 </Menu>
             )
@@ -177,7 +180,7 @@ class DefaultScreen extends Component {
         const graytextcolor = { color: nightmode ? colors.gray2 : colors.black }
         const marginTop = { marginTop: Platform.OS == "android" ? 20 : 0 }
 
-        if (this.state.active === 'Rooms') {
+        if (this.state.active === 'ROOMS') {
             return (
                 <ScrollView
                     showsVerticalScrollIndicator={false}
@@ -241,7 +244,7 @@ class DefaultScreen extends Component {
                     </Block>
                 </ScrollView>
             )
-        } else if (this.state.active === "Lights") {
+        } else if (this.state.active === "LIGHTS") {
             return (
                 Object.entries(lights).length === 0 && lights.constructor === Object ?
                     <Block style={{ paddingHorizontal: theme.sizes.base * 2, alignItems: 'center', justifyContent: 'center' }}>
@@ -257,7 +260,7 @@ class DefaultScreen extends Component {
                             keyExtractor={(item) => item}
                             data={Object.keys(lights)}
                             renderItem={({ item: key }) => (
-                                <View style={[styles.bulbRow, { backgroundColor: ConvertXYtoHex(lights[key].state.xy[0], lights[key].state.xy[1], 254)}]}>
+                                <View style={[styles.bulbRow, { backgroundColor: ColorizeRows(lights[key].state.xy[0], lights[key].state.xy[1], lights[key].state.bri) }]}>
                                     <TouchableOpacity
                                         onPress={() => {
                                             this.props._fetchAllLights();
@@ -268,8 +271,8 @@ class DefaultScreen extends Component {
                                             }, 700);
                                             console.log(lights)
                                         }}>
-                                        <View style={{ marginTop: 20, flexDirection: 'row', justifyContent: 'space-between'}}>
-                                            <Text googlemedium style={{ fontSize: 21, marginLeft: 20, color : 'white' }}>{lights[key].name.length > 15 ? lights[key].name.substring(0, 15) + "..." : lights[key].name}</Text>
+                                        <View style={{ marginTop: 20, flexDirection: 'row', justifyContent: 'space-between' }}>
+                                            <Text googlemedium style={{ fontSize: 21, marginLeft: 20, color: 'white' }}>{lights[key].name.length > 15 ? lights[key].name.substring(0, 15) + "..." : lights[key].name}</Text>
                                             <View style={{ marginRight: 20 }}>
                                                 <ToggleSwitch
                                                     offColor="#DDDDDD"
@@ -284,11 +287,11 @@ class DefaultScreen extends Component {
                                             </View>
                                         </View>
                                         <View style={{ marginLeft: 20 }}>
-                                            <Text style={{ marginTop: 5, color : 'white' }}>Brightness {Math.round((lights[key].state.bri * 100) / 254)}%</Text>
-                                            <Text style={{ marginTop: 5, color : 'white' }}>Saturation {Math.round((lights[key].state.sat * 100) / 254)}%</Text>
+                                            <Text style={{ marginTop: 5, color: 'white' }}>Brightness {Math.round((lights[key].state.bri * 100) / 254)}%</Text>
+                                            <Text style={{ marginTop: 5, color: 'white' }}>Saturation {Math.round((lights[key].state.sat * 100) / 254)}%</Text>
                                             <View style={{ marginTop: 10, flexDirection: 'row' }}>
                                                 <MaterialIcons name="room" size={20} color='white'></MaterialIcons>
-                                                <Text style={{ marginLeft: 5, color : 'white' }}>Room</Text>
+                                                <Text style={{ marginLeft: 5, color: 'white' }}>Room</Text>
                                             </View>
                                         </View>
                                     </TouchableOpacity>
@@ -298,7 +301,7 @@ class DefaultScreen extends Component {
                         />
                     </View>
             )
-        } else if (this.state.active === "Schedules") {
+        } else if (this.state.active === "SCHEDULES") {
             return (
                 Object.entries(schedules).length === 0 && lights.constructor === Object ?
                     <Block style={{ paddingHorizontal: theme.sizes.base * 2, alignItems: 'center', justifyContent: 'center' }}>
@@ -406,34 +409,24 @@ class DefaultScreen extends Component {
     }
 
     render() {
-        const tabs = ['Rooms', 'Lights', 'Schedules'];
-        const { nightmode } = this.props;
+        const tabs = ['ROOMS', 'LIGHTS', 'SCHEDULES'];
+        const { nightmode, config } = this.props;
+        const { tapBridgeInfo } = this.state;
         const { colors } = theme;
         const backgroundcolor = { backgroundColor: nightmode ? colors.background : colors.backgroundLight }
-        const textcolor = { color: nightmode ? colors.white : colors.black }
         return (
             <Block style={backgroundcolor}>
                 <Block flex={false} center row space="between" style={styles.header}>
                     {this.renderLoadingModal()}
-                    <Text h1 style={[textcolor, { fontWeight: 'bold' }]}>Explore</Text>
+                    <Text h1 googlebold>Explore</Text>
                     {this.renderMenu(this.state.active)}
                 </Block>
                 <Block flex={false} style={{
                     paddingHorizontal: theme.sizes.base * 2,
                     marginTop: 5
                 }}>
-                    <TouchableOpacity
-                        onPress={() => {
-                            this.setState(previousState => (
-                                { tapBridgeInfo: !previousState.tapBridgeInfo }
-                            ))
-                        }}>
-                        {
-                            this.state.tapBridgeInfo ?
-                                <Text p style={[textcolor]}>Current Bridge : {this.props.config.ipaddress}</Text>
-                                :
-                                <Text p style={[textcolor]}>Bridge Name : {this.props.config.name}</Text>
-                        }
+                    <TouchableOpacity onPress={() => this.setTapBridgeInfo()}>
+                        <Text googleregular>{tapBridgeInfo === 0 ? `Bridge Name : ${config.name}` : tapBridgeInfo === 1 ? `IP Address : ${config.ipaddress}` : tapBridgeInfo === 2 ? `Bridge ID : ${config.bridgeid}` : tapBridgeInfo === 3 ? config.modelid : config.modelid}</Text>
                     </TouchableOpacity>
 
                 </Block>
@@ -484,20 +477,15 @@ const styles = StyleSheet.create({
         backgroundColor: theme.colors.background
     },
     header: {
-        marginTop: 10,
+        marginTop: 25,
         paddingHorizontal: theme.sizes.base * 2,
     },
     avatar: {
         height: theme.sizes.base * 2.2,
         width: theme.sizes.base * 2.2,
     },
-    bulbRow: {
-        marginBottom: 20,
-        paddingBottom: 15,
-        borderRadius: 10
-    },
     tabs: {
-        marginTop: 30,
+        marginTop: 25,
         justifyContent: 'space-around',
         borderBottomColor: theme.colors.gray2,
         borderBottomWidth: StyleSheet.hairlineWidth,
@@ -505,7 +493,7 @@ const styles = StyleSheet.create({
         marginHorizontal: theme.sizes.base * 2,
     },
     tab: {
-        paddingBottom: theme.sizes.base
+        paddingBottom: theme.sizes.base / 3
     },
     active: {
         borderBottomColor: theme.colors.secondary,
@@ -516,13 +504,19 @@ const styles = StyleSheet.create({
         paddingHorizontal: theme.sizes.base * 2,
         marginBottom: theme.sizes.base * 3.5,
     },
+    bulbRow: {
+        marginBottom: 20,
+        paddingBottom: 15,
+        borderRadius: 10
+    },
     category: {
         minWidth: (width - (theme.sizes.padding * 2.4) - theme.sizes.base) / 2,
         maxWidth: (width - (theme.sizes.padding * 2.4) - theme.sizes.base) / 2,
         maxHeight: (width - (theme.sizes.padding * 2.4) - theme.sizes.base) / 2,
     },
     roomText: {
-        fontSize: (width <= 350) ? 9 : (width < 380) ? 12 : 14
+        fontSize: (width <= 350) ? 9 : (width < 380) ? 12 : 14,
+        color: 'black'
     },
     divider: {
         marginVertical: 5,
@@ -545,13 +539,6 @@ const styles = StyleSheet.create({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-around'
-    },
-    divider: {
-        marginTop: 20,
-        marginVertical: 5,
-        marginHorizontal: 2,
-        borderBottomWidth: 1,
-        borderColor: "#747880"
     }
 })
 

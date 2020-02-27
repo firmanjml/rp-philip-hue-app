@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
   // default style
   text: {
     fontSize: theme.sizes.font,
-    color: theme.colors.black,
+    color: theme.colors.white,
     fontFamily: 'googlesans-regular'
   },
   // variations
