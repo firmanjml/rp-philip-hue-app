@@ -17,8 +17,6 @@ class AddRoomScreen extends React.Component {
     lightSelected: null,
   };
 
-  // The 3 parts below handles hardware Back Button on Android
-
   componentWillMount() {
     this.loopBulb();
   }

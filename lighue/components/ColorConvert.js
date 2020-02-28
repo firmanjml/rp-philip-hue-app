@@ -126,6 +126,15 @@ export const ColorizeRows = (x, y, bri) => {
     return ColorLuminance(ConvertXYtoHex(x, y, bri), -0.3)
 }
 
+export const ColorizeRowsRandom = () => {
+    var
+        r = Math.floor(Math.random() * Math.floor(255)),
+        g = Math.floor(Math.random() * Math.floor(255)),
+        b = Math.floor(Math.random() * Math.floor(255)),
+        a = 0.4;
+    return `rgba(${r},${g},${b},${a})`
+}
+
 
 
 

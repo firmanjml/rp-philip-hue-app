@@ -1,6 +1,5 @@
 import React from 'react';
 import { StyleSheet, Platform, View } from 'react-native';
-import { BlurView } from 'expo';
 import { Block, Text, Button } from '../components';
 import { connect } from 'react-redux'
 import { theme } from '../constants';

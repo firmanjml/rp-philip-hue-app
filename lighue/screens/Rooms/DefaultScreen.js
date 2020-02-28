@@ -27,7 +27,7 @@ import {
     MenuTrigger,
 } from 'react-native-popup-menu';
 
-import { ColorizeRows } from '../../components/ColorConvert';
+import { ColorizeRows, ColorizeRowsRandom } from '../../components/ColorConvert';
 
 const { width } = Dimensions.get('window');
 
@@ -312,35 +312,38 @@ class DefaultScreen extends Component {
                         </TouchableOpacity>
                     </Block>
                     :
-
-                    <View style={{ paddingHorizontal: theme.sizes.base * 2 }}>
-                        <Text bold style={[textcolor, { fontSize: 21, marginBottom: 10 }]}>List of Schedules</Text>
-                        <ScrollView>
-                            {
-                                Object.keys(schedules).map((val, index) => {
-                                    const str = schedules[val].name.split("#");
-                                    return (
-                                        <View key={index} style={{ flexDirection: 'row' }}>
-                                            <TouchableOpacity
-                                                onPress={() => this.props.navigation.navigate("ViewSchedule", {
-                                                    id: val
-                                                })}>
-                                                {str[1] == null ?
-                                                    <Text style={[textcolor, { fontSize: 21, alignSelf: 'center', marginTop: 10, marginBottom: 10 }]}>{`${str[0]}`}</Text>
-                                                    :
-                                                    <View style={{ flexDirection: 'row', alignSelf: 'center', marginTop: 10, marginBottom: 10 }}>
-                                                        <Text style={[textcolor, { fontSize: 21 }]}>{`${str[0]}`}</Text>
-                                                        <Text style={[graytextcolor, { fontSize: 21 }]}>{` - ${str[1]}`}</Text>
-                                                    </View>
-                                                }
-                                            </TouchableOpacity>
-                                            <View style={styles.divider} />
+                    <FlatList
+                        keyExtractor={(item) => item}
+                        data={Object.keys(schedules)}
+                        renderItem={({ item: key }) => (
+                            <View style={{ paddingHorizontal: theme.sizes.base * 2 }}>
+                                <TouchableOpacity onPress={() => navigate('ViewSchedule', { id: key })}>
+                                    <View style={{
+                                        backgroundColor: ColorizeRowsRandom(),
+                                        paddingBottom: 20,
+                                        paddingTop: 20,
+                                        marginBottom: 20,
+                                        borderRadius: 10
+                                    }}>
+                                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginLeft: 20, marginRight: 20 }}>
+                                            <Text googlebold style={[{ fontSize: 21, alignSelf: 'center' }]}>{`${schedules[key].name}`}</Text>
+                                            <ToggleSwitch
+                                                offColor="#DDDDDD"
+                                                onColor={theme.colors.secondary}
+                                                onToggle={() => console.log("haloo")}
+                                                isOn={schedules[key].status}
+                                            />
                                         </View>
-                                    )
-                                })
-                            }
-                        </ScrollView>
-                    </View>
+                                        <Text style={[{ fontSize: 15, marginLeft: 20, marginTop: 10 }]}>{`${schedules[key].description}`}</Text>
+                                        <View style={{ flexDirection: 'row', marginLeft: 20, marginTop: 10 }}>
+                                            <Ionicons name="ios-alarm" size={20} color="white"></Ionicons>
+                                            <Text googlemedium style={[{ fontSize: 15, marginLeft: 10 }]}>{`${schedules[key].time}`}</Text>
+                                        </View>
+                                    </View>
+                                </TouchableOpacity>
+                            </View>
+                        )}
+                    />
 
             )
         }

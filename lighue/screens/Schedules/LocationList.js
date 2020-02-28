@@ -3,7 +3,7 @@ import { Image, StyleSheet, TouchableOpacity, View, ScrollView, Dimensions, Plat
 import { Block, Text, Card, Badge } from '../../components';
 import { theme, constant } from '../../constants';
 import { connect } from 'react-redux';
-import Icon from 'react-native-vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('window');
 
@@ -188,7 +188,7 @@ class LocationList extends Component {
                         onPress={() => this.redirectHome()}>
                         <View style={{justifyContent : 'space-between', flexDirection : 'row'}}>
                             <Text style={[{alignSelf : 'center'},textcolor]}>Save  </Text>
-                            <Icon.Ionicons name="ios-arrow-forward" style={{alignSelf : 'center'}} size={25} color={theme.colors.gray} />
+                            <Ionicons name="ios-arrow-forward" style={{alignSelf : 'center'}} size={25} color={theme.colors.gray} />
                         </View>
                     </TouchableOpacity>
                 </Block>

@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Image, StyleSheet, TouchableOpacity, Dimensions, View, Alert } from 'react-native'
+import { Image, StyleSheet, TouchableOpacity, View, Alert } from 'react-native'
 import { Block, Text, Button } from '../../components';
 import { theme } from '../../constants';
 import { connect } from 'react-redux';

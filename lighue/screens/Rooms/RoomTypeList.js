@@ -33,7 +33,7 @@ class RoomTypeList extends Component {
                         <Badge margin={[0, 0, 15]} size={50} color="rgba(41,216,143,0.20)">
                             <Image style={{ width: constant.class_base64[val].width, height: constant.class_base64[val].height }} source={{ uri: constant.class_base64[val].uri }} />
                         </Badge>
-                        <Text medium height={30} style={styles.roomText}>{val}</Text>
+                        <Text medium black height={30} style={styles.roomText}>{val}</Text>
                     </Card>
                 </TouchableOpacity>
             )))
@@ -48,7 +48,7 @@ class RoomTypeList extends Component {
         return (
             <Block style={backgroundcolor}>
                 <View style={styles.header}>
-                    <Text h1 bold style={[titlecolor, { marginTop: 25, marginBottom : 10 }]}>Choose room type</Text>
+                    <Text h1 bold style={[titlecolor, { marginTop: 10, marginBottom : 10 }]}>Choose room type</Text>
                 </View>
                 <ScrollView>
                     <Block flex={false} row space="between" style={[styles.categories, { marginTop: 20 }]}>
@@ -78,7 +78,6 @@ const styles = StyleSheet.create({
         marginTop: 20,
     },
     header: {
-        marginTop: 50,
         paddingHorizontal: theme.sizes.base * 2,
     },
     roomText: {

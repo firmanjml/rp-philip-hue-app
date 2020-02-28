@@ -20,7 +20,6 @@ import {
   MenuTrigger
 } from "react-native-popup-menu";
 
-// kau tak tukar ControlBulb to ControlRoomScreen
 class ControlRoomScreen extends React.Component {
   static navigationOptions = {
     header: null
@@ -146,15 +145,15 @@ class ControlRoomScreen extends React.Component {
           {this.renderMenuOption()}
           <View style={styles.divider} />
           <MenuOption value={2}>
-            <Text h3>Edit Room Info</Text>
+            <Text black h3>Edit Room Info</Text>
           </MenuOption>
           <View style={styles.divider} />
           <MenuOption value={3}>
-            <Text h3>Modify Transition Time</Text>
+            <Text black h3>Modify Transition Time</Text>
           </MenuOption>
           <View style={styles.divider} />
           <MenuOption value={4}>
-            <Text h3>Apply Hex Code</Text>
+            <Text black h3>Apply Hex Code</Text>
           </MenuOption>
           <View style={styles.divider} />
         </MenuOptions>
@@ -166,13 +165,13 @@ class ControlRoomScreen extends React.Component {
     if (this.state.active == "Main") {
       return (
         <MenuOption value={1}>
-          <Text h3>Show Room Bulbs</Text>
+          <Text black h3>Show Room Bulbs</Text>
         </MenuOption>
       );
     } else if (this.state.active == "ShowMoreInfo") {
       return (
         <MenuOption value={1}>
-          <Text h3>Show Color Picker</Text>
+          <Text black h3>Show Color Picker</Text>
         </MenuOption>
       );
     }
@@ -436,9 +435,6 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps
 )(ControlRoomScreen);
-// sbb ni refer to ControlRoomScreen class, and class name ni tadi is ControlBulb
-// so that whys undefined
-// these two kena same name
 
 const styles = StyleSheet.create({
   lightPicker: {
@@ -484,7 +480,8 @@ const styles = StyleSheet.create({
   titleRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 25
+    marginBottom: 25,
+    marginTop : 10
   },
   textControl: {
     textAlign: "left"
