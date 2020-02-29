@@ -32,21 +32,6 @@ class SettingScreen extends Component {
         }, 4000);
     }
 
-    renderBridgeInfo(textcolor) {
-        return (
-            <View>
-                <Block flex={false} row space="between" style={styles.row}>
-                    <TouchableOpacity
-                        onPress={() => this.props.navigation.navigate("BridgeInfo")}>
-                        <Text style={[styles.textSetting, textcolor]}>Bridge Info</Text>
-                    </TouchableOpacity>
-                </Block>
-                <View style={styles.divider} />
-            </View>
-        )
-
-    }
-
     renderClearButton() {
         return (
             <Block bottom flex={1} style={{ marginBottom: 10 }}>
@@ -109,7 +94,24 @@ class SettingScreen extends Component {
 
                                         </Block>
                                         <View style={styles.divider} />
-                                        {this.renderBridgeInfo(textcolor)}
+                                        <View>
+                                            <Block flex={false} row space="between" style={styles.row}>
+                                                <TouchableOpacity
+                                                    onPress={() => this.props.navigation.navigate("BridgeInfo")}>
+                                                    <Text style={[styles.textSetting, textcolor]}>Bridge Info</Text>
+                                                </TouchableOpacity>
+                                            </Block>
+                                            <View style={styles.divider} />
+                                        </View>
+                                        <View>
+                                            <Block flex={false} row space="between" style={styles.row}>
+                                                <TouchableOpacity
+                                                    onPress={() => this.props.navigation.navigate("TimeZone")}>
+                                                    <Text style={[styles.textSetting, textcolor]}>Change Time Zone</Text>
+                                                </TouchableOpacity>
+                                            </Block>
+                                            <View style={styles.divider} />
+                                        </View>
                                     </Block>
                                 )
                                 :

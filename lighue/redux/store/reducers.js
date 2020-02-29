@@ -168,6 +168,17 @@ export const config = (state = {}, action) => {
     }
 }
 
+export const capabilities = (state = {}, action) => {
+    switch (action.type) {
+        case C.FETCH_CAPABILITIES:
+            _state = JSON.parse(JSON.stringify(state));
+            _state = action.payload;
+            return _state;
+        default:
+            return state;
+    }
+}
+
 /** 
  * groups
  * * Redux reducer stores group data it recevied from the API to Redux state
@@ -295,5 +306,6 @@ export default combineReducers({
     scenes,
     status,
     username,
-    nightmode
+    nightmode,
+    capabilities
 });

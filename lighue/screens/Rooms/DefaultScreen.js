@@ -51,12 +51,12 @@ class DefaultScreen extends Component {
         setInterval(() => {
             this.props._fetchEverything();
             this.checkBridgeStatus()
-        }, 3000)
+        }, 5000)
     }
 
     setTapBridgeInfo() {
         this.state.tapBridgeInfo === 4 ? this.setState({ tapBridgeInfo: 0 }) : this.setState({ tapBridgeInfo: this.state.tapBridgeInfo + 1 });
-        console.log(this.props.lights[1])
+        console.log(this.props.capabilities)
     }
 
     checkBridgeStatus() {
@@ -421,7 +421,7 @@ class DefaultScreen extends Component {
             <Block style={backgroundcolor}>
                 <Block flex={false} center row space="between" style={styles.header}>
                     {this.renderLoadingModal()}
-                    <Text h1 googlebold>Explore</Text>
+                    <Text h1 bold>Explore</Text>
                     {this.renderMenu(this.state.active)}
                 </Block>
                 <Block flex={false} style={{
@@ -469,7 +469,8 @@ const mapStateToProps = (state) => {
         nightmode: state.nightmode,
         loading: state.loading,
         cloud_enable: state.cloud_enable,
-        config: state.config
+        config: state.config,
+        capabilities : state.capabilities
     }
 }
 

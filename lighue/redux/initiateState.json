@@ -17,5 +17,6 @@
   "groups": {},
   "schedules": {},
   "scenes": {},
-  "lights": {}
+  "lights": {},
+  "capabilities" : {}
 }

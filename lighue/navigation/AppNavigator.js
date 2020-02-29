@@ -19,6 +19,7 @@ import SearchScreen from '../screens/Lights/SearchBulbScreen';
 import ListBridgeScreen from '../screens/Settings/ListBridgeScreen';
 import PairNewBridgeScreen from '../screens/DiscoveryBridge/PairNewBridgeScreen';
 import ViewScheduleScreen from '../screens/Schedules/ViewScheduleScreen';
+import TimeZoneScreen from '../screens/Settings/TimeZoneScreen';
 
 import { theme } from '../constants';
 import { fromRight } from 'react-navigation-transitions';
@@ -83,6 +84,9 @@ const SetupNavigatorApp = createStackNavigator(
     },
     ViewSchedule: {
       screen: ViewScheduleScreen
+    },
+    TimeZone : {
+      screen : TimeZoneScreen
     }
   },
   {

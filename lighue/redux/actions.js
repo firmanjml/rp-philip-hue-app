@@ -740,11 +740,40 @@ export const GetConfig = (initialCheck = false) => (dispatch, getState) => {
         dispatch(GetAllGroups());
         dispatch(GetAllLights());
         dispatch(GetSchedules());
+        dispatch(GetAllCapabilities());
     }).catch((error) => {
         dispatch(ChangeLoading(false))
         dispatch(ChangeStatus(false))
     })
 }
+
+export const ChangeConfig = (config) => (dispatch, getState) => {
+    const i = getState().bridgeIndex;
+    const bridgeip = getState().bridgeip[i];
+    const username = getState().username[i];
+    const url = getState().cloud_enable === false ? `http://${bridgeip}/api/${username}/config` : `https://api.meethue.com/bridge/${username}/config`;
+    const headers = getState().cloud_enable === true ? { "Authorization": `Bearer ${getState().cloud.token}`, "Content-Type": "application/json" } : { "Content-Type": "application/json" };
+
+    axios({
+        url,
+        method: 'PUT',
+        headers,
+        data: config
+    }).then(res => {
+        var payload = {};
+        res.data.map((data) => {
+            let key = Object.keys(data.success)[0].substring(Object.keys(data.success)[0].lastIndexOf('/') + 1);
+            let value = Object.values(data.success)[0];
+            payload[key] = value;
+        })
+        console.log(key)
+        console.log(value)
+        if (payload) {
+            dispatch(GetConfig());
+        }
+    })
+};
+
 
 /** 
  * SetLampAttributes
@@ -904,3 +933,32 @@ export const CreateSchedules = (scheduleData, navigation) => (dispatch, getState
         );
     }
 };
+
+/** 
+ * GetCapabilities
+ * * Document 10.1 Get all Capabilties
+ * * https://developers.meethue.com/develop/hue-api/10-capabilities-api/#capability-list
+*/
+export const GetAllCapabilities = () => (dispatch, getState) => {
+    const i = getState().bridgeIndex;
+    const bridgeip = getState().bridgeip[i];
+    const username = getState().username[i];
+    const url = getState().cloud_enable === false ? `http://${bridgeip}/api/${username}/capabilities` : `https://api.meethue.com/bridge/${username}/capabilities`;
+    const headers = getState().cloud_enable === true ? { "Authorization": `Bearer ${getState().cloud.token}`, "Content-Type": "application/json" } : { "Content-Type": "application/json" };
+
+    axios({
+        url,
+        method: 'GET',
+        headers
+    }).then((res) => {
+        dispatch({
+            type: C.FETCH_CAPABILITIES,
+            payload: res.data
+        })
+        dispatch(ChangeLoading(false))
+    }).catch((error) => {
+        dispatch(ChangeLoading(false))
+    });
+}
+
+
