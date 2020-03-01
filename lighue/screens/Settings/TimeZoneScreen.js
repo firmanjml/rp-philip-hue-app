@@ -1,12 +1,9 @@
 import React, { Component } from 'react'
-import { Image, StyleSheet, TouchableOpacity, View, Button } from 'react-native'
+import { Image, StyleSheet, TouchableOpacity, View, FlatList } from 'react-native'
 import { Block, Text } from '../../components';
 import { ChangeConfig } from '../../redux/actions'
 import { theme } from '../../constants';
 import { connect } from 'react-redux';
-import Timezone from '../../assets/lottie/timezone.json'
-import LottieView from 'lottie-react-native'
-import PickerModal from 'react-native-picker-modal-view';
 
 class TimeZone extends Component {
     static navigationOptions = ({ navigation }) => {
@@ -21,50 +18,40 @@ class TimeZone extends Component {
     }
 
     state = {
-        animation1: Timezone,
-        selectedItem : {}
+        selectedTimezone: this.props.config.timezone
     }
 
-    componentDidMount() {
-        this.animation1.play();
-    }
-
-    updateTimezone() {
-
-    }
-
-    onSelected(selected) {
-        this.setState({ selectedItem: selected });
-        return selected;
+    updateTimezone(value) {
+        this.props.ChangeConfig({
+            "timezone" : value
+        });
+        this.setState({
+            selectedTimezone : value
+        })
     }
 
     render() {
         const { config, capabilities } = this.props;
-        const { selectedItem } = this.state;
         return (
             <Block style={styles.container}>
-                <Text h1 bold>Timezone Settings</Text>
-                <Block style={{ justifyContent: 'center', alignItems: 'center', marginTop: 30 }}>
-                    {this.state.animation1 &&
-                        <LottieView
-                            ref={animation1 => {
-                                this.animation1 = animation1;
-                            }}
-                            style={{
-                                width: '100%',
-                                height: '100%',
-                                alignSelf: 'center'
-                            }}
-                            loop={true}
-                            source={this.state.animation1}
-                        />}
-                </Block>
-                <Block bottom flex={1} style={{ marginBottom: 10 }}>
-                    <View style={{ marginBottom: 20 }}>
-                        <Text bold>Current Timezone : {config.timezone}</Text>
-                        <Text bold>New Timezone :</Text>
-                    </View>
-                </Block>
+                <Text h1 bold style={{marginBottom : 20}}>Time zone</Text>
+                <FlatList
+                    keyExtractor={(item) => item}
+                    data={Object.keys(capabilities.timezones.values)}
+                    renderItem={({ item: key }) => (
+                        <TouchableOpacity onPress={() => this.updateTimezone(capabilities.timezones.values[key])}>
+                            <Block flex={false} row space="between" style={styles.row}>
+                                <Text style={{fontSize: 16}}>{capabilities.timezones.values[key]}</Text>
+                                {capabilities.timezones.values[key] == this.state.selectedTimezone
+                                    ?
+                                    <Text>Selected</Text>
+                                    :
+                                    null
+                                }
+                            </Block>
+                        </TouchableOpacity>
+                    )}
+                />
             </Block>
         )
     }
@@ -104,7 +91,7 @@ const styles = StyleSheet.create({
         marginTop: 25
     },
     row: {
-        marginTop: 20,
+        marginBottom: 30,
     },
     divider: {
         marginTop: 15,

@@ -17,7 +17,7 @@ import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import ToggleSwitch from "../../components/ToggleSwitch";
 import { ScrollView, FlatList } from 'react-native-gesture-handler';
 import { connect } from 'react-redux';
-import { SetLampState } from '../../redux/actions';
+import { SetLampState, SetGroupState } from '../../redux/actions';
 import { GetAllGroups, GetAllLights, GetConfig, ChangeSaving, SearchForNewLights } from '../../redux/actions';
 import DialogInput from 'react-native-dialog-input';
 import {
@@ -26,8 +26,6 @@ import {
     MenuOption,
     MenuTrigger,
 } from 'react-native-popup-menu';
-
-import { ColorizeRows, ColorizeRowsRandom } from '../../components/ColorConvert';
 
 const { width } = Dimensions.get('window');
 
@@ -43,48 +41,19 @@ class DefaultScreen extends Component {
         categories: [],
         refreshing: false,
         alertStatus: false,
+        houseOn : true
     }
 
     componentWillMount() {
-        this.props._fetchEverything(true);
-        this.props._changeSavingToFalse(false);
+        this.props._fetchEverything();
         setInterval(() => {
             this.props._fetchEverything();
-            this.checkBridgeStatus()
         }, 5000)
     }
 
     setTapBridgeInfo() {
         this.state.tapBridgeInfo === 4 ? this.setState({ tapBridgeInfo: 0 }) : this.setState({ tapBridgeInfo: this.state.tapBridgeInfo + 1 });
         console.log(this.props.capabilities)
-    }
-
-    checkBridgeStatus() {
-        if (!this.props.status && !this.state.alertStatus && !this.props.cloud_enable) {
-            this.setState({
-                alertStatus: true
-            })
-            Alert.alert(
-                'No connection to Philips Hue Bridge',
-                "Please try to reconnect",
-                [{
-                    text: 'Cancel',
-                    onPress: () => { this.setState({ alertStatus: false }) },
-                    style: 'cancel',
-                },
-                {
-                    text: "Reconnect",
-                    onPress: () => {
-                        {
-                            this.setState({ alertStatus: false }),
-                                this.props._fetchEverything(true),
-                                console.log("reconnect")
-                        }
-                    }
-                }],
-                { cancelable: false }
-            );
-        }
     }
 
     renderLoadingModal() {
@@ -111,7 +80,7 @@ class DefaultScreen extends Component {
             <TouchableOpacity
                 key={`tab-${tab}`}
                 onPress={() => {
-                    this.setState({ active: tab })
+                    this.setState({ active: tab });
                 }}
                 style={[
                     styles.tab,
@@ -173,76 +142,92 @@ class DefaultScreen extends Component {
     }
 
     displayLayout() {
-        const { navigation, groups, nightmode, lights, schedules, _changeLightState } = this.props;
+        const { navigation, groups, nightmode, lights, schedules, _changeLightState, _changeGroupStateByID } = this.props;
         const { colors } = theme;
         const refreshtextcolor = nightmode ? colors.white : colors.black
         const textcolor = { color: nightmode ? colors.white : colors.black }
         const graytextcolor = { color: nightmode ? colors.gray2 : colors.black }
-        const marginTop = { marginTop: Platform.OS == "android" ? 20 : 0 }
+        const marginTop = { marginTop: Platform.OS == "android" ? 10 : 0 }
 
         if (this.state.active === 'ROOMS') {
             return (
-                <ScrollView
-                    showsVerticalScrollIndicator={false}
-                    style={{ paddingVertical: theme.sizes.base }}
-                    refreshControl={
-                        <RefreshControl
-                            refreshing={this.state.refreshing}
-                            title={"Swipe to refresh...."}
-                            titleColor={refreshtextcolor}
-                            onRefresh={async () => {
-                                this.setState({ refreshing: true })
-                                await this.props._fetchAllGroups();
-                                setTimeout(() => {
-                                    this.setState({ refreshing: false })
-                                }, 800);
-                            }} />
-                    }>
-                    <Block flex={false} row space="between" style={[styles.categories, marginTop]}>
-                        {
-                            Object.entries(groups).length === 0 && groups.constructor === Object ?
-                                <Block middle center>
-                                    <Text h1 bold style={[textcolor]}>
-                                        No Room created
+                <View>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: theme.sizes.base * 2 }}>
+                        <Text header bold style={{color : 'white', alignSelf : 'center'}}>Whole Home</Text>
+                        <ToggleSwitch
+                            offColor="#DDDDDD"
+                            onColor={theme.colors.secondary}
+                            onToggle={(value) => {
+                                _changeGroupStateByID(0, {
+                                    "on": value,
+                                  });
+                                  this.setState({houseOn : !this.state.houseOn})
+                            }}
+                            isOn={this.state.houseOn}
+                        />
+                    </View>
+                    <ScrollView
+                        showsVerticalScrollIndicator={false}
+                        style={{ paddingVertical: theme.sizes.base }}
+                        refreshControl={
+                            <RefreshControl
+                                refreshing={this.state.refreshing}
+                                title={"Swipe to refresh...."}
+                                titleColor={refreshtextcolor}
+                                onRefresh={async () => {
+                                    this.setState({ refreshing: true })
+                                    await this.props._fetchAllGroups();
+                                    setTimeout(() => {
+                                        this.setState({ refreshing: false })
+                                    }, 800);
+                                }} />
+                        }>
+                        <Block flex={false} row space="between" style={[styles.categories, marginTop]}>
+                            {
+                                Object.entries(groups).length === 0 && groups.constructor === Object ?
+                                    <Block middle center>
+                                        <Text h1 bold style={[textcolor]}>
+                                            No Room created
                                     </Text>
-                                    <TouchableOpacity
-                                        onPress={() => {
-                                            navigation.navigate('AddRoom');
-                                        }}>
-                                        <Text h2 style={{ marginTop: 5, color: '#20D29B' }}>Add Rooms</Text>
-                                    </TouchableOpacity>
-                                </Block>
-                                :
-                                Object.keys(groups).map(val => (
-                                    <TouchableOpacity
-                                        key={val}
-                                        onPress={() => {
-                                            this.props._fetchAllGroups(),
-                                                setTimeout(() => {
-                                                    navigation.navigate('ControlRoom', {
-                                                        id: val,
-                                                        class: groups[val].class > -1 ? groups[val].class : "Other"
-                                                    });
-                                                }, 700);
-                                        }}>
-                                        <Card center middle shadow style={styles.category}>
-                                            <Badge margin={[0, 0, 15]} size={50} color="rgba(41,216,143,0.20)">
-                                                {
-                                                    constant.room_class.indexOf(groups[val].class) > -1
-                                                        ?
-                                                        <Image style={{ width: constant.class_base64[groups[val].class].width, height: constant.class_base64[groups[val].class].height }} source={{ uri: constant.class_base64[groups[val].class].uri }} />
-                                                        :
-                                                        <Image style={{ width: constant.class_base64["Other"].width, height: constant.class_base64["Other"].height }} source={{ uri: constant.class_base64["Other"].uri }} />
-                                                }
-                                            </Badge>
-                                            <Text medium height={30} style={styles.roomText}>{groups[val].name.length > 12 ? groups[val].name.substring(0, 12) + "..." : groups[val].name}</Text>
-                                            <Text gray caption>{groups[val].lights ? groups[val].lights.length : '0'} bulbs</Text>
-                                        </Card>
-                                    </TouchableOpacity>
-                                ))
-                        }
-                    </Block>
-                </ScrollView>
+                                        <TouchableOpacity
+                                            onPress={() => {
+                                                navigation.navigate('AddRoom');
+                                            }}>
+                                            <Text h2 style={{ marginTop: 5, color: '#20D29B' }}>Add Rooms</Text>
+                                        </TouchableOpacity>
+                                    </Block>
+                                    :
+                                    Object.keys(groups).map(val => (
+                                        <TouchableOpacity
+                                            key={val}
+                                            onPress={() => {
+                                                this.props._fetchAllGroups(),
+                                                    setTimeout(() => {
+                                                        navigation.navigate('ControlRoom', {
+                                                            id: val,
+                                                            class: groups[val].class > -1 ? groups[val].class : "Other"
+                                                        });
+                                                    }, 700);
+                                            }}>
+                                            <Card center middle shadow style={styles.category}>
+                                                <Badge margin={[0, 0, 15]} size={50} color="rgba(41,216,143,0.20)">
+                                                    {
+                                                        constant.room_class.indexOf(groups[val].class) > -1
+                                                            ?
+                                                            <Image style={{ width: constant.class_base64[groups[val].class].width, height: constant.class_base64[groups[val].class].height }} source={{ uri: constant.class_base64[groups[val].class].uri }} />
+                                                            :
+                                                            <Image style={{ width: constant.class_base64["Other"].width, height: constant.class_base64["Other"].height }} source={{ uri: constant.class_base64["Other"].uri }} />
+                                                    }
+                                                </Badge>
+                                                <Text medium height={30} style={styles.roomText}>{groups[val].name.length > 12 ? groups[val].name.substring(0, 12) + "..." : groups[val].name}</Text>
+                                                <Text gray caption>{groups[val].lights ? groups[val].lights.length : '0'} bulbs</Text>
+                                            </Card>
+                                        </TouchableOpacity>
+                                    ))
+                            }
+                        </Block>
+                    </ScrollView>
+                </View>
             )
         } else if (this.state.active === "LIGHTS") {
             return (
@@ -260,7 +245,7 @@ class DefaultScreen extends Component {
                             keyExtractor={(item) => item}
                             data={Object.keys(lights)}
                             renderItem={({ item: key }) => (
-                                <View style={[styles.bulbRow, { backgroundColor: ColorizeRows(lights[key].state.xy[0], lights[key].state.xy[1], lights[key].state.bri) }]}>
+                                <View style={[styles.bulbRow, { backgroundColor: 'white' }]}>
                                     <TouchableOpacity
                                         onPress={() => {
                                             this.props._fetchAllLights();
@@ -269,10 +254,9 @@ class DefaultScreen extends Component {
                                                     id: key
                                                 });
                                             }, 700);
-                                            console.log(lights)
                                         }}>
                                         <View style={{ marginTop: 20, flexDirection: 'row', justifyContent: 'space-between' }}>
-                                            <Text googlemedium style={{ fontSize: 21, marginLeft: 20, color: 'white' }}>{lights[key].name.length > 15 ? lights[key].name.substring(0, 15) + "..." : lights[key].name}</Text>
+                                            <Text googlemedium black style={{ fontSize: 16, marginLeft: 20 }}>{lights[key].name.length > 25 ? lights[key].name.substring(0, 15) + "..." : lights[key].name}</Text>
                                             <View style={{ marginRight: 20 }}>
                                                 <ToggleSwitch
                                                     offColor="#DDDDDD"
@@ -280,18 +264,19 @@ class DefaultScreen extends Component {
                                                     onToggle={(value) => {
                                                         _changeLightState(key, {
                                                             "on": value,
-                                                        })
+                                                        });
+                                                        this.props._fetchEverything();
                                                     }}
                                                     isOn={lights[key].state.on}
                                                 />
                                             </View>
                                         </View>
                                         <View style={{ marginLeft: 20 }}>
-                                            <Text style={{ marginTop: 5, color: 'white' }}>Brightness {Math.round((lights[key].state.bri * 100) / 254)}%</Text>
-                                            <Text style={{ marginTop: 5, color: 'white' }}>Saturation {Math.round((lights[key].state.sat * 100) / 254)}%</Text>
+                                            <Text gray style={{ marginTop: 5 }}>Brightness : {Math.round((lights[key].state.bri * 100) / 254)}%</Text>
+                                            <Text gray style={{ marginTop: 5 }}>Saturation : {Math.round((lights[key].state.sat * 100) / 254)}%</Text>
                                             <View style={{ marginTop: 10, flexDirection: 'row' }}>
-                                                <MaterialIcons name="room" size={20} color='white'></MaterialIcons>
-                                                <Text style={{ marginLeft: 5, color: 'white' }}>Room</Text>
+                                                <MaterialIcons name="room" size={20} color='gray'></MaterialIcons>
+                                                <Text gray style={{ marginLeft: 5 }}>Room</Text>
                                             </View>
                                         </View>
                                     </TouchableOpacity>
@@ -317,16 +302,16 @@ class DefaultScreen extends Component {
                         data={Object.keys(schedules)}
                         renderItem={({ item: key }) => (
                             <View style={{ paddingHorizontal: theme.sizes.base * 2 }}>
-                                <TouchableOpacity onPress={() => navigate('ViewSchedule', { id: key })}>
+                                <TouchableOpacity onPress={() => navigation.navigate('ViewSchedule', { id: key })}>
                                     <View style={{
-                                        backgroundColor: ColorizeRowsRandom(),
+                                        backgroundColor: 'white',
                                         paddingBottom: 20,
                                         paddingTop: 20,
                                         marginBottom: 20,
                                         borderRadius: 10
                                     }}>
                                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginLeft: 20, marginRight: 20 }}>
-                                            <Text googlebold style={[{ fontSize: 21, alignSelf: 'center' }]}>{`${schedules[key].name}`}</Text>
+                                            <Text googlemedium black style={[{ fontSize: 16, alignSelf: 'center' }]}>{`${schedules[key].name.split("#")[0]} (${schedules[key].name.split("#")[1]})`}</Text>
                                             <ToggleSwitch
                                                 offColor="#DDDDDD"
                                                 onColor={theme.colors.secondary}
@@ -334,10 +319,11 @@ class DefaultScreen extends Component {
                                                 isOn={schedules[key].status}
                                             />
                                         </View>
-                                        <Text style={[{ fontSize: 15, marginLeft: 20, marginTop: 10 }]}>{`${schedules[key].description}`}</Text>
+                                        <Text gray style={[{ fontSize: 15, marginLeft: 20, marginTop: 10 }]}>{`${schedules[key].description}`}</Text>
+                                        <Text gray style={[{ fontSize: 15, marginLeft: 20, marginTop: 10 }]}>Location : {schedules[key].command.address.split("/")[3] == "groups" ? "Room" : schedules[key].command.address.split("/")[3] == "lights" ? "Bulb" : "House"}</Text>
                                         <View style={{ flexDirection: 'row', marginLeft: 20, marginTop: 10 }}>
-                                            <Ionicons name="ios-alarm" size={20} color="white"></Ionicons>
-                                            <Text googlemedium style={[{ fontSize: 15, marginLeft: 10 }]}>{`${schedules[key].time}`}</Text>
+                                            <Ionicons name="ios-alarm" size={20} color="gray"></Ionicons>
+                                            <Text googlemedium gray style={[{ fontSize: 15, marginLeft: 10 }]}>{`${schedules[key].time}`}</Text>
                                         </View>
                                     </View>
                                 </TouchableOpacity>
@@ -450,6 +436,9 @@ const mapDispatchToProps = (dispatch) => {
         _changeLightState(id, data) {
             return dispatch(SetLampState(id, data));
         },
+        _changeGroupStateByID(id, data) {
+            return dispatch(SetGroupState(id, data));
+          },
         _fetchEverything(isLoading) {
             return dispatch(GetConfig(isLoading));
         },
@@ -470,7 +459,7 @@ const mapStateToProps = (state) => {
         loading: state.loading,
         cloud_enable: state.cloud_enable,
         config: state.config,
-        capabilities : state.capabilities
+        capabilities: state.capabilities
     }
 }
 

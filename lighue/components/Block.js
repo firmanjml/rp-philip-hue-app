@@ -193,6 +193,7 @@ export const styles = StyleSheet.create({
   container: {
     justifyContent: 'flex-start',
     paddingHorizontal: theme.sizes.base * 2,
+    marginTop : 10
   },
   containerNoHeader: {
     justifyContent: 'flex-start',

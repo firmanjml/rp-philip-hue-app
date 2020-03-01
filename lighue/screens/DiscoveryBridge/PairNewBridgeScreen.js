@@ -60,7 +60,7 @@ class PairNewBridgeScreen extends Component {
                         Link to Philips Hue
                     </Text>
                     <Text paragraph style={[{ marginTop: 20 }, textcolor]}>
-                        To link this device with the Bridge, press the push-link button of the Hue bridge you want to connect to.
+                        To link this device with the Bridge, press the big button of the Hue bridge you want to connect to.
                     </Text>
                     <Block marginTop={30} justifyContent={'center'} alignItems={'center'}>
                         <Image
@@ -92,7 +92,7 @@ class PairNewBridgeScreen extends Component {
                         />}
                         <Block marginTop={20}>
                             <Text paragraph style={textcolor}>
-                                Note: You will have 30 seconds to press the push-link button
+                                Note: You will have 30 seconds to press the big button
                             </Text>
                         </Block>
                     </Block>

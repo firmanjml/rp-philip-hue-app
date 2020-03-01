@@ -72,8 +72,9 @@ class AuthenticationSetting extends React.Component {
                             <Text style={[textcolor, { marginTop: 15 }]}>All the {type} on this device can be used to unlock the Lighue app.</Text>
                         </View>
                         <Button
+                           color="#0194FD"
                             onPress={() => this.props.navigation.navigate("ListRoom")}>
-                            <Text center semibold white>Next</Text>
+                            <Text center bold white>Next</Text>
                         </Button>
                     </Block>
                 </Block>

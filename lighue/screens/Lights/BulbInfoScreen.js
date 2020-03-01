@@ -91,7 +91,7 @@ class BulbInfoScreen extends React.Component {
         </MenuTrigger>
         <MenuOptions style={{ padding: 15 }}>
           <MenuOption value={1}>
-            <Text h3>Edit Bulb Name</Text>
+            <Text black h3>Edit Bulb Name</Text>
           </MenuOption>
         </MenuOptions>
       </Menu>
@@ -105,7 +105,7 @@ class BulbInfoScreen extends React.Component {
       // edit lamp
       this.props.navigation.navigate('EditBulb', {
         id: this.state.id,
-        name: this.props.lights[this.state.id].name
+        name: this.state.name
       })
     }
   }
@@ -120,7 +120,7 @@ class BulbInfoScreen extends React.Component {
       <Block style={backgroundcolor}>
         <Block container style={{ marginBottom: 20 }}>
           <Block flex={false} row space="between">
-            <Text h1 bold style={[titlecolor, { marginTop: 10 }]}>Bulb Info</Text>
+            <Text h1 bold style={titlecolor}>Bulb Info</Text>
             {this.renderMenu()}
           </Block>
           <ScrollView>
@@ -156,8 +156,9 @@ class BulbInfoScreen extends React.Component {
             </Block>
             <Block bottom flex={1}>
               <Button
+                color='red'
                 onPress={() => this.alertUserDeletion()}>
-                <Text center semibold white>Delete Bulb</Text>
+                <Text center bold white>Delete Bulb</Text>
               </Button>
             </Block>
           </ScrollView>

@@ -73,6 +73,7 @@ class ManualScreen extends React.Component {
                     </Block>
                     <Block middle flex={1}>
                         <Button
+                            color="#0194FD"
                             onPress={() => {
                                 if (validator.isIP(this.state.manualIP, [4])) {
                                     this.props._setIP(this.props.navigation, this.state.manualIP)

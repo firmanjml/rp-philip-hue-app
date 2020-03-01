@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Animated, Image, FlatList, StyleSheet } from 'react-native';
-import { Button, Block, Text } from '../../components';
+import { Block, Text, Button } from '../../components';
 import { theme } from '../../constants';
 import Layout from '../../constants/Layout';
 import SnackBar from 'rn-snackbar';
@@ -89,14 +89,14 @@ class WelcomeScreen extends Component {
         const {navigation, bridgeip} = this.props;
         if (bridgeip) {
             return (
-                <Button shadow onPress={() => navigation.navigate('LinkButton')}>
-                        <Text center semibold>Pair Bridge</Text>
+                <Button color="#0194FD" onPress={() => navigation.navigate('LinkButton')}>
+                        <Text center bold>Pair Bridge</Text>
                     </Button>
             )
         } else {
             return (
-                <Button shadow onPress={() => navigation.navigate('ManualIP')}>
-                        <Text center semibold>Searching</Text>
+                <Button color="grey" onPress={() => navigation.navigate('ManualIP')}>
+                        <Text center bold>Searching</Text>
                 </Button>
             )
        }  
@@ -111,10 +111,10 @@ class WelcomeScreen extends Component {
             <Block style={backgroundcolor}>
                 <Block center bottom flex={0.4}>
                     <Text h1 center bold style={textcolor}>
-                        Your Smarter Home
+                        Lighue
                     </Text>
                     <Text h3 gray2 style={{ marginTop: theme.sizes.padding / 2 }}>
-                        Enjoy the experience
+                        Enjoy the smart experience
                     </Text>
                 </Block>
                 <Block center middle>
@@ -124,7 +124,7 @@ class WelcomeScreen extends Component {
                 <Block middle flex={0.5} margin={[0, theme.sizes.padding * 2]}>
                     {this.renderPairBtn()}
                     <Button shadow onPress={() => navigation.navigate('ManualIP')}>
-                        <Text center semibold>Manual Search</Text>
+                        <Text center black bold>Manual Search</Text>
                     </Button>
                 </Block>
             </Block>

@@ -154,6 +154,17 @@ class AddSchedules extends Component {
         const { username, bridgeIndex } = this.props;
         const { homeSelected, roomSelected, bulbSelected,
             categories, time, name, description, enabled, mode, date } = this.state;
+        
+        console.log(homeSelected);
+        console.log(roomSelected);
+        console.log(bulbSelected);
+        console.log(categories);
+        console.log(time);
+        console.log(name);
+        console.log(description);
+        console.log(enabled);
+        console.log(mode);
+        console.log(date);
 
         if (name == null ||
             time == "Add time" ||
@@ -484,6 +495,7 @@ class AddSchedules extends Component {
         return (
             <Block bottom flex={1} style={{ marginBottom: 10 }}>
                 <Button
+                    color='#0194FD'
                     onPress={() => this.confirmAddSchedule()}>
                     <Text center semibold white>Create new schedule</Text>
                 </Button>

@@ -281,7 +281,7 @@ const mapDispatchToProps = dispatch => {
 
 const styles = StyleSheet.create({
   textInput: {
-    height: 25,
+    height: 30,
     borderBottomWidth: 0.5,
     borderRadius: 0,
     borderWidth: 0,

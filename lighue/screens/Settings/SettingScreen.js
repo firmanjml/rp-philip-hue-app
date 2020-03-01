@@ -51,75 +51,62 @@ class SettingScreen extends Component {
         return (
             <Block style={backgroundcolor}>
                 <Block container>
-                    <Text h1 bold style={[textcolor, { marginTop: 10 }]}>Settings</Text>
+                    <Text h1 bold>Settings</Text>
                     <ScrollView>
-                        {
-                            hardwareSupport != 0 ?
-                                <View>
-                                    <Block flex={false} row space="between" style={styles.row}>
-                                        <Text style={[styles.textSetting, textcolor]}>Enable Fingerprint</Text>
-                                        <ToggleSwitch
-                                            offColor="#DDDDDD"
-                                            onColor={theme.colors.secondary}
-                                            isOn={this.props.authentication}
-                                            onToggle={(boolean) => this.props._UpdateAuthentication(boolean)}
-                                        />
-                                    </Block>
-                                    <View style={styles.divider} />
-                                </View>
-                                :
-                                <View></View>
-                        }
-                        {
-                            this.props.bridgeip.length > 0 ?
-                                (
-                                    <Block>
-                                        <Block flex={false} row space="between" style={styles.row}>
-                                            {
-                                                cloud_enable === true ?
-                                                    <Text style={[styles.textSetting, { color: theme.colors.gray2 }]}>Connected via Cloud</Text>
-                                                    :
-                                                    <TouchableOpacity
-                                                        onPress={() => this._handleoAuth()}>
-                                                        <Text style={[styles.textSetting, textcolor]}>Setup Remote Control via Cloud</Text>
-                                                    </TouchableOpacity>
-                                            }
-                                        </Block>
-                                        <View style={styles.divider} />
-                                        <Block flex={false} row space="between" style={styles.row}>
-                                            <TouchableOpacity
-                                                onPress={() => this.props.navigation.navigate("ListBridge")}>
-                                                <Text style={[styles.textSetting, textcolor]}>{(bridgeip.length > 1) ? "Switch Bridge" : "Add new Bridge"}</Text>
-                                            </TouchableOpacity>
-
-                                        </Block>
-                                        <View style={styles.divider} />
-                                        <View>
+                        <Block>
+                            <Block flex={false} column style={styles.row}>
+                                <Text gray googlebold style={styles.textSetting}>Bridge Configuration</Text>
+                                <TouchableOpacity
+                                    onPress={() => this.props.navigation.navigate("ListBridge")}>
+                                    <Text style={[styles.textSetting, textcolor]}>{(bridgeip.length > 1) ? "Switch Bridge" : "Add new Bridge"}</Text>
+                                </TouchableOpacity>
+                                <View style={styles.divider} />
+                                {
+                                    cloud_enable === true ?
+                                        <Text style={[styles.textSetting, { color: theme.colors.gray2 }]}>Connected via Cloud</Text>
+                                        :
+                                        <TouchableOpacity
+                                            onPress={() => this._handleoAuth()}>
+                                            <Text style={[styles.textSetting, textcolor]}>Setup Remote Control via Cloud</Text>
+                                        </TouchableOpacity>
+                                }
+                                <View style={styles.divider} />
+                                <TouchableOpacity
+                                    onPress={() => this.props.navigation.navigate("BridgeInfo")}>
+                                    <Text style={[styles.textSetting, textcolor]}>Bridge Info</Text>
+                                </TouchableOpacity>
+                                <View style={styles.divider} />
+                                <TouchableOpacity
+                                    onPress={() => this.props.navigation.navigate("TimeZone")}>
+                                    <Text style={[styles.textSetting, textcolor]}>Change Time Zone</Text>
+                                </TouchableOpacity>
+                                <View style={styles.divider} />
+                            </Block>
+                            <View>
+                                {
+                                    hardwareSupport != 0 ?
+                                        <Block flex={false} column style={styles.row}>
+                                            <Text gray googlebold style={styles.textSetting}>Lighue</Text>
                                             <Block flex={false} row space="between" style={styles.row}>
-                                                <TouchableOpacity
-                                                    onPress={() => this.props.navigation.navigate("BridgeInfo")}>
-                                                    <Text style={[styles.textSetting, textcolor]}>Bridge Info</Text>
-                                                </TouchableOpacity>
+                                                <Text style={[styles.textSetting, textcolor, {alignSelf : 'center'}]}>Enable Fingerprint</Text>
+                                                <ToggleSwitch
+                                                    offColor="#DDDDDD"
+                                                    onColor={theme.colors.secondary}
+                                                    isOn={this.props.authentication}
+                                                    onToggle={(boolean) => this.props._UpdateAuthentication(boolean)}
+                                                />
                                             </Block>
                                             <View style={styles.divider} />
-                                        </View>
-                                        <View>
-                                            <Block flex={false} row space="between" style={styles.row}>
-                                                <TouchableOpacity
-                                                    onPress={() => this.props.navigation.navigate("TimeZone")}>
-                                                    <Text style={[styles.textSetting, textcolor]}>Change Time Zone</Text>
-                                                </TouchableOpacity>
-                                            </Block>
-                                            <View style={styles.divider} />
-                                        </View>
-                                    </Block>
-                                )
-                                :
-                                null
-                        }
+                                        </Block>
+                                        :
+                                        <View></View>
+                                }
+                            
+                            </View>
+                        </Block>
                     </ScrollView>
-                </Block>
             </Block>
+            </Block >
         )
     }
 
@@ -206,9 +193,8 @@ const styles = StyleSheet.create({
         marginTop: 20,
     },
     textSetting: {
-        fontSize: 16,
-        color: 'black',
-        alignSelf: "center"
+        marginTop: 18,
+        fontSize: 16
     },
     divider: {
         marginTop: 20,

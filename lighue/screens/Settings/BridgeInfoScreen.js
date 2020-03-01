@@ -38,9 +38,8 @@ class BridgeInfo extends Component {
         return (
             <Block style={styles.container}>
                 <Block flex={false} center row space="between" style={styles.header}>
-                    <Text h1 googlebold>{config.name}</Text>
+                    <Text h1 bold>{config.name}</Text>
                 </Block>
-                <Text gray style={{ marginTop: 10 }}>Bridge Information</Text>
                 <ScrollView>
                     <Block flex={false} column>
                         <Text gray googlebold style={styles.textSetting}>Connection</Text>
@@ -97,9 +96,6 @@ const styles = StyleSheet.create({
     textSetting: {
         marginTop: 18,
         fontSize: 16
-    },
-    header: {
-        marginTop: 25
     },
     row: {
         marginTop: 20,

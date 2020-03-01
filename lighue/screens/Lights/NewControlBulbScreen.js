@@ -187,15 +187,15 @@ class NewControlBulbScreen extends Component {
                 </MenuTrigger>
                 <MenuOptions style={{ padding: 15 }}>
                     <MenuOption value={1}>
-                        <Text h3>Apply Hex Code Color</Text>
+                        <Text black h3>Apply Hex Code Color</Text>
                     </MenuOption>
                     <View style={styles.divider} />
                     <MenuOption value={2}>
-                        <Text h3>Modify Transition Time</Text>
+                        <Text black h3>Modify Transition Time</Text>
                     </MenuOption>
                     <View style={styles.divider} />
                     <MenuOption value={3}>
-                        <Text h3>Show bulb info</Text>
+                        <Text black h3>Show bulb info</Text>
                     </MenuOption>
                 </MenuOptions>
             </Menu>
